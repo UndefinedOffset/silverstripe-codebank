@@ -1,0 +1,26 @@
+Requirements:
+-------------
+    PHP 5.2.x or greater
+    MySQL 5.x or greater
+
+
+Installation:
+-------------
+    1. Make sure that the config folder is writable by PHP
+    2. Make sure that temp exists and is writable by PHP
+    3. Make sure that install.css, install.php, and install.sql are also writable by PHP
+    4. Create a database for Code Bank to use in MySQL, you will need this during the installer
+    5. Hit install.php in your browser and fill out the required information.
+    6. If the installer completes successfully you will now be able to use the remote server in Code Bank's desktop client. Just set the server path to be http://{your domain}/{path to root of code bank server folder}
+    7. Ensure the installer removed all install files (install.php, install.css, install.sql and update.php) before using your server again
+
+Upgrading to new versions:
+-----------
+    1. Visit http://programs.edchipman.ca/applications/code-bank/ and download the latest version of the server
+    2. Extract all files in the archieve over your existing server install
+    3. Make sure that the config folder is writable by PHP
+    4. Make sure that temp exists and is writable by PHP
+    5. Make sure that install.css, install.php, install.sql, and update.php are also writable by PHP
+    6. Backup your code bank server database
+    7. Hit update.php in your browser this will automatically upgrade the server database if needed
+    8. Ensure the updater removed all install files (install.php, install.css, install.sql and update.php) before using your server again

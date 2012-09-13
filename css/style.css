@@ -1,0 +1,1414 @@
+html, body {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #343434;
+    
+    height: 100%;
+    
+    margin: 0;
+    padding: 0;
+    
+    overflow: auto;
+}
+
+body {
+    background: url(./../images/background.png) repeat-x;
+}
+
+*:focus {
+    outline: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    text-decoration: underline;
+}
+
+.noScript {
+    background: #FFFFFF;
+    
+    position: fixed;
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 100%;
+    
+    z-index: 10000;
+}
+
+div.clear {
+    clear: both;
+}
+
+#loadingSpinner {
+    position: absolute;
+    top: 5px;
+    left: 275px;
+    
+    line-height: 24px;
+    
+    text-align: center;
+}
+
+#loadingSpinner img {
+    margin-right: 5px;
+    
+    vertical-align: middle;
+}
+
+#NotifyArea {
+    background: url(./../images/notification-bar.png) repeat-x;
+    
+    position: absolute;
+    left: 0;
+    top: 64px;
+    
+    width: 100%;
+    height: 32px;
+    
+    z-index: 1200;
+}
+
+#NotifyArea.good {
+    background-position: 0 -32px;
+}
+
+#NotifyArea.error {
+    background-position: 0 -64px;
+}
+
+#NotifyArea .content {
+    background: url(./../images/notify-icons.png) no-repeat 35px 0;
+    
+    color: #BDA410;
+    
+    line-height: 32px;
+    
+    width: 871px;
+    height: 32px;
+    
+    margin: 0 auto;
+    padding: 0 66px;
+}
+
+#NotifyArea.good .content {
+    background-position: 35px -32px;
+    
+    color: #006700;
+}
+
+#NotifyArea.error .content {
+    background-position: 35px -64px;
+    
+    color: #CF0002;
+}
+
+#NotifyArea.loading .content {
+    background-position: 35px -96px;
+}
+
+#NotifyArea a {
+    font-weight: bold;
+    color: #BDA410;
+    
+    text-decoration: underline;
+}
+
+#NotifyArea a:hover, #NotifyArea a:active {
+    text-decoration: none;
+}
+
+#NotifyArea.good a {
+    color: #006700;
+}
+
+#NotifyArea.error a {
+    color: #CF0002;
+}
+
+.bodyWrapper {
+    position: relative;
+    
+    height: 100%;
+    
+    overflow: hidden;
+}
+
+#contentWrapper {
+    position: relative;
+    
+    width: 1003px;
+    height: 100%;
+    
+    margin: 0 auto;
+    
+    overflow: hidden;
+}
+
+.header {
+    position: relative;
+    
+    width: 1003px;
+    height: 64px;
+    
+    margin: 0 auto;
+}
+
+.header #Logo {
+    background: url(./../images/logo.png) no-repeat;
+    
+    width: 252px;
+    height: 22px;
+    
+    padding-top: 42px;
+    
+    font-size: 10px;
+    
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    
+    cursor: default;
+}
+
+.header #TopNav {
+    display: none;
+    
+    position: absolute;
+    right: 0;
+    top: 5px;
+}
+
+.header #TopNav a {
+    font-size: 12px;
+    color: #000000;
+}
+
+.header #TabNav {
+    display: none;
+    
+    position: absolute;
+    left: 274px;
+    top: 33px;
+}
+
+.header #TabNav .tab {
+    background: url(./../images/tabs.png) no-repeat;
+    
+    display: block;
+    
+    float: left;
+    
+    width: 91px;
+    height: 31px;
+}
+
+.header #TabNav .tab.disabled {
+    cursor: default;
+}
+
+.header #TabNav #snippetsButton:hover, .header #TabNav #snippetsButton:active, .header #TabNav #snippetsButton.selected {
+    background-position: 0 -31px;
+}
+
+.header #TabNav #manageUserAccounts.disabled {
+    background-position: 0 -62px;
+}
+
+.header #TabNav #newSnippetsButton {
+    background-position: -91px 0;
+    
+    width: 101px;
+}
+
+.header #TabNav #newSnippetsButton:hover, .header #TabNav #newSnippetsButton:active, .header #TabNav #newSnippetsButton.selected {
+    background-position: -91px -31px;
+}
+
+.header #TabNav #manageUserAccounts.disabled {
+    background-position: -91px -62px;
+}
+
+.header #TabNav #manageUserAccounts {
+    background-position: -192px 0;
+    
+    width: 161px;
+}
+
+.header #TabNav #manageUserAccounts:hover, .header #TabNav #manageUserAccounts:active, .header #TabNav #manageUserAccounts.selected {
+    background-position: -192px -31px;
+}
+
+.header #TabNav #manageUserAccounts.disabled {
+    background-position: -192px -62px;
+}
+
+.header #TabNav #manageIPAgreement {
+    background-position: -353px 0;
+    
+    width: 201px;
+}
+
+.header #TabNav #manageLanguages:hover, .header #TabNav #manageLanguages:active, .header #TabNav #manageLanguages.selected {
+    background-position: -554px -31px;
+}
+
+.header #TabNav #manageLanguages.disabled {
+    background-position: -554px -62px;
+}
+
+.header #TabNav #manageLanguages {
+    background-position: -554px 0;
+    
+    width: 161px;
+}
+
+.header #TabNav #manageIPAgreement:hover, .header #TabNav #manageIPAgreement:active, .header #TabNav #manageIPAgreement.selected {
+    background-position: -353px -31px;
+}
+
+.header #TabNav #manageIPAgreement.disabled {
+    background-position: -353px -62px;
+}
+
+.footer {
+    font-size: 12px;
+    color: #C3C3C3;
+    
+    border-top: 1px solid #C3C3C3;
+    
+    padding-top: 24px;
+    
+    text-align: center;
+}
+
+.footer p {
+    margin-bottom: 0;
+}
+
+.footer a {
+    color: #C3C3C3;
+}
+
+fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+form label {
+    display: block;
+    
+    margin-bottom: 2px;
+}
+
+form label span {
+    color: #CC0000;
+    
+    padding-right: 1ex;
+}
+
+fieldset legend {
+    font-size: 16px;
+    font-weight: bold;
+    
+    padding: 20px 0 10px 0;
+}
+
+form .Actions, form .field {
+    position: relative;
+    
+    margin-top: 10px;
+}
+
+form input, form textarea, form select {
+    background: #F8F8F8;
+    
+    border: 1px solid #AAAAAA;
+    
+    color: #000000;
+    
+    padding: 3px;
+    
+    width: 300px;
+}
+
+form select {
+    width: 308px;
+}
+
+form input:disabled, form textarea:disabled, form select:disabled {
+    color: #CCCCCC;
+}
+
+form input {
+    height: 16px;
+}
+
+form textarea {
+    resize: none;
+}
+
+form label.error {
+    background: #CC0000;
+    
+    position: absolute;
+    left: 0;
+    top: 100%;
+    
+    color: #FFFFFF;
+    
+    width: 297px;
+    min-height: 18px;
+    
+    line-height: 18px;
+    
+    margin-bottom: 0;
+    padding: 3px 3px 3px 8px;
+    
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    
+    -webkit-box-shadow: 1px 2px 2px #000000;
+    -moz-box-shadow: 1px 2px 2px #000000;
+    box-shadow: 1px 2px 2px #000000;
+    
+    -webkit-box-shadow: 1px 2px 2px rgba(0,0,0,0.5);
+    -moz-box-shadow: 1px 2px 2px rgba(0,0,0,0.5);
+    box-shadow: 1px 2px 2px rgba(0,0,0,0.5);
+    
+    z-index: 200;
+}
+
+button {
+    background: url(./../images/ui-buttons.png) no-repeat;
+    
+    width: 73px;
+    height: 24px;
+    
+    padding: 0;
+    
+    border: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: normal;
+}
+
+h1, h2, h3, h4, h5, h6, p {
+    margin: 0 0 10px 0;
+}
+
+h2 {
+    font-size: 18px;
+}
+
+h3 {
+    font-size: 24px;
+}
+
+#LoginScreen {
+    background: url(./../images/login-back.png) no-repeat;
+    
+    width: 231px;
+    height: 165px;
+    
+    margin: 200px auto 0 auto;
+    padding: 14px 20px 16px 20px;
+}
+
+#LoginScreen input {
+    width: 222px;
+}
+
+#LoginScreen label.error {
+    width: 219px;
+}
+
+#LoginForm_login {
+    background-position: -581px 0;
+    
+    width: 63px;
+}
+
+#LoginForm_login:hover, #LoginForm_login:active {
+    background-position: -581px -24px;
+}
+
+#LoginForm_login:disabled {
+    background-position: -581px -48px !important;
+}
+
+#sidebar {
+    background: #DDDDDD;
+    
+    position: absolute;
+    left: 1px;
+    top: 0;
+    
+    width: 232px;
+    height: 100%;
+    
+    border: 1px solid #EBEBEB;
+    outline: 1px solid #C3C3C3;
+    
+    padding: 20px 8px;
+}
+
+#sidebarBlocker {
+    background: #DDDDDD;
+    
+    display: none;
+    
+    position: absolute;
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 100%;
+    
+    filter: opacity(alpha = 75);
+    opacity: 0.75;
+}
+
+#SearchForm_Query {
+    float: left;
+    
+    width: 143px;
+    
+    margin-right: 7px;
+}
+
+#SearchForm_Search:hover, #SearchForm_Search:active {
+    background-position: 0 -24px;
+}
+
+#SearchForm_Search:disabled {
+    background-position: 0 -48px !important;
+}
+
+#filterForm label {
+    float: left;
+    
+    margin-right: 7px;
+    
+    line-height: 26px;
+}
+
+#FilterForm_Filter {
+    width: 194px;
+}
+
+#snippetTree {
+    background: #FFFFFF;
+    
+    width: 230px;
+    height: 486px;
+    
+    border: 1px solid #A5A5A5;
+    
+    margin-top: 26px;
+    
+    overflow: auto;
+}
+
+#snippetTree li ul {
+    margin-left: -16px;
+}
+
+#snippetTree li ul li {
+    padding-left: 32px;
+}
+
+#snippetTree li.file {
+    cursor: pointer;
+}
+
+#snippetTree li.file.clicked {
+    background-color: #DDDDDD;
+}
+
+#snippetTree span.folder.hover {
+    color: #343434 !important;
+}
+
+div.screen {
+    position: absolute;
+    left: 275px;
+    top: 0;
+    
+    width: 728px;
+    
+    padding-top: 15px;
+    
+    overflow: auto;
+}
+
+#snippetContainer {
+    width: 726px;
+    height: 100%;
+    
+    border: 1px solid #A5A5A5;
+    
+    overflow: auto;
+}
+
+#snippetContainer div.syntaxhighlighter {
+    overflow: visible !important;
+    margin: 0 !important;
+}
+
+button + button {
+    margin-left: 9px;
+}
+
+#snippetActions {
+    float: right;
+    
+    text-align: right;
+    
+    margin-top: 15px;
+}
+
+#snippetInfo {
+    float: left;
+    
+    margin-top: 15px;
+}
+
+#snippetCopyButton {
+    background-position: 0 -72px;
+}
+
+#snippetCopyButton:hover, #snippetCopyButton:active {
+    background-position: 0 -96px;
+}
+
+#snippetCopyButton:disabled {
+    background-position: 0 -120px !important;
+}
+
+#snippetEditButton {
+    background-position: -73px -72px;
+}
+
+#snippetEditButton:hover, #snippetEditButton:active {
+    background-position: -73px -96px;
+}
+
+#snippetEditButton:disabled {
+    background-position: -73px -120px !important;
+}
+
+#snippetDeleteButton {
+    background-position: -146px -72px;
+}
+
+#snippetDeleteButton:hover, #snippetDeleteButton:active {
+    background-position: -146px -96px;
+}
+
+#snippetDeleteButton:disabled {
+    background-position: -146px -120px !important;
+}
+
+#snippetExportButton {
+    background-position: -219px -72px;
+}
+
+#snippetExportButton:hover, #snippetExportButton:active {
+    background-position: -219px -96px;
+}
+
+#snippetExportButton:disabled {
+    background-position: -219px -120px !important;
+}
+
+#snippetPrintButton {
+    background-position: -292px -72px;
+}
+
+#snippetPrintButton:hover, #snippetPrintButton:active {
+    background-position: -292px -96px;
+}
+
+#snippetPrintButton:disabled {
+    background-position: -292px -120px !important;
+}
+
+#snippetCompareButton {
+    background-position: -365px -72px;
+    
+    float: right;
+    
+    width: 163px;
+}
+
+#snippetCompareButton:hover, #snippetCompareButton:active {
+    background-position: -365px -96px;
+}
+
+#snippetCompareButton:disabled {
+    background-position: -365px -120px !important;
+}
+
+#SnippetForm label {
+    float: right;
+    
+    margin-right: 7px;
+    
+    line-height: 26px;
+}
+
+#SnippetForm_Rev {
+    float: right;
+    
+    width: 196px;
+    
+    margin-right: 7px;
+}
+
+#snippetRaw {
+    display: none;
+}
+
+/**** Change Password Dialog ****/
+#popupMask {
+    background: #000000;
+    
+    position: absolute;
+    left: 0;
+    top: 0;
+    
+    width: 100%;
+    height: 100%;
+    
+    opacity: 0.75;
+    filter: opacity(alpha = 75);
+    
+    z-index: 1000;
+}
+
+#changePasswordDialog, #adminChangePasswordDialog, #addUserDialog {
+    background: url(./../images/change-pass-back.png) no-repeat;
+    
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    
+    width: 230px;
+    height: 212px;
+    
+    margin: -123px 0 0 -135px;
+    padding: 17px 20px;
+    
+    z-index: 1100;
+}
+
+#adminAddLanguageDialog, #adminEditLanguageDialog {
+    background: url(./../images/language-back.png) no-repeat;
+    
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    
+    width: 230px;
+    height: 171px;
+    
+    margin: -102px 0 0 -115px;
+    padding: 17px 20px;
+    
+    z-index: 1100;
+}
+
+#changePasswordDialog h3, #adminChangePasswordDialog h3, #addUserDialog h3, #adminAddLanguageDialog h3, #adminEditLanguageDialog h3 {
+    margin: 0;
+}
+
+#changePasswordForm .Actions, #adminChangePasswordForm .Actions, #adminAddUserForm .Actions, #adminAddLanguageDialog .Actions, #adminEditLanguageDialog .Actions {
+    width: 163px;
+    
+    margin: 10px auto 0 auto;
+}
+
+#changePasswordForm .field input, #adminChangePasswordForm .field input, #adminAddUserForm .field input, #adminAddLanguageDialog .field input, #adminEditLanguageDialog .field input {
+    width: 222px;
+}
+
+#ChangePasswordForm_Cancel, #AdminChangePasswordForm_Cancel, #AdminAddUserForm_Cancel, #AdminAddLanguageForm_Cancel, #AdminEditLanguageForm_Cancel {
+    background-position: -676px -73px;
+}
+
+#ChangePasswordForm_Cancel:hover, #ChangePasswordForm_Cancel:active, #AdminChangePasswordForm_Cancel:hover, #AdminChangePasswordForm_Cancel:active, #AdminAddUserForm_Cancel:hover, #AdminAddUserForm_Cancel:active, #AdminEditLanguageForm_Cancel:hover, #AdminEditLanguageForm_Cancel:active, #AdminAddLanguageForm_Cancel:hover, #AdminAddLanguageForm_Cancel:active {
+    background-position: -676px -97px;
+}
+
+#ChangePasswordForm_Submit, #AdminChangePasswordForm_Submit, #AdminAddUserForm_Submit, #InstallForm_Submit, #AdminEditLanguageForm_Submit, #AdminAddLanguageForm_Submit {
+    background-position: -749px -73px;
+}
+
+#ChangePasswordForm_Submit:hover, #ChangePasswordForm_Submit:active, #AdminChangePasswordForm_Submit:hover, #AdminChangePasswordForm_Submit:active, #AdminAddUserForm_Submit:hover, #AdminAddUserForm_Submit:active, #InstallForm_Submit:hover, #InstallForm_Submit:active, #AdminEditLanguageForm_Submit:hover, #AdminEditLanguageForm_Submit:active, #AdminAddLanguageForm_Submit:hover, #AdminAddLanguageForm_Submit:active {
+    background-position: -749px -97px;
+}
+
+#changePasswordForm .error, #adminChangePasswordForm .error, #adminAddUserForm .error, #adminAddLanguageForm .error, #adminEditLanguageForm .error {
+    width: 219px;
+}
+
+/**** Donation Page ****/
+#donateDialog {
+    background: url(./../images/change-pass-back.png) no-repeat;
+    
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    
+    width: 230px;
+    height: 212px;
+    
+    margin: -123px 0 0 -135px;
+    padding: 17px 20px;
+    
+    z-index: 1100;
+}
+
+#donateDialog p {
+    text-align: center;
+}
+
+#PayPalForm_Cancel {
+    background-position: -676px -73px;
+    
+    float: left;
+    
+    margin: 2px 2ex 0 32px;
+}
+
+#PayPalForm_Cancel:hover, #PayPalForm_Cancel:active {
+    background-position: -676px -97px;
+}
+
+.paypalButton {
+    background: transparent;
+    
+    float: left;
+    
+    border: 0;
+    padding: 0;
+    
+    width: auto;
+    height: auto;
+}
+
+#donateButton {
+    color: #343434;
+}
+
+/**** New Snippet Screen ****/
+#NewSnippetForm_Title, #NewSnippetForm_Tags, #NewSnippetForm_Description, #NewSnippetForm_Code {
+    width: 640px;
+}
+
+#NewSnippetForm_Description {
+    height: 51px;
+}
+
+#NewSnippetForm_Code {
+    height: 287px;
+}
+
+#NewSnippetForm_Save {
+    background-position: -508px 0;
+}
+
+#NewSnippetForm_Save:hover, #NewSnippetForm_Save:active {
+    background-position: -508px -24px;
+}
+
+#NewSnippetForm_Save:disabled {
+    background-position: -508px -48px;
+}
+
+#NewSnippetScreen .Actions {
+    text-align: right;
+    
+    padding-right: 80px;
+}
+
+/**** Edit Snippet Screen ****/
+#EditSnippetForm_Title, #EditSnippetForm_Tags, #EditSnippetForm_Description, #EditSnippetForm_Code {
+    width: 640px;
+}
+
+#EditSnippetForm_Description {
+    height: 51px;
+}
+
+#EditSnippetForm_Code {
+    height: 287px;
+}
+
+#EditSnippetForm_Cancel {
+    background-position: -435px 0;
+}
+
+#EditSnippetForm_Cancel:hover, #EditSnippetForm_Cancel:active {
+    background-position: -435px -24px;
+}
+
+#EditSnippetForm_Cancel:disabled {
+    background-position: -435px -48px;
+}
+
+#EditSnippetForm_Save {
+    background-position: -508px 0;
+}
+
+#EditSnippetForm_Save:hover, #EditSnippetForm_Save:active {
+    background-position: -508px -24px;
+}
+
+#EditSnippetForm_Save:disabled {
+    background-position: -508px -48px;
+}
+
+#EditSnippetScreen .Actions {
+    text-align: right;
+    
+    padding-right: 80px;
+}
+
+/**** IP Agreement Dialog ****/
+#ipAgreementDialog {
+    background: #DDDDDD;
+    
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    
+    width: 650px;
+    height: 590px;
+    
+    margin-top: -325px;
+    margin-left: -295px;
+    
+    border: 1px solid #A5A5A5;
+    
+    -moz-box-shadow: 1px 1px 5px #888;
+    -webkit-box-shadow: 1px 1px 5px #888;
+    box-shadow: 1px 1px 5px #888;
+    -moz-box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    
+    z-index: 1100;
+}
+
+#ipAgreementDialog .ipAgreementWrapper {
+    border: 1px solid #EBEBEB;
+    
+    width: 612px;
+    height: 552px;
+    
+    padding: 18px;
+}
+
+#ipAgreementDialog .ipAgreementWrapper #ipAgreementContent {
+    height: 477px;
+    
+    margin-bottom: 10px;
+    
+    overflow-y: auto;
+}
+
+#ipAgreementDialog .ipAgreementWrapper .Actions {
+    text-align: center;
+}
+
+#IPAgreement_Disagree {
+    background-position: -644px 0;
+    
+    width: 86px;
+}
+
+#IPAgreement_Disagree:hover, #IPAgreement_Disagree:active {
+    background-position: -644px -24px;
+}
+
+#IPAgreement_Disagree:disabled {
+    background-position: -644px -48px;
+}
+
+#IPAgreement_Agree {
+    background-position: -730px 0;
+}
+
+#IPAgreement_Agree:hover, #IPAgreement_Agree:active {
+    background-position: -730px -24px;
+}
+
+#IPAgreement_Agree:disabled {
+    background-position: -730px -48px;
+}
+
+/**** IP Agreement Manager Screen ****/
+#IPAgreementForm_IPAgreement {
+    width: 640px;
+    height: 400px;
+}
+
+#IPAgreementForm .Actions {
+    text-align: right;
+    
+    padding-right: 80px;
+}
+
+#IPAgreementForm_Save {
+    background-position: -508px 0;
+}
+
+#IPAgreementForm_Save:hover, #IPAgreementForm_Save:active {
+    background-position: -508px -24px;
+}
+
+#IPAgreementForm_Save:disabled {
+    background-position: -508px -48px;
+}
+
+#IPAgreementForm select {
+    background: #F8F8F8 !important;
+    
+    border: 1px solid #AAAAAA !important;
+    
+    color: #000000 !important;
+    
+    padding: 3px !important;
+    
+    width: 200px !important;
+}
+
+/**** Manage User Accounts Screen ****/
+#ManageUserAccountsForm {
+    width: 700px;
+}
+
+#ManageUserAccountsForm .leftColumn {
+    float: left;
+}
+
+#ManageUserAccountsForm .leftColumn label, #ManageUserAccountsForm .leftColumn input {
+    display: inline;
+    
+    width: auto;
+}
+
+#ManageUserAccountsForm .leftColumn div {
+    float: left;
+    
+    padding: 0 10px;
+}
+
+#ManageUserAccountsForm .leftColumn div:first-child {
+    padding-left: 0;
+}
+
+#ManageUserAccountsForm .leftColumn div:first-child {
+    border-right: 1px solid #A5A5A5;
+}
+
+#ManageUserAccountsForm .rightColumn {
+    float: right;
+}
+
+#ManageUserAccountsTable {
+    width: 700px;
+    
+    border: 1px solid #A5A5A5;
+    
+    margin-top: 30px;
+}
+
+#ManageUserAccountsTable thead th {
+    background: url(./../images/column-heading.jpg) repeat-x;
+    
+    border: 1px solid #DDDDDD;
+    border-left: 1px solid #C3C3C3;
+    
+    line-height: 21px;
+    
+    text-align: left;
+    
+    padding: 0 12px;
+}
+
+#ManageUserAccountsTable thead th:first-child {
+    border-left: 1px solid #DDDDDD;
+}
+
+#ManageUserAccountsTable td {
+    border-top: 1px solid #C3C3C3;
+    
+    line-height: 21px;
+    
+    padding: 0 12px;
+}
+
+#ManageUserAccountsTable td + td {
+    border-left: 1px solid #C3C3C3;
+}
+
+#ManageUserAccountsTable td input {
+    display: none;
+}
+
+#ManageUserAccountsTable td label {
+    display: block;
+}
+
+#ManageUserAccountsForm_AddUser {
+    background-position: -73px 0;
+    
+    width: 94px;
+}
+
+#ManageUserAccountsForm_AddUser:hover, #ManageUserAccountsForm_AddUser:active {
+    background-position: -73px -24px;
+}
+
+#ManageUserAccountsForm_AddUser:disabled {
+    background-position: -73px -48px;
+}
+
+#ManageUserAccountsForm_DeleteUser {
+    background-position: -167px 0;
+    
+    width: 104px;
+}
+
+#ManageUserAccountsForm_DeleteUser:hover, #ManageUserAccountsForm_DeleteUser:active {
+    background-position: -167px -24px;
+}
+
+#ManageUserAccountsForm_DeleteUser:disabled {
+    background-position: -167px -48px;
+}
+
+#ManageUserAccountsForm_UndeleteUser {
+    background-position: -803px 0;
+    
+    width: 104px;
+}
+
+#ManageUserAccountsForm_UndeleteUser:hover, #ManageUserAccountsForm_UndeleteUser:active {
+    background-position: -803px -24px;
+}
+
+#ManageUserAccountsForm_UndeleteUser:disabled {
+    background-position: -803px -48px;
+}
+
+#ManageUserAccountsForm_CUPUser {
+    background-position: -271px 0;
+    
+    width: 164px;
+}
+
+#ManageUserAccountsForm_CUPUser:hover, #ManageUserAccountsForm_CUPUser:active {
+    background-position: -271px -24px;
+}
+
+#ManageUserAccountsForm_CUPUser:disabled {
+    background-position: -271px -48px;
+}
+
+#ManageUserAccountsTable tr.deleted td {
+    color: #DD0000;
+    text-decoration: line-through;
+}
+
+#ManageUserAccountsTable tr.selected {
+    background: #E5E5E5;
+}
+
+
+/**** IP Agreement Dialog ****/
+#compareDialog {
+    background: #DDDDDD;
+    
+    position: absolute;
+    left: 50%;
+    top: 84px;
+    bottom: 100px;
+    
+    width: 969px;
+    min-height: 498px;
+    
+    margin-left: -486px;
+    
+    border: 1px solid #A5A5A5;
+    
+    -moz-box-shadow: 1px 1px 5px #888;
+    -webkit-box-shadow: 1px 1px 5px #888;
+    box-shadow: 1px 1px 5px #888;
+    -moz-box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    box-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+    
+    z-index: 1100;
+}
+
+#compareDialog .compareDialogWrapper {
+    border: 1px solid #EBEBEB;
+    
+    position:absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    
+    padding: 7px;
+}
+
+#compareDialog .compareDialogWrapper h4 {
+    float: left;
+    
+    font-size: 16px;
+    
+    width: 468px;
+}
+
+#compareDialog .compareDialogWrapper h4 + h4 {
+    margin-left: 15px;
+}
+
+#compareDialog .compareDialogWrapper .compare {
+    background: #FFFFFF;
+    
+    position: absolute;
+    top: 35px;
+    bottom: 52px;
+    
+    width: 468px;
+    
+    border: 1px solid #A6A6A6;
+    
+    overflow: auto;
+}
+
+#compareDialog .compareDialogWrapper .compare.leftSide {
+    left: 7px;
+}
+
+#compareDialog .compareDialogWrapper .compare.rightSide {
+    right: 7px;
+}
+
+#compareDialog .compareDialogWrapper .Actions {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 10px;
+    
+    text-align: center;
+    padding-top: 16px;
+}
+
+#CompareDialog_Close {
+    background-position: -907px 0;
+    
+    width: 73px;
+}
+
+#CompareDialog_Close:hover, #CompareDialog_Close:active {
+    background-position: -907px -24px;
+}
+
+#CompareDialog_Close:disabled {
+    background-position: -907px -48px;
+}
+
+/* Diff */
+table.diff {
+    width: 100%;
+}
+
+table.diff col.ltype {
+    width: 20px;
+}
+
+table.diff col.content {
+    width: 100%;
+}
+
+table.diff tr {
+    background-color: transparent;
+}
+
+table.diff td {
+    min-height: 1em;
+    
+    white-space: pre;
+}
+
+table.diff td,table.diff th {
+    font-family: Consolas, Monaco, Courier, monospace;
+    border: none;
+}
+
+table.diff .diff-deletedline del,table.diff .diff-addedline ins {
+    text-decoration: none;
+}
+
+table.diff .diff-deletedline {
+    background-color: #FFDDDD;
+}
+
+table.diff .diff-deletedline del {
+    background-color: #FF9999;
+}
+
+table.diff .diff-addedline {
+    background-color: #DDFFDD;
+}
+
+table.diff .diff-addedline ins {
+    background-color: #99FF99;
+}
+
+#att-info {
+    background-color: #E4F2FD;
+}
+
+
+/**** Manage Languages Screen ****/
+#ManageLanguagesForm {
+    width: 700px;
+}
+
+#ManageLanguagesForm .leftColumn {
+    float: left;
+}
+
+#ManageLanguagesForm .leftColumn label, #ManageLanguagesForm .leftColumn input {
+    display: inline;
+    
+    width: auto;
+}
+
+#ManageLanguagesForm .leftColumn div {
+    float: left;
+    
+    padding: 0 10px;
+}
+
+#ManageLanguagesForm .leftColumn div:first-child {
+    padding-left: 0;
+}
+
+#ManageLanguagesForm .leftColumn div:first-child {
+    border-right: 1px solid #A5A5A5;
+}
+
+#ManageLanguagesForm .rightColumn {
+    float: right;
+}
+
+.manageLanguagesTableWrapper {
+    margin-top: 30px;
+    
+    overflow-y: auto;
+}
+
+#ManageLanguagesTable {
+    width: 700px;
+    
+    border: 1px solid #A5A5A5;
+}
+
+#ManageLanguagesTable thead th {
+    background: url(./../images/column-heading.jpg) repeat-x;
+    
+    border: 1px solid #DDDDDD;
+    border-left: 1px solid #C3C3C3;
+    
+    line-height: 21px;
+    
+    text-align: left;
+    
+    padding: 0 12px;
+}
+
+#ManageLanguagesTable thead th:first-child {
+    border-left: 1px solid #DDDDDD;
+}
+
+#ManageLanguagesTable td {
+    border-top: 1px solid #C3C3C3;
+    
+    line-height: 21px;
+    
+    padding: 0 12px;
+}
+
+#ManageLanguagesTable td + td {
+    border-left: 1px solid #C3C3C3;
+}
+
+#ManageLanguagesTable td input {
+    display: none;
+}
+
+#ManageLanguagesTable td label {
+    display: block;
+}
+
+#ManageLanguagesForm_AddLanguage {
+    background-position: -823px -72px;
+    
+    width: 112px;
+}
+
+#ManageLanguagesForm_AddLanguage:hover, #ManageLanguagesForm_AddLanguage:active {
+    background-position: -823px -96px;
+}
+
+#ManageLanguagesForm_AddLanguage:disabled {
+    background-position: -823px -120px;
+}
+
+#ManageLanguagesForm_DeleteLanguage {
+    background-position: -935px -72px;
+    
+    width: 118px;
+}
+
+#ManageLanguagesForm_DeleteLanguage:hover, #ManageLanguagesForm_DeleteLanguage:active {
+    background-position: -935px -96px;
+}
+
+#ManageLanguagesForm_DeleteLanguage:disabled {
+    background-position: -935px -120px;
+}
+
+#ManageLanguagesForm_EditLanguage {
+    background-position: -980px 0;
+    
+    width: 112px;
+}
+
+#ManageLanguagesForm_EditLanguage:hover, #ManageLanguagesForm_EditLanguage:active {
+    background-position: -980px -24px;
+}
+
+#ManageLanguagesForm_EditLanguage:disabled {
+    background-position: -980px -48px;
+}
+
+#ManageLanguagesTable tr.selected {
+    background: #E5E5E5;
+}

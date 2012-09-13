@@ -1,0 +1,172 @@
+.syntaxhighlighter
+{
+	background-color: #fff !important;
+}
+
+/* Highlighed line number */
+.syntaxhighlighter .line.highlighted .number
+{
+	background-color: #c3defe !important;
+}
+
+/* Highlighed line */
+.syntaxhighlighter .line.highlighted.alt1,
+.syntaxhighlighter .line.highlighted.alt2
+{
+	background-color: #c3defe !important;
+}
+
+/* Gutter line numbers */
+.syntaxhighlighter .line .number
+{
+	color: #787878 !important;
+	background-color: #fff !important;
+}
+
+/* Add border to the lines */
+.syntaxhighlighter .line .content
+{
+	border-left: 1px solid #d4d0c8 !important;
+	color: #000 !important;
+}
+
+.syntaxhighlighter.printing .line .content 
+{
+	border: 0 !important;
+}
+
+/* First line */
+.syntaxhighlighter .line.alt1
+{
+	background-color: #fff !important;
+}
+
+/* Second line */
+.syntaxhighlighter .line.alt2
+{
+	background-color: #fff !important;
+}
+
+.syntaxhighlighter .toolbar
+{
+	background-color: #F8F8F8 !important;
+	border: #E7E5DC solid 1px !important;
+}
+
+.syntaxhighlighter .toolbar a
+{
+	color: #a0a0a0 !important;
+}
+
+.syntaxhighlighter .toolbar a:hover
+{
+	color: red !important;
+}
+
+/************************************
+ * Actual syntax highlighter colors.
+ ************************************/
+.syntaxhighlighter .plain,
+.syntaxhighlighter .plain a
+{ 
+	color: #000 !important;
+}
+
+.syntaxhighlighter .comments,
+.syntaxhighlighter .comments a
+{ 
+	color: #3f5fbf !important;
+}
+
+.syntaxhighlighter .comments.singleline,
+.syntaxhighlighter .comments.singleline a
+{ 
+	color: #009900 !important;
+    font-style: italic !important;
+}
+
+.syntaxhighlighter .comments.params,
+.syntaxhighlighter .comments.params a
+{
+    font-weight: bold;
+}
+
+.syntaxhighlighter .string,
+.syntaxhighlighter .string a
+{
+	color: #990000 !important; 
+}
+
+.syntaxhighlighter .keyword
+{ 
+	color: #0033ff !important; 
+	font-weight: bold !important; 
+}
+
+.syntaxhighlighter .preprocessor 
+{ 
+	color: #646464 !important; 
+}
+
+.syntaxhighlighter .variable 
+{ 
+	color: #6699cc !important;
+    font-weight: bold !important;
+}
+
+.syntaxhighlighter .value
+{ 
+	color: #000000 !important; 
+}
+
+.syntaxhighlighter .functions
+{ 
+	color: #339966 !important;
+    font-weight: bold !important;
+}
+
+.syntaxhighlighter .constants
+{ 
+	color: #000000 !important; 
+}
+
+.syntaxhighlighter .script
+{ 
+	background-color: yellow !important;
+}
+
+.syntaxhighlighter .color1,
+.syntaxhighlighter .color1 a
+{ 
+	color: #9900cc !important;
+    font-weight: bold !important;
+}
+
+.syntaxhighlighter .color2,
+.syntaxhighlighter .color2 a
+{ 
+	color: #0033ff !important; 
+	font-weight: bold !important;
+}
+
+.syntaxhighlighter .color3,
+.syntaxhighlighter .color3 a
+{ 
+	color: #000000 !important; 
+}
+
+
+.xml .keyword {
+    color: #3f7f7f !important;
+    font-weight: normal !important;
+}
+
+.xml .color1,
+.xml .color1 a{
+    color: #7f007f !important;
+}
+
+.xml .string {
+    font-style: italic !important;
+    color: #2a00ff !important;
+}

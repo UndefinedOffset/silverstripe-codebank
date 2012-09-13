@@ -1,0 +1,496 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>Code Bank: Web Client</title>
+        
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+        <meta name="robots" content="noindex,nofollow"/>
+        
+        <link rel="shortcut icon" href="favicon.ico" />
+        
+        <link type="text/css" rel="stylesheet" href="javascript/external/syntaxhighlighter/themes/shCore.css"/>
+        <link type="text/css" rel="stylesheet" href="javascript/external/syntaxhighlighter/themes/shCoreDefault.css"/>
+        <link type="text/css" rel="stylesheet" href="javascript/external/syntaxhighlighter/themes/shThemeDefault.css"/>
+        <link type="text/css" rel="stylesheet" href="javascript/external/jquery-treeview/jquery.treeview.css"/>
+        <link type="text/css" rel="stylesheet" href="css/style.css"/>
+        <link type="text/css" rel="stylesheet" media="print" href="css/print.css"/>
+    </head>
+    <body>
+        <div id="LoadingScreen" style="background: #FFFFFF url(./images/loading.png) no-repeat center center;width: 100%;height: 100%; position: absolute;left: 0;top: 0;z-index: 10000;">
+            <noscript>
+                <h3>Code Bank: Web Client Requires JavaScript</h3>
+            </noscript>
+        </div>
+        
+        <div id="NotifyArea">
+            <div class="content"><!--  --></div>
+        </div>
+        
+        <div id="bodyWrapper">
+            <div class="header">
+                <div id="Logo"><!--  --></div>
+                
+                <div id="TopNav">
+                    Logged in as: <span id="loggedInAs"></span> | <a href="#" id="changePassword">Change Password</a> | <a href="#" id="logoutButton">Logout</a>
+                </div>
+                
+                <div id="TabNav">
+                    <a href="#" id="snippetsButton" title="Snippets" class="tab disabled selected"><!--  --></a>
+                    <a href="#" id="newSnippetsButton" title="New Snippet" class="tab disabled"><!--  --></a>
+                    <a href="#" id="manageUserAccounts" title="Manage User Accounts" class="tab disabled"><!--  --></a>
+                    <a href="#" id="manageIPAgreement" title="Intellectual Property Agreement" class="tab disabled"><!--  --></a>
+                    <a href="#" id="manageLanguages" title="Manage Languages" class="tab disabled"><!--  --></a>
+                </div>
+                
+                <div id="loadingSpinner" style="display: none;">
+                    <img src="images/spinner.gif" alt=""/> Loading
+                </div>
+            </div>
+            <div id="contentWrapper">
+                <div id="sidebar">
+                    <form action="#" method="post" id="searchForm">
+                        <fieldset>
+                            <div class="field">
+                                <input type="text" name="query" id="SearchForm_Query"/>
+                                <button type="submit" title="Search" id="SearchForm_Search"><!--  --></button>
+                            </div>
+                        </fieldset>
+                    </form>
+                    
+                    <form action="#" method="post" id="filterForm">
+                        <fieldset>
+                            <div class="field">
+                                <label for="FilterForm_Filter">Filter:</label>
+                                <select name="filter" id="FilterForm_Filter"><!--  --></select>
+                            </div>
+                        </fieldset>
+                    </form>
+                    
+                    <div id="snippetTree"><!--  --></div>
+                    
+                    <div id="sidebarBlocker"><!--  --></div>
+                </div>
+                
+                <div id="LoginScreen" title="Please Login">
+                    <h2>Please Login</h2>
+                    <form action="#" method="post" id="LoginForm">
+                        <fieldset>
+                            <div class="field">
+                                <label for="LoginForm_username">Username:</label>
+                                <input type="text" id="LoginForm_username" name="username" value="" disabled="disabled" autocomplete="off" class="required"/>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="LoginForm_password">Password:</label>
+                                <input type="password" id="LoginForm_password" name="password" value="" disabled="disabled" class="required"/>
+                            </div>
+                        </fieldset>
+                        
+                        <div class="Actions">
+                            <button type="submit" id="LoginForm_login" title="Login" disabled="disabled"><!--  --></button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="SnippetScreen" class="screen">
+                    <h1 id="snippetTitle">&nbsp;</h1>
+                    <p id="snippetDesc">&nbsp;</p>
+                    <div id="snippetContainer"><!--  --></div>
+                    
+                    <input type="hidden" name="snippetID" id="snippetID" value="" disabled="disabled"/>
+                    <textarea name="snippetRaw" id="snippetRaw" disabled="disabled"></textarea>
+                    
+                    <div id="snippetInfo">
+                        <p>
+                            <b>Creator: </b><span id="snippetAuthor"></span><br/>
+                            <b>Language: </b><span id="snippetLang"></span><br/>
+                            <b>Last Modified: </b><span id="snippetModified"></span><br/>
+                            <b>Last Edited By: </b><span id="snippetLastEditUser"></span>
+                        </p>
+                    </div>
+                    
+                    <div id="snippetActions">
+                        <form action="#" method="post" id="SnippetForm">
+                            <fieldset>
+                                <div class="topButtons">
+                                    <button type="button" id="snippetCopyButton" class="button" disabled="disabled" title="Copy"><!--  --></button>
+                                    <button type="button" id="snippetEditButton" class="button" disabled="disabled" title="Edit"><!--  --></button>
+                                    <button type="button" id="snippetDeleteButton" class="button" disabled="disabled" title="Delete"><!--  --></button>
+                                    <button type="button" id="snippetExportButton" class="button" disabled="disabled" title="Export"><!--  --></button>
+                                    <button type="button" id="snippetPrintButton" class="button" disabled="disabled" title="Print"><!--  --></button>
+                                </div>
+                                
+                                <div class="field">
+                                    <button type="button" id="snippetCompareButton" class="button" disabled="disabled" title="Compare with Current"><!--  --></button>
+                                    
+                                    <select name="rev" id="SnippetForm_Rev" disabled="disabled">
+                                        <option>{Current Revision}</option>
+                                    </select>
+                                    
+                                    <label for="SnippetForm_Rev">Revision: </label>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    
+                    <div class="clear"><!--  --></div>
+                </div>
+                
+                <div id="NewSnippetScreen" class="screen">
+                    <h1>Create a new Snippet</h1>
+                    
+                    <form action="#" method="post" id="NewSnippetForm">
+                        <fieldset>
+                            <div class="field">
+                                <label for="NewSnippetForm_Language"><span>*</span>Language:</label>
+                                <select name="language" id="NewSnippetForm_Language" disabled="disabled" class="required"><!--  --></select>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="NewSnippetForm_Title"><span>*</span>Title:</label>
+                                <input type="text" name="title" id="NewSnippetForm_Title" value="" disabled="disabled" class="required"/>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="NewSnippetForm_Description"><span>*</span>Description:</label>
+                                <textarea name="description" id="NewSnippetForm_Description" disabled="disabled" class="required"></textarea>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="NewSnippetForm_Code"><span>*</span>Code:</label>
+                                <textarea name="code" id="NewSnippetForm_Code" class="required"></textarea>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="NewSnippetForm_Tags"><span>*</span>Tags (comma seperate):</label>
+                                <input type="text" name="tags" id="NewSnippetForm_Tags" value="" disabled="disabled" class="required"/>
+                            </div>
+                        </fieldset>
+                        
+                        <div class="Actions">
+                            <button type="submit" id="NewSnippetForm_Save" disabled="disabled" title="Save"><!--  --></button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="EditSnippetScreen" class="screen">
+                    <h1>Edit Snippet</h1>
+                    
+                    <form action="#" method="post" id="EditSnippetForm">
+                        <fieldset>
+                            <div class="field">
+                                <label for="EditSnippetForm_Language"><span>*</span>Language:</label>
+                                <select name="language" id="EditSnippetForm_Language" disabled="disabled" class="required"><!--  --></select>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="EditSnippetForm_Title"><span>*</span>Title:</label>
+                                <input type="text" name="title" id="EditSnippetForm_Title" value="" disabled="disabled" class="required"/>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="EditSnippetForm_Description"><span>*</span>Description:</label>
+                                <textarea name="description" id="EditSnippetForm_Description" disabled="disabled" class="required"></textarea>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="EditSnippetForm_Code"><span>*</span>Code:</label>
+                                <textarea name="code" id="EditSnippetForm_Code" class="required"></textarea>
+                            </div>
+                            
+                            <div class="field">
+                                <label for="EditSnippetForm_Tags"><span>*</span>Tags (comma seperate):</label>
+                                <input type="text" name="tags" id="EditSnippetForm_Tags" value="" disabled="disabled" class="required"/>
+                            </div>
+                        </fieldset>
+                        
+                        <div class="Actions">
+                            <button type="button" id="EditSnippetForm_Cancel" disabled="disabled" title="Cancel"><!--  --></button>
+                            <button type="submit" id="EditSnippetForm_Save" disabled="disabled" title="Save"><!--  --></button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="IPAgreementScreen" class="screen">
+                    <h1>Edit Intellectual Property Agreement</h1>
+                    
+                    <form action="#" method="post" id="IPAgreementForm">
+                        <fieldset>
+                            <div class="field">
+                                <textarea name="ipAgreement" id="IPAgreementForm_IPAgreement" disabled="disabled" class="required"></textarea>
+                            </div>
+                        </fieldset>
+                        
+                        <div class="Actions">
+                            <button type="submit" id="IPAgreementForm_Save" disabled="disabled" title="Save"><!--  --></button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="ManageUsersScreen" class="screen">
+                    <h1>Manage User Accounts</h1>
+                    
+                    <div class="manageUserAccountsBar">
+                        <form action="#" method="post" id="ManageUserAccountsForm">
+                            <div class="leftColumn">
+                                <div>
+                                    <input type="radio" name="listType" id="ManageUserAccountsForm_ShowDeleted" value="1"/>
+                                    <label for="ManageUserAccountsForm_ShowDeleted">Show Deleted Users</label>
+                                </div>
+                                
+                                <div>
+                                    <input type="radio" name="listType" id="ManageUserAccountsForm_HideDeleted" value="0" checked="checked"/>
+                                    <label for="ManageUserAccountsForm_HideDeleted">Hide Deleted Users</label>
+                                </div>
+                            </div>
+                            
+                            <div class="rightColumn">
+                                <button type="button" id="ManageUserAccountsForm_AddUser" title="Add User" disabled="disabled"><!--  --></button>
+                                <button type="button" id="ManageUserAccountsForm_DeleteUser" title="Delete User" disabled="disabled"><!--  --></button>
+                                <button type="button" id="ManageUserAccountsForm_UndeleteUser" title="Undelete User" disabled="disabled"><!--  --></button>
+                                <button type="button" id="ManageUserAccountsForm_CUPUser" title="Change User Password" disabled="disabled"><!--  --></button>
+                            </div>
+                        </form>
+                        
+                        <div class="clear"><!--  --></div>
+                        
+                        <table border="0" cellpadding="0" cellspacing="0" id="ManageUserAccountsTable">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Last Active</th>
+                                    <th>Last IP</th>
+                                </tr>
+                            </thead>
+                            <tbody><!--  --></tbody>
+                        </table>
+                        
+                        <div class="clear"><!--  --></div>
+                    </div>
+                </div>
+                
+                <div id="ManageLanguagesScreen" class="screen">
+                    <h1>Manage Languages</h1>
+                    
+                    <div class="manageLanguagesBar">
+                        <form action="#" method="post" id="ManageLanguagesForm">
+                            <div class="rightColumn">
+                                <button type="button" id="ManageLanguagesForm_AddLanguage" title="Add Language" disabled="disabled"><!--  --></button>
+                                <button type="button" id="ManageLanguagesForm_DeleteLanguage" title="Delete Language" disabled="disabled"><!--  --></button>
+                                <button type="button" id="ManageLanguagesForm_EditLanguage" title="Edit Language" disabled="disabled"><!--  --></button>
+                            </div>
+                        </form>
+                        
+                        <div class="clear"><!--  --></div>
+                        
+                        <div class="manageLanguagesTableWrapper">
+                            <table border="0" cellpadding="0" cellspacing="0" id="ManageLanguagesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Language</th>
+                                        <th>File Extension</th>
+                                        <th>User Language</th>
+                                        <th>Snippet Count</th>
+                                    </tr>
+                                </thead>
+                                <tbody><!--  --></tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="clear"><!--  --></div>
+                    </div>
+                </div>
+                
+                <div class="clear"><!--  --></div>
+            </div>
+            
+            <div class="footer">
+                <p>
+                    Code Bank Copyright 2011 Ed Chipman<br/>
+                    Code Bank is licensed under a <a href="http://creativecommons.org/licenses/by-nc-nd/3.0/" target="_blank">Creative Commons Attribution-Noncommercial-No Derivative Works 3.0 License</a><br/>
+                    Any part of the license can be waived with permission from the copyright holder.<br/>
+                    <a href="#" id="donateButton">Support Code Bank Development</a>
+                </p>
+            </div>
+        </div>
+        
+        
+        
+        <div id="popupMask"><!--  --></div>
+        
+        <div id="changePasswordDialog">
+            <h3>Change Password</h3>
+            <form id="changePasswordForm" action="#" method="post">
+                <fieldset>
+                    <div class="field">
+                        <label>Current Password:</label>
+                        <input type="password" id="ChangePasswordForm_CurrentPassword" name="currentPassword" value="" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>New Password:</label>
+                        <input type="password" id="ChangePasswordForm_NewPassword" name="newPassword" value="" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>Confirm Password:</label>
+                        <input type="password" id="ChangePasswordForm_ConfirmPassword" name="confirmPassword" value="" class="required"/>
+                    </div>
+                </fieldset>
+                
+                <div class="Actions">
+                    <button type="submit" id="ChangePasswordForm_Cancel" title="Cancel"><!--  --></button>
+                    <button type="submit" id="ChangePasswordForm_Submit" title="Submit"><!--  --></button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="adminChangePasswordDialog">
+            <h3>Change User Password</h3>
+            <form id="adminChangePasswordForm" action="#" method="post">
+                <fieldset>
+                    <div class="field">
+                        <label>New Password:</label>
+                        <input type="password" id="AdminChangePasswordForm_NewPassword" name="newPassword" value="" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>Confirm Password:</label>
+                        <input type="password" id="AdminChangePasswordForm_ConfirmPassword" name="confirmPassword" value="" class="required"/>
+                    </div>
+                </fieldset>
+                
+                <div class="Actions">
+                    <button type="submit" id="AdminChangePasswordForm_Cancel" title="Cancel"><!--  --></button>
+                    <button type="submit" id="AdminChangePasswordForm_Submit" title="Submit"><!--  --></button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="addUserDialog">
+            <h3>Add User</h3>
+            <form id="adminAddUserForm" action="#" method="post">
+                <fieldset>
+                    <div class="field">
+                        <label>Username:</label>
+                        <input type="password" id="AdminAddUserForm_Username" name="username" value="" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>Password:</label>
+                        <input type="password" id="AdminAddUserForm_Password" name="password" value="" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>Confirm Password:</label>
+                        <input type="password" id="AdminAddUserForm_ConfirmPassword" name="confirmPassword" value="" class="required"/>
+                    </div>
+                </fieldset>
+                
+                <div class="Actions">
+                    <button type="submit" id="AdminAddUserForm_Cancel" title="Cancel"><!--  --></button>
+                    <button type="submit" id="AdminAddUserForm_Submit" title="Submit"><!--  --></button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="adminAddLanguageDialog">
+            <h3>Add Language</h3>
+            <form id="adminAddLanguageForm" action="#" method="post">
+                <fieldset>
+                    <div class="field">
+                        <label>Language:</label>
+                        <input type="text" id="AdminAddLanguageForm_Language" name="language" value="" maxlength="100" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>File Extension:</label>
+                        <input type="text" id="AdminAddLanguageForm_FileExtension" name="fileExtension" value="" maxlength="45" class="required"/>
+                    </div>
+                </fieldset>
+                
+                <div class="Actions">
+                    <button type="submit" id="AdminAddLanguageForm_Cancel" title="Cancel"><!--  --></button>
+                    <button type="submit" id="AdminAddLanguageForm_Submit" title="Submit"><!--  --></button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="adminEditLanguageDialog">
+            <h3>Edit Language</h3>
+            <form id="adminEditLanguageForm" action="#" method="post">
+                <fieldset>
+                    <div class="field">
+                        <label>Language:</label>
+                        <input type="text" id="AdminEditLanguageForm_Language" name="language" value="" maxlength="100" class="required"/>
+                    </div>
+                    <div class="field">
+                        <label>File Extension:</label>
+                        <input type="text" id="AdminEditLanguageForm_FileExtension" name="fileExtension" value="" maxlength="45" class="required"/>
+                    </div>
+                </fieldset>
+                
+                <div class="Actions">
+                    <button type="submit" id="AdminEditLanguageForm_Cancel" title="Cancel"><!--  --></button>
+                    <button type="submit" id="AdminEditLanguageForm_Submit" title="Submit"><!--  --></button>
+                </div>
+            </form>
+        </div>
+        
+        <div id="donateDialog">
+            <h3>Support Code Bank</h3>
+            <p>Code Bank is developed by me in my spare time, if you feel like supporting development of Code Bank you can click the donate button bellow, all donations are made securely through PayPal. I do not require dontations or payment, for me Code Bank is a hobby project and a tool I and my co-workers use everyday at work.</p>
+            
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                <fieldset>
+                    <input type="hidden" name="cmd" value="_s-xclick"/>
+                    <input type="hidden" name="hosted_button_id" value="7F9ZPXZ8STB5C"/>
+                    <input type="hidden" name="image_url" value="http://www.edchipman.ca/assets/paypal-logo.jpg"/>
+                    <img src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1" alt=""/>
+                    
+                    <button type="button" id="PayPalForm_Cancel" title="Cancel"><!--  --></button>
+                    <input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" class="paypalButton" id="PayPalForm_Donate"/>
+                </fieldset>
+            </form>
+        </div>
+        
+        <div id="ipAgreementDialog">
+            <div class="ipAgreementWrapper">
+                <h3>Intellectual Property Agreement</h3>
+                
+                <div id="ipAgreementContent"><!--  --></div>
+                
+                <div class="Actions">
+                    <button type="button" id="IPAgreement_Disagree" title="Disagree"><!--  --></button>
+                    <button type="button" id="IPAgreement_Agree" title="Agree"><!--  --></button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="compareDialog">
+            <div class="compareDialogWrapper">
+                <h4>Current Revision</h4>
+                <h4>Compared Revision</h4>
+                
+                <div id="compareDialogContent"><!--  --></div>
+                
+                <div class="Actions">
+                    <button type="button" id="CompareDialog_Close" title="Close"><!--  --></button>
+                </div>
+            </div>
+        </div>
+        
+        
+        <script type="text/javascript" src="javascript/external/jquery-packed.js"></script>
+        <script type="text/javascript" src="javascript/external/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="javascript/external/jquery.zend.jsonrpc.js"></script>
+        <script type="text/javascript" src="javascript/external/jquery-zclip/jquery.zclip.min.js"></script>
+        <script type="text/javascript" src="javascript/external/json2.js"></script>
+        <script type="text/javascript" src="javascript/external/syntaxhighlighter/brushes/shCore.js"></script>
+        <script type="text/javascript" src="javascript/external/syntaxhighlighter/brushes/shAutoloader.js"></script>
+        <script type="text/javascript" src="javascript/highlighter_config.js"></script>
+        <script type="text/javascript" src="javascript/external/jquery-treeview/jquery.treeview.js"></script>
+        <script type="text/javascript" src="javascript/external/htmlbox/htmlbox.min.js"></script>
+        <script type="text/javascript" src="javascript/external/htmlbox/xhtml.js"></script>
+        <script type="text/javascript" src="javascript/external/jquery-treeview/jquery.treeview.js"></script>
+        <script type="text/javascript" src="javascript/external/layout_helpers.js"></script>
+        <script type="text/javascript" src="javascript/layout.js"></script>
+        <script type="text/javascript" src="javascript/main.js"></script>
+        <script type="text/javascript" src="javascript/screen.js"></script>
+    </body>
+</html>
