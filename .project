@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Code Bank Server</name>
+	<name>Code Bank Server (SilverStripe)</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -22,6 +22,7 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>ca.edchipman.silverstripepdt.SilverStripeNature</nature>
 		<nature>org.eclipse.php.core.PHPNature</nature>
 		<nature>org.eclipse.wst.jsdt.core.jsNature</nature>
 	</natures>
