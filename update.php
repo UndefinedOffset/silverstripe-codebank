@@ -1,5 +1,6 @@
 <?php
-require_once(dirname(__FILE__).'/includes/func.inc.php');
+//@TODO Should be automated via the cms
+/*require_once(dirname(__FILE__).'/includes/func.inc.php');
 require_once(dirname(__FILE__).'/config/main.php');
 
 $main=file_get_contents(dirname(__FILE__).'/config/main.php');
@@ -151,5 +152,5 @@ if($updateRequired) {
     }
 }else {
     print 'No Update Required</i>';
-}
+}*/
 ?>

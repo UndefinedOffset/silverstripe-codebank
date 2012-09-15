@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE response PUBLIC "-//ANT//DTD project//EN" "http://validation.edchipman.ca/ant.dtd">
+<project name="Code Bank Server" default="release" basedir=".">
+    <description><![CDATA[Code Bank Server release builder]]></description>
+    
+    <property name="releaseDir" location="../release"/>
+    <property name="releaseFolder" location="${releaseDir}/codeBankServer"/>
+    <property name="releaseArchive" value="codeBankServer.zip"/>
+    
+    <target name="updateSilverStripe">
+        <delete file="cache/stable-download.html"/>
+        <delete file="silverstripe-3.0.tar.gz"/>
+        
+        <!-- Fetch 3.0 -->
+        <get src="http://www.silverstripe.org/stable-download/" dest="cache/stable-download.html" verbose="true"/>
+        
+        <loadfile srcFile="cache/stable-download.html" property="resultStable">
+            <filterchain>
+                <linecontains>
+                    <contains value="assets/releases/SilverStripe-framework-v3.0"/>
+                </linecontains>
+                <tokenfilter>
+                    <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot;&gt;&lt;div class=&quot;green-button action-download&quot;&gt;&lt;span&gt;Download for free&lt;/span&gt;&lt;/div&gt;&lt;/a&gt;" replace="\2"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        
+        <get src="http://www.silverstripe.org/${resultStable}" dest="cache/silverstripe-3.0.tar.gz" verbose="true"/>
+        
+        <untar src="cache/silverstripe-3.0.tar.gz" dest="./../../" compression="gzip">
+            <patternset>
+                <exclude name="framework/mysite"/>
+                <exclude name="framework/mysite/*"/>
+                <exclude name="framework/themes"/>
+                <exclude name="framework/themes/*"/>
+            </patternset>
+            <cutdirsmapper dirs="1"/>
+        </untar>
+    </target>
+    
+    <target name="release" depends="clean">
+        <!-- Create the time stamp -->
+        <tstamp>
+            <format property="releaseDir.buildDate" pattern="yyyyMMdd"/>
+        </tstamp>
+        
+                
+        <!-- Prompt for version -->
+        <input message="Version number: " addproperty="version"/> 
+        
+        
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${releaseFolder}"/>
+        
+        
+        <!-- Copy Files -->
+        <echo message="Copying Files" />
+        
+        <copy todir="${releaseFolder}">
+            <fileset dir="../">
+                <exclude name="**/.svn"/>
+                <exclude name="**/build"/>
+            </fileset>
+        </copy>
+        
+        <!-- Untar Framework -->
+        <untar src="cache/silverstripe-3.0.tar.gz" dest="${releaseFolder}" compression="gzip">
+            <patternset>
+                <exclude name="framework/mysite"/>
+                <exclude name="framework/mysite/*"/>
+                <exclude name="framework/themes"/>
+                <exclude name="framework/themes/*"/>
+                <exclude name="phpunit*"/>
+                <exclude name="Makefile"/>
+                <exclude name="favicon.ico"/>
+                <exclude name="build.properties.default"/>
+                <include name=".htaccess"/>
+                <include name="**/.htaccess"/>
+            </patternset>
+            
+            <cutdirsmapper dirs="1"/>
+        </untar>
+        
+        <!-- Replace Fav Icon -->
+        <copy file="favicon.ico" todir="${releaseFolder}"/>
+        
+        
+        <!-- Update Build Date -->
+        <echo message="Updating Build Date"/>
+        <replace file="${releaseFolder}/_config.php" token="@@BUILD_DATE@@" value="${releaseDir.buildDate}"/>
+        <replace file="${releaseFolder}/_config.php" token="@@VERSION@@" value="${version}"/>
+        
+        
+        <!-- Patch install.php5 -->
+        <replace file="${releaseFolder}/framework/dev/install/install.php5">
+            <replacefilter token="&lt;/head&gt;" value="&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;CodeBank/css/install.css&quot;/&gt;&lt;/head&gt;"/>
+            <replacefilter token="SilverStripe" value="Code Bank"/>
+        	<replacefilter token="// Set the current theme. More themes can be downloaded from" value=""/>
+        	<replacefilter token="// http://www.silverstripe.org/themes/" value=""/>
+        	<replacefilter token="// Enable nested URLs for this site (e.g. page/sub-page/)" value=""/>
+        	<replacefilter token="if (class_exists('SiteTree')) SiteTree::enable_nested_urls();" value=""/>
+        	<replacefilter token="your SilverStripe site" value="your Code Bank server"/>
+        	<replacefilter token="your site" value="your Code Bank Server"/>
+            <replacefilter token="codebank-cache" value="silverstripe-cache"/>
+    	</replace>
+        
+        
+        <!-- Patch config-form.html -->
+        <replace file="${releaseFolder}/framework/dev/install/config-form.html">
+            <replacefilter token="&lt;/head&gt;" value="&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;CodeBank/css/install.css&quot;/&gt;&lt;/head&gt;"/>
+            <replacefilter token="SilverStripe CMS / Framework Installation" value="Code Bank"/>
+            <replacefilter token="SilverStripe" value="Code Bank"/>
+            <replacefilter token="http://doc.silverstripe.org/sapphire/en/installation/server-requirements" value="http://programs.edchipman.ca/applications/code-bank/server-requirements"/>
+        	<replacefilter token="http://doc.silverstripe.org/doku.php?id=server-requirements" value="http://programs.edchipman.ca/applications/code-bank/server-requirements"/>
+        	<replacefilter token="&lt;h3 class=&quot;sectionHeading&quot;&gt;Theme selection &lt;small&gt;Step 4 of 5&lt;/small&gt;&lt;/h3&gt;" value=""/>
+        	<replacefilter token="&lt;p class=&quot;helpText&quot;&gt;You can change the theme or &lt;a href=&quot;http://silverstripe.org/themes&quot;&gt;download&lt;/a&gt; another from the SilverStripe website after installation.&lt;/p&gt;" value=""/>
+        	<replacefilter token="&lt;ul id=&quot;Themes&quot;&gt;" value=""/>
+        	<replacefilter token="&lt;li&gt;&lt;input type=&quot;radio&quot; name=&quot;template&quot; value=&quot;simple&quot; id=&quot;Simple&quot; &lt;?php if(!isset($_POST['template']) || $_POST['template'] == 'simple') {?&gt;checked=&quot;checked&quot;&lt;?php }?&gt;&gt;&lt;label for=&quot;Simple&quot;&gt;&lt;a href=&quot;https://github.com/silverstripe-themes/silverstripe-simple&quot;&gt;Simple&lt;/a&gt; - our default theme ready to use.&lt;/label&gt;&lt;/li&gt;" value=""/>
+        	<replacefilter token="&lt;li&gt;&lt;input type=&quot;radio&quot; name=&quot;template&quot; value=&quot;tutorial&quot; id=&quot;EmptyTemplate&quot; &lt;?php if(isset($_POST['template']) &amp;&amp; $_POST['template'] == 'tutorial') {?&gt;checked=&quot;checked&quot;&lt;?php }?&gt;&gt;&lt;label for=&quot;EmptyTemplate&quot;&gt;Empty template - ready to begin the &lt;a href=&quot;http://doc.silverstripe.org/sapphire/en/tutorials&quot; target=&quot;_blank&quot;&gt;tutorial&lt;/a&gt;.&lt;/label&gt;&lt;/li&gt;" value=""/>
+        	<replacefilter token="&lt;/ul&gt;" value="&lt;input type=&quot;hidden&quot; name=&quot;template&quot; value=&quot;codeBank&quot;/&gt;"/>
+        	<replacefilter token="Step 5 of 5" value="Step 4 of 4"/>
+        	<replacefilter token="of 5" value="of 4"/>
+    	</replace>
+        
+        
+        <!-- Compress Files -->
+        <echo message="Building Archive"/>
+        <zip destfile="${releaseDir}/${releaseArchive}" basedir="${releaseDir}" update="true" level="9"/>
+    </target>
+    
+    <target name="clean" description="clean up">
+        <!-- Delete the ${releaseDir} directory tree -->
+        <delete dir="${releaseDir}"/>
+    </target>
+</project>
