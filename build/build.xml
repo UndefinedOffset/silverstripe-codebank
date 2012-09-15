@@ -56,8 +56,8 @@
         <!-- Copy Files -->
         <echo message="Copying Files" />
         
-        <copy todir="${releaseFolder}">
-            <fileset dir="../">
+        <copy todir="${releaseFolder}/CodeBank">
+            <fileset dir="./">
                 <exclude name="**/.svn"/>
                 <exclude name="**/build"/>
             </fileset>
@@ -87,8 +87,8 @@
         
         <!-- Update Build Date -->
         <echo message="Updating Build Date"/>
-        <replace file="${releaseFolder}/_config.php" token="@@BUILD_DATE@@" value="${releaseDir.buildDate}"/>
-        <replace file="${releaseFolder}/_config.php" token="@@VERSION@@" value="${version}"/>
+        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@BUILD_DATE@@" value="${releaseDir.buildDate}"/>
+        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@VERSION@@" value="${version}"/>
         
         
         <!-- Patch install.php5 -->
@@ -98,7 +98,7 @@
         	<replacefilter token="// Set the current theme. More themes can be downloaded from" value=""/>
         	<replacefilter token="// http://www.silverstripe.org/themes/" value=""/>
         	<replacefilter token="// Enable nested URLs for this site (e.g. page/sub-page/)" value=""/>
-        	<replacefilter token="if (class_exists('SiteTree')) SiteTree::enable_nested_urls();" value=""/>
+        	<replacefilter token="if (class_exists('SiteTree')) SiteTree::enable_nested_urls();" value="Object::add_extension('Security', 'CodeBankSecurity');"/>
         	<replacefilter token="your SilverStripe site" value="your Code Bank server"/>
         	<replacefilter token="your site" value="your Code Bank Server"/>
             <replacefilter token="codebank-cache" value="silverstripe-cache"/>
