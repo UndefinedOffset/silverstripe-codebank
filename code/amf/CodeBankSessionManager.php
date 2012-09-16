@@ -61,10 +61,6 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 		//Session now expired
 		$response['session']='expired';
 		
-		//Clear the user data
-		$_SESSION['user']=null;
-		$_SESSION['id']=null;
-		
 		$member=Member::currentUser();
 		if($member) {
 		    $member->logOut();
