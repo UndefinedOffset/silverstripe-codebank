@@ -6,73 +6,35 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 	 * @return {array} Returns a standard response array
 	 */
 	public function login($data) {
-		$response=responseBase();
+		$response=CodeBank_ClientAPI::responseBase();
 		
 		$response['login']=true;
 	    
-		//Opens the connection to the db
-		$conn=openDB();
+		//Try to login
+		$member=MemberAuthenticator::authenticate(array(
+	                                                    'Email'=>$data->user,
+                                                        'Password'=>$data->pass
+	                                                ), false);
 		
-		//Check users login
-		$query="SELECT id,username
-		        FROM users
-		        WHERE username='".Convert::raw2sql($data->user)."' AND password='".Convert::raw2sql(sha1($data->pass))."' AND deleted='0'
-		        LIMIT 1";
-		$result=$conn->Execute($query);
-		
-		if($result->recordCount()==1) {
-		    $id=$result->fields['id']; //Store the user id
-		    $user=$result->fields['username']; //Store the username
-		    
-		    $time=date('Y-m-d H:i'); //Get the current time
-		    
-		    $key=md5($user.$id.$_SERVER['REMOTE_ADDR'].$time); //Generate the users login key based on a md5 of the username, id, remote ip, and the current time
-		    
+		if($member instanceof Member && $member->ID!=0) {
 		    try {
-		        //Update the users record with the current session data
-		        $query="UPDATE users
-		                SET loginKey='".Convert::raw2sql($key)."',
-		                    lastLogin='".Convert::raw2sql($time)."',
-		                    lastLoginIP='".Convert::raw2sql($_SERVER['REMOTE_ADDR'])."'
-		                WHERE id=".intval($id);
-		        $conn->Execute($query);
-		        
-		        //Store session data
-		        $_SESSION['user']=$user;
-		        $_SESSION['id']=$id;
-		        $_SESSION['loginKey']=$key;
-		        $_SESSION['loginTime']=$time;
-		        
-		        //Get the ip agreement
-                $query="SELECT *
-                        FROM settings
-                        WHERE code='ipMessage'";
-                $ipAgrement=$conn->Execute($query)->fields['value'];
+    		    $member->logIn();
+    		    
+                $ipAgrement=CodeBankConfig::CurrentConfig()->IPAgreement;
 		        
                 
                 //Get preferences
                 $prefs=new stdClass();
-                $query='SELECT code, value '.
-                       'FROM preferences '.
-                       'WHERE fkUser='.$id;
-                $result=$conn->Execute($query);
-                foreach($result as $row) {
-                    $code=$row['code'];
-                    
-                    if($code=='heartbeat') {
-                        $prefs->$code=($row['value']==1);
-                    }else {
-                        $prefs->$code=$row['value'];
-                    }
-                }
-                
-                $result->Free();
-                
+                $prefs->heartbeat=$member->UseHeartbeat;
                 
 		        //Set the response to HELO
 		        $response['status']='HELO';
-		        $response['message']='Welcome '.htmlentities($_SESSION['user']); //Set the message to "Welcome ...."
-		        $response['data']=array('id'=>$id,'hasIPAgreement'=>!empty($ipAgrement),'preferences'=>$prefs);
+		        $response['message']='Welcome '.htmlentities($member->Name); //Set the message to "Welcome ...."
+		        $response['data']=array(
+                		                'id'=>Member::currentUserID(),
+                		                'hasIPAgreement'=>!empty($ipAgrement),
+                		                'preferences'=>$prefs
+            		                );
 		    }catch (Exception $e) {
 		    	//Something happend on the server
 		        $response['status']='EROR';
@@ -81,10 +43,8 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 		}else {
 			//Bad username/pass combo
 		    $response['status']='EROR';
-            $response['message']='Incorrect Password';
+            $response['message']='Invalid Login';
 		}
-		
-		$conn->close();
 		
 		
 		return $response;
@@ -95,7 +55,7 @@ class CodeBankSessionManager implements CodeBank_APIClass {
      * @return {array} Default response base
      */
 	public function logout() {
-		$response=responseBase();
+		$response=CodeBank_ClientAPI::responseBase();
 		
 		//Session now expired
 		$response['session']='expired';
@@ -103,14 +63,11 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 		//Clear the user data
 		$_SESSION['user']=null;
 		$_SESSION['id']=null;
-		$_SESSION['loginKey']=null;
-		$_SESSION['loginTime']=null;
 		
-		//Unset the session
-		session_unset();
-		
-		//Destroy the Session
-		session_destroy();
+		$member=Member::currentUser();
+		if($member) {
+		    $member->logOut();
+		}
 		
 		return $response;
     }

@@ -1,39 +1,13 @@
 <?php
 class CodeBankServer implements CodeBank_APIClass {
-    public function connect() {
-        $response=responseBase();
-        
-        $response['login']=true;
-        $response['data']=array(CB_VERSION, CB_BUILD_DATE);
-        return $response;
-    }
-    
-    /**
-     * Gets the current php session id
-     */
-    public function getSessionId() {
-        $response=responseBase();
-        
-        $response['data']=session_id();
-        
-        return $response;
-    }
-    
     /**
      * Gets the ip message
      * @return {array} Standard response base
      */
     public function getIPMessage() {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        $conn=openDB();
-        
-        $query="SELECT *
-                FROM settings
-                WHERE code='ipMessage'";
-        $response['data']=$conn->Execute($query)->fields['value'];
-        
-        $conn->Close();
+        $response['data']=CodeBankConfig::CurrentConfig()->IPMessage;
         
         return $response;
     }
@@ -44,9 +18,9 @@ class CodeBankServer implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function saveIPMessage($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -54,11 +28,10 @@ class CodeBankServer implements CodeBank_APIClass {
         
         
         try {
-            $conn=openDB();
+            $codeBankConfig=CodeBankConfig::CurrentConfig();
+            $codeBankConfig->IPMessage=$data->message;
+            $codeBankConfig->write();
             
-            $conn->Execute("UPDATE settings SET value='".Convert::raw2sql($data->message)."' WHERE code='ipMessage'");
-            
-            $conn->close();
             
             $response['status']='HELO';
             $response['message']='Intellectual Property message changed successfully';
@@ -75,7 +48,7 @@ class CodeBankServer implements CodeBank_APIClass {
      * @return {array} Standard response base
      */
     public function heartbeat() {
-        return responseBase();
+        return CodeBank_ClientAPI::responseBase();
     }
     
     /**
@@ -84,19 +57,17 @@ class CodeBankServer implements CodeBank_APIClass {
      * @return {array} Standard response base
      */
     public function savePreferences($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            //Open db connection
-            $conn=openDB();
+            $member=Member::currentUser();
+            if($member && $member->ID!=0) {
+                $member->UseHeartbeat=($data->heartbeat==1 ? true:false);
+                $member->write();
+            }else {
+                throw new Exception('Not Logged In!');
+            }
             
-            
-            //Write heartbeat preference
-            $conn->Execute("UPDATE preferences SET value=".intval($data->heartbeat)." WHERE code='heartbeat' AND fkUser=".$_SESSION['id']);
-            
-            
-            //Close db connection
-            $conn->Close();
             
             $response['status']='HELO';
             $response['message']='Preferences saved successfully';
@@ -105,6 +76,28 @@ class CodeBankServer implements CodeBank_APIClass {
             $response['message']='Internal server error has occured';
         }
         
+        return $response;
+    }
+}
+
+class CodeBankServerController implements CodeBank_APIClass {
+    
+    public function connect() {
+        $response=CodeBank_ClientAPI::responseBase();
+    
+        $response['login']=true;
+        $response['data']=array(CB_VERSION, CB_BUILD_DATE);
+        return $response;
+    }
+    
+    /**
+     * Gets the current php session id
+     */
+    public function getSessionId() {
+        $response=CodeBank_ClientAPI::responseBase();
+    
+        $response['data']=session_id();
+    
         return $response;
     }
 }

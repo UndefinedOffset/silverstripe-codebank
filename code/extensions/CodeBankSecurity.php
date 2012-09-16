@@ -5,11 +5,7 @@ class CodeBankSecurity extends Extension {
      * @return {string} Version Number Plus Build Date
      */
     public function getCodeBankVersion() {
-        if(CB_VERSION=='@@VERSION@@') {
-            return _t('CodeBank.DEVELOPMENT_BUILD', '_Development Build');
-        }
-        
-        return CB_VERSION.' '.CB_BUILD_DATE;
+        return CodeBank::getVersion();
     }
 }
 ?>

@@ -5,9 +5,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function getUsersList() {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -31,9 +31,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function deleteUser($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -63,9 +63,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function undeleteUser($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -95,12 +95,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function changeUserPassword($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
         try {
             $conn=openDB();
             
-            if($_SESSION['user']!='admin') {
+            if(!Permission::check('ADMIN')) {
                 $result=$conn->Execute('SELECT password '.
                                        'FROM users '.
                                        'WHERE id='.intval($data->id));
@@ -134,9 +134,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function createUser($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -177,7 +177,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Standard response base
      */
     public function getAdminLanguages() {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
         $conn=openDB();
         
@@ -199,9 +199,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function createLanguage($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -241,9 +241,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function deleteLanguage($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
@@ -295,9 +295,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @return {array} Returns a standard response array
      */
     public function editLanguage($data) {
-        $response=responseBase();
+        $response=CodeBank_ClientAPI::responseBase();
         
-        if($_SESSION['user']!='admin') {
+        if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
             return $response;
