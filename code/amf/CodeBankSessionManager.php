@@ -33,7 +33,8 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 		        $response['data']=array(
                 		                'id'=>Member::currentUserID(),
                 		                'hasIPAgreement'=>!empty($ipAgrement),
-                		                'preferences'=>$prefs
+                		                'preferences'=>$prefs,
+		                                'isAdmin'=>(Permission::check('ADMIN')!==false)
             		                );
 		    }catch (Exception $e) {
 		    	//Something happend on the server
