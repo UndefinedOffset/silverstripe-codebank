@@ -19,9 +19,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['data'][]=array(
                                     'id'=>$member->ID,
                                     'username'=>$member->Email,
-                                    'lastLogin'=>$member->LastVisited,
-                                    'lastLoginIP'=>'N/A',
-                                    'deleted'=>0
+                                    'lastLogin'=>$member->LastVisited
                                 );
         }
         
