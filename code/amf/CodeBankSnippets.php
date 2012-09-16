@@ -1,5 +1,5 @@
 <?php
-class CodeBankSnippits implements CodeBank_APIClass {
+class CodeBankSnippets implements CodeBank_APIClass {
     /**
      * Gets the list of languages
      * @return {array} Standard response base
@@ -8,9 +8,9 @@ class CodeBankSnippits implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -31,16 +31,16 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets a list of snippits in an array of languages
+     * Gets a list of snippets in an array of languages
      * @return {array} Standard response base
      */
-    public function getSnippits() {
+    public function getSnippets() {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -52,7 +52,7 @@ class CodeBankSnippits implements CodeBank_APIClass {
                 $snippets=$lang->getSnippets()->map('ID', 'Title')->toArray();
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
-                                        'snippits'=>$snippets
+                                        'snippets'=>$snippets
                                     );
             }
         }
@@ -62,17 +62,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets a list of snippits that are in the selected index in an array of languages
+     * Gets a list of snippets that are in the selected index in an array of languages
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippitsByLanguage($data) {
+    public function getSnippetsByLanguage($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -83,7 +83,7 @@ class CodeBankSnippits implements CodeBank_APIClass {
             $snippets=$lang->getSnippets()->map('ID', 'Title')->toArray();
             $response['data'][]=array(
                                     'language'=>$lang->Name,
-                                    'snippits'=>$snippets
+                                    'snippets'=>$snippets
                                 );
         }
         
@@ -92,17 +92,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Searches for snippits that match the information the client in the search field
+     * Searches for snippets that match the information the client in the search field
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function searchSnippits($data) {
+    public function searchSnippets($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -115,7 +115,7 @@ class CodeBankSnippits implements CodeBank_APIClass {
                 $snippets=$snippets->map('ID', 'Title')->toArray();
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
-                                        'snippits'=>$snippets
+                                        'snippets'=>$snippets
                                     );
             }
         }
@@ -125,17 +125,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets a snippit's information
+     * Gets a snippet's information
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippitInfo($data) {
+    public function getSnippetInfo($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -152,8 +152,8 @@ class CodeBankSnippits implements CodeBank_APIClass {
                         'languageID'=>$snippet->LanguageID,
                         'lastModified'=>$snippet->LastEdited,
                         'creatorID'=>$snippet->CreatorID,
-                        'creator'=>($snippet->Creator() ? $snippet->Creator()->Name:''),
-                        'lastEditor'=>($snippet->LastEditor() ? $snippet->LastEditor()->Name:''),
+                        'creator'=>($snippet->Creator() ? $snippet->Creator()->Name:'Deleted User'),
+                        'lastEditor'=>($snippet->LastEditor() ? $snippet->LastEditor()->Name:($snippet->LastEditorID!=0 ? 'Deleted User':'')),
                         'language'=>$snippet->Language()->Name,
                         'fileType'=>$snippet->Language()->FileExtension,
                         'shjs_code'=>$snippet->Language()->HighlightCode
@@ -191,17 +191,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets a revisions of the snippit
+     * Gets a revisions of the snippet
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippitRevisions($data) {
+    public function getSnippetRevisions($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -228,17 +228,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets the of the snippit from a revision
+     * Gets the of the snippet from a revision
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippitTextFromRevision($data) {
+    public function getSnippetTextFromRevision($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -276,17 +276,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     
     
     /**
-     * Saves a new snippit
+     * Saves a new snippet
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function newSnippit($data) {
+    public function newSnippet($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -314,17 +314,17 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Saves an existing snippit
+     * Saves an existing snippet
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function saveSnippit($data) {
+    public function saveSnippet($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Member::currentUser()) {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Not logged in';
+            $response['message']='Permission Denied';
             
             return $response;
         }
@@ -357,11 +357,11 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Deletes a snippit from the database
+     * Deletes a snippet from the database
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function deleteSnippit($data) {
+    public function deleteSnippet($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
@@ -393,43 +393,43 @@ class CodeBankSnippits implements CodeBank_APIClass {
     }
     
     /**
-     * Gets the snippit text for the two revisions as well as a unified diff file of the revisions
+     * Gets the snippet text for the two revisions as well as a unified diff file of the revisions
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippitDiff($data) {
+    public function getSnippetDiff($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
         
         //Get the Main Revision
-        $snippit1=SnippetVersion::get()->byID(intval($data->mainRev));
-        if(empty($snippit1) || $snippit1===false || $snippit1->ID==0) {
+        $snippet1=SnippetVersion::get()->byID(intval($data->mainRev));
+        if(empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
             $response['status']='EROR';
             $response['message']='Main revision not found';
         
             return $response;
         }
         
-        $snippit1=preg_replace('/\r\n|\n|\r/', "\n", $snippit1->Text);
+        $snippet1=preg_replace('/\r\n|\n|\r/', "\n", $snippet1->Text);
         
         
         //Get the Comparision Revision
-        $snippit2=SnippetVersion::get()->byID(intval($data->compRev));
-        if(empty($snippit2) || $snippit1===false || $snippit2->ID==0) {
+        $snippet2=SnippetVersion::get()->byID(intval($data->compRev));
+        if(empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
             $response['status']='EROR';
             $response['message']='Compare revision not found';
         
             return $response;
         }
         
-        $snippit2=preg_replace('/\r\n|\n|\r/', "\n", $snippit2->Text);
+        $snippet2=preg_replace('/\r\n|\n|\r/', "\n", $snippet2->Text);
         
         
         //Generate the diff file
-        $diff=new Text_Diff('auto', array(preg_split('/\n/', $snippit1), preg_split('/\n/', $snippit2)));
+        $diff=new Text_Diff('auto', array(preg_split('/\n/', $snippet1), preg_split('/\n/', $snippet2)));
         $renderer=new Text_Diff_Renderer_unified(array('leading_context_lines'=>1, 'trailing_context_lines'=>1));
         
-        $response['data']=array('mainRev'=>$snippit1, 'compRev'=>$snippit2, 'diff'=>$renderer->render($diff));
+        $response['data']=array('mainRev'=>$snippet1, 'compRev'=>$snippet2, 'diff'=>$renderer->render($diff));
         
         $conn->Close();
         

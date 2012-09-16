@@ -9,18 +9,22 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
-        $conn=openDB();
+        $members=Permission::get_members_by_permission(array('ADMIN', 'CODE_BANK_ACCESS'));
+        foreach($members as $member) {
+            $response['data'][]=array(
+                                    'id'=>$member->ID,
+                                    'username'=>$member->Email,
+                                    'lastLogin'=>$member->LastVisited,
+                                    'lastLoginIP'=>'N/A',
+                                    'deleted'=>0
+                                );
+        }
         
-        $query="SELECT id,username,lastLogin,lastLoginIP,deleted
-                FROM users";
-        $response['data']=$conn->Execute($query)->getAll();
-        
-        $conn->Close();
         
         return $response;
     }
@@ -35,52 +39,19 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
         try {
-            $conn=openDB();
-            
-            $conn->Execute("UPDATE users SET deleted='1' WHERE id=".intval($data->id)." AND username<>'admin'");
-            
-            $conn->close();
+            $member=Member::get()->filter('ID', intval($data->id))->where('ID<>'.Member::currentUserID())->First();
+            if(!empty($member) && $member!==false && $member->ID!=0) {
+                $member->delete();
+            }
             
             $response['status']='HELO';
             $response['message']='User deleted successfully';
-        }catch (Exception $e) {
-            $response['status']='EROR';
-            $response['message']='Internal server error has occured';
-        }
-        
-        return $response;
-    }
-    
-    /**
-     * Undeletes a user
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
-     * @return {array} Returns a standard response array
-     */
-    public function undeleteUser($data) {
-        $response=CodeBank_ClientAPI::responseBase();
-        
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']='Internal server error has occured';
-            return $response;
-        }
-        
-        
-        try {
-            $conn=openDB();
-            
-            $conn->Execute("UPDATE users SET deleted='0' WHERE id=".intval($data->id));
-            
-            $conn->close();
-            
-            $response['status']='HELO';
-            $response['message']='User undeleted successfully';
         }catch (Exception $e) {
             $response['status']='EROR';
             $response['message']='Internal server error has occured';
@@ -98,25 +69,33 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            $conn=openDB();
-            
             if(!Permission::check('ADMIN')) {
-                $result=$conn->Execute('SELECT password '.
-                                       'FROM users '.
-                                       'WHERE id='.intval($data->id));
-                $result=$result->fetchRow();
+                $member=Member::currentUser();
                 
-                if($result['password']!=sha1($data->currPassword)) {
+                $e=PasswordEncryptor::create_for_algorithm($this->PasswordEncryption);
+                if(!$e->check($member->Password, $data->currPassword, $member->Salt, $member)) {
                     $response['status']='EROR';
                     $response['message']='Current password does not match';
                     
                     return $response;
                 }
+            }else {
+                $member=Member::get()->byID(intval($data->id));
+                if(empty($member) || $member===false || $member->ID==0) {
+                    $response['status']='EROR';
+                    $response['message']='Member not found';
+                    
+                    return $response;
+                }
             }
             
-            $conn->Execute("UPDATE users SET password='".Convert::raw2sql(sha1($data->password))."' WHERE id=".intval($data->id));
+            if(!$member->changePassword($data->password)) {
+                $response['status']='EROR';
+                $response['message']='New password is not valid';
+                
+                return $response;
+            }
             
-            $conn->close();
             
             $response['status']='HELO';
             $response['message']="User's password changed successfully";
@@ -138,29 +117,35 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
         try {
-            $conn=openDB();
-            
-            $result=$conn->Execute("SELECT id FROM users WHERE username LIKE '".Convert::raw2sql($data->username)."'");
-            
-            if($result->recordCount()>0) {
+            if(Member::get()->filter('Email', Convert::raw2sql($data->username))) {
                 $response['status']='EROR';
                 $response['message']='Username already exists';
                 
                 return $response;
-            }else {
-                $conn->Execute("INSERT INTO users (username,password) VALUES('".Convert::raw2sql($data->username)."','".Convert::raw2sql(sha1($data->password))."')");
-                
-                //Setup default preferences
-                $conn->Execute("INSERT INTO preferences (fkUser,code,value) VALUE(".$conn->Insert_ID().",'heartbeat','0')");
             }
             
-            $conn->close();
+            
+            //Create and write member
+            $member=new Member();
+            $member->Email=$data->username;
+            $member->Password=$data->Password;
+            $member->UseHeartbeat=0;
+            
+            if(!$member->validate()) {
+                $response['status']='EROR';
+                $response['message']='Password is not valid';
+                
+                return $response;
+            }
+            
+            $member->write();
+            
             
             $response['status']='HELO';
             $response['message']="User added successfully";
@@ -179,16 +164,25 @@ class CodeBankAdministration implements CodeBank_APIClass {
     public function getAdminLanguages() {
         $response=CodeBank_ClientAPI::responseBase();
         
-        $conn=openDB();
+        if(!Permission::check('ADMIN')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+            return $response;
+        }
         
-        $query="SELECT l.*, count(s.id) AS snippetCount
-                FROM languages l
-                    LEFT JOIN snippits s ON s.fkLanguage=l.id
-                GROUP BY l.id
-                ORDER BY l.language";
-        $response['data']=$conn->Execute($query)->getAll();
         
-        $conn->Close();
+        $languages=SnippetLanguage::get();
+        foreach($languages as $lang) {
+            $response['data'][]=array(
+                                    'id'=>$lang->ID,
+                                    'language'=>$lang->Name,
+                                    'file_extension'=>$lang->FileExtension,
+                                    'shjh_code'=>$lang->HighlightCode,
+                                    'user_language'=>$lang->UserLanguage,
+                                    'snippetCount'=>$lang->getSnippets()->Count()
+                                );
+        }
+        
         
         return $response;
     }
@@ -203,17 +197,13 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
         try {
-            $conn=openDB();
-            
-            $result=$conn->Execute("SELECT id FROM languages WHERE language LIKE '".Convert::raw2sql($data->language)."'");
-            
-            if($result->recordCount()>0) {
+            if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
                 $response['status']='EROR';
                 $response['message']='Language already exists';
                 
@@ -221,9 +211,13 @@ class CodeBankAdministration implements CodeBank_APIClass {
             }
             
             
-            $conn->Execute("INSERT INTO languages(language,file_extension,shjs_code,user_language) VALUES('".Convert::raw2sql($data->language)."','".Convert::raw2sql($data->fileExtension)."','Plain',1)");
+            $lang=new SnippetLanguage();
+            $lang->Name=$data->language;
+            $lang->FileExtension=$data->fileExtension;
+            $lang->HighlightCode='Plain';
+            $lang->UserLanguage=1;
+            $lang->write();
             
-            $conn->close();
             
             $response['status']='HELO';
             $response['message']="Language added successfully";
@@ -245,22 +239,15 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
         try {
-            $conn=openDB();
-            
-            $result=$conn->Execute("SELECT l.user_language, count(s.id) AS snippetCount
-                                    FROM languages l
-                                        LEFT JOIN snippits s ON s.fkLanguage=l.id
-                                    WHERE l.id=".intval($data->id)."
-                                    GROUP BY l.id");
-            if($result && $result->recordCount()>0) {
-                $result=$result->fetchRow();
-                if($result['user_language']==false || $result['snippitCount']>0) {
+            $lang=SnippetLanguage::get()->byID(intval($data->id));
+            if(!empty($lang) && $lang!==false && $lang->ID!=0) {
+                if($lang->UserLanguage==false || $lang->getSnippets()->Count()>0) {
                     $response['status']='EROR';
                     $response['message']='Language cannot be deleted, it is either not a user language or has snippets attached to it';
                     
@@ -274,10 +261,8 @@ class CodeBankAdministration implements CodeBank_APIClass {
             }
             
             
-            $conn->Execute("DELETE FROM languages WHERE id=".intval($data->id));
+            $lang->delete();
             
-            
-            $conn->close();
             
             $response['status']='HELO';
             $response['message']="Language deleted successfully";
@@ -299,17 +284,14 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
         
         try {
-            $conn=openDB();
-            
-            $result=$conn->Execute("SELECT id FROM languages WHERE language LIKE '".Convert::raw2sql($data->language)."' AND id<>".intval($data->id));
-            
-            if($result->recordCount()>0) {
+            $lang=SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."' AND ID<>=".intval($data->id));
+            if(empty($lang) || $lang===false || $lang->ID==0) {
                 $response['status']='EROR';
                 $response['message']='Language already exists';
             
@@ -317,12 +299,9 @@ class CodeBankAdministration implements CodeBank_APIClass {
             }
             
             
-            $result=$conn->Execute("SELECT user_language
-                                    FROM languages
-                                    WHERE id=".intval($data->id));
-            if($result && $result->recordCount()>0) {
-                $result=$result->fetchRow();
-                if($result['user_language']==false) {
+            $lang=SnippetLanguage::get()->byID(intval($data->id));
+            if(!empty($lang) && $lang!==false && $lang->ID!=0) {
+                if($lang->UserLanguage==false) {
                     $response['status']='EROR';
                     $response['message']='Language cannot be edited, it is not a user language';
                     
@@ -336,13 +315,11 @@ class CodeBankAdministration implements CodeBank_APIClass {
             }
             
             
-            $conn->Execute("UPDATE languages
-                            SET language='".Convert::raw2sql($data->language)."',
-                                file_extension='".Convert::raw2sql($data->fileExtension)."'
-                            WHERE id=".intval($data->id));
+            //Update language and write
+            $lang->Name=$data->language;
+            $lang->FileExtension=$data->fileExtension;
+            $lang->write();
             
-            
-            $conn->close();
             
             $response['status']='HELO';
             $response['message']="Language edited successfully";

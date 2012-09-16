@@ -1,6 +1,10 @@
 <?php
-class CodeBank extends LeftAndMain {
+class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $url_segment='codeBank';
+    
+    public static $required_permission_codes=array(
+                                                    'CODE_BANK_ACCESS'
+                                                );
     
     public function init() {
         parent::init();
@@ -51,9 +55,25 @@ class CodeBank extends LeftAndMain {
         
         return CB_VERSION.' '.CB_BUILD_DATE;
     }
+    /**
+	 * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
+	 * array(
+	 *   'VIEW_SITE' => 'View the site',
+	 * );
+	 */
+	public function providePermissions() {
+	    return array(
+	                'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
+	            );
+	}
 }
 
 class CodeBank_ClientAPI extends Controller {
+    public static $allowed_actions=array(
+                                        'index',
+                                        'export_snippet'
+                                    );
+    
     public function init() {
         parent::init();
         
@@ -87,6 +107,99 @@ class CodeBank_ClientAPI extends Controller {
         
         //Output
         echo $response;
+        
+        //Save session and exit
+        Session::save();
+        exit;
+    }
+    
+    /**
+     * Handles exporting of snippets
+     * @param {SS_HTTPRequest} $request HTTP Request Data
+     */
+    public function export_snippet(SS_HTTPRequest $request) {
+        if($request->getVar('s')) {
+            //Use the session id in the request
+            Session::start($request->getVar('s'));
+        }
+        
+        
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            header("HTTP/1.1 401 Unauthorized");
+            
+            
+            //Save session and exit
+            Session::save();
+            exit;
+        }
+        
+        
+        try {
+            $fileID=uniqId(time());
+            
+            $snippet=Snippet::get()->byID(intval($request->getVar('id')));
+            if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+                header("HTTP/1.1 404 Not Found");
+                
+                
+                //Save session and exit
+                Session::save();
+                exit;
+            }
+            
+            
+            //If the temp dir doesn't exist create it
+            if(!file_exists(ASSETS_PATH.'/.codeBankTemp')) {
+                mkdir(ASSETS_PATH.'/.codeBankTemp', 0644);
+            }
+            
+            
+            if($snippet->Language()->Name=='ActionScript 3') {
+                $zip=new ZipArchive();
+                
+                $res=$zip->open(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip', ZIPARCHIVE::CREATE);
+                
+                if($res) {
+                    $path='';
+                    $text=preg_split("/[\n\r]/", $snippet->getSnippetText());
+                    $folder=str_replace('.', '/', trim(preg_replace('/^package (.*?)((\s*)\{)?$/i', '\\1', $text[0])));
+                    
+                    $className=array_values(preg_grep('/(\s*|\t*)public(\s+)class(\s+)(.*?)(\s*)((extends|implements)(.*?)(\s*))*\{/i', $text));
+                    
+                    if(count($className)==0) {
+                        throw new Exception('Class definition could not be found');
+                    }
+                    
+                    $className=trim(preg_replace('/(\s*|\t*)public(\s+)class(\s+)(.*?)(\s*)((extends|implements)(.*?)(\s*))*\{/i','\\4', $className[0]));
+                    
+                    if($className=="") {
+                        throw new Exception('Class definition could not be found');
+                    }
+                    
+                    $zip->addFromString($folder.'/'.$className.'.'.$snippet->Language()->FileExtension, $snippet->getSnippetText());
+                    
+                    $zip->Close();
+                    chmod(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip',0600);
+                    
+                    
+                    header('Content-Type: application/octet-stream');
+                    header('Content-Disposition: attachment;  filename="'.$fileID.'.zip"');
+                    header('Content-Transfer-Encoding: binary');
+                    
+                    readfile(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
+                    unlink(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
+                }
+            }else {
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment;  filename="'.$fileID.'.'.$snippet->Language()->FileExtension.'"');
+                header('Content-Transfer-Encoding: binary');
+                
+                print $snippet->getSnippetText();
+            }
+        }catch (Exception $e) {
+            header("HTTP/1.1 500 Internal Server Error");
+        }
+        
         
         //Save session and exit
         Session::save();

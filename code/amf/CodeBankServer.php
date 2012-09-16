@@ -22,7 +22,7 @@ class CodeBankServer implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']='Permission Denied';
             return $response;
         }
         
