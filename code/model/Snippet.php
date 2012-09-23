@@ -36,7 +36,7 @@ class Snippet extends DataObject {
                                     new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
-                                    TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth'),
+                                    TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
                                 )
                             )
@@ -99,6 +99,17 @@ class Snippet extends DataObject {
         $version=$this->Versions()->First();
         if($version) {
             return $version->Text;
+        }
+    }
+    
+    /**
+     * Gets the id from the latest snippet version
+     * @return {string} Snippet text
+     */
+    public function getCurrentVersionID() {
+        $version=$this->Versions()->First();
+        if($version) {
+            return $version->ID;
         }
     }
     

@@ -1,5 +1,5 @@
 <?php
-class CodeBank_ClientAPI extends Controller {
+class CodeBankClientAPI extends Controller {
     public static $allowed_actions=array(
                                         'index',
                                         'export_snippet'

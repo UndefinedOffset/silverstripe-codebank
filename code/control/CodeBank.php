@@ -9,7 +9,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     
     public static $allowed_actions=array(
                                         'tree',
-                                        'EditForm'
+                                        'EditForm',
+                                        'clear'
                                     );
     
     public static $session_namespace='CodeBank';
@@ -22,9 +23,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
-     * @param Int $id
-     * @param {FieldList} $fields
-     * @return {Form}
+     * Gets the form used for viewing snippets
+     * @param {int} $id ID of the record to fetch
+     * @param {FieldList} $fields Fields to use
+     * @return {Form} Form to be used
      */
     public function getEditForm($id=null, $fields=null) {
         if(!$id) {
@@ -52,14 +54,24 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         if($record) {
             $fields->push($idField=new HiddenField("ID", false, $id));
-            $actions=new FieldList();
+            $actions=new FieldList(
+                                    new FormAction('doCopy', _t('CodeBank.COPY', '_Copy')),
+                                    new FormAction('doEditRedirect', _t('CodeBank.EDIT', '_Edit')),
+                                    new FormAction('doExport', _t('CodeBank.EXPORT', '_Export')),
+                                    new FormAction('doPrint', _t('CodeBank.PRINT', '_Print')),
+                                    new LabelField('Revision', _t('CodeBank.REVISION', '_Revision').': '),
+                                    DropdownField::create('RevisionID', '', $record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created'), null, null, '{'._t('CodeBank.CURRENT_REVISION', '_Current Revision').'}')->setDisabled($record->Versions()->Count()<=1)->addExtraClass('no-change-track'),
+                                    FormAction::create('compareRevision', _t('CodeBank.COMPARE_WITH_CURRENT', '_Compare with Current'))->setDisabled($record->Versions()->Count()<=1)
+                                );
             
             
             // Use <button> to allow full jQuery UI styling
             $actionsFlattened=$actions->dataFields();
             if($actionsFlattened) {
                 foreach($actionsFlattened as $action) {
-                    $action->setUseButtonTag(true);
+                    if($action instanceof FormAction) {
+                        $action->setUseButtonTag(true);
+                    }
                 }
             }
             
@@ -71,6 +83,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
+            $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), DBField::create_field('SS_DateTime', $record->LastEdited)->Nice())->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditor', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
+            $fields->push(new HiddenField('ID', 'ID'));
+            
             $form=new Form($this, 'EditForm', $fields, $actions, $validator);
             $form->loadDataFrom($record);
             $form->disableDefaultAction();
@@ -81,11 +100,15 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
             
             $readonlyFields=$form->Fields()->makeReadonly();
-            //@TODO Replace the Text field with a custom field that enables syntax highlighter
             
             $form->setFields($readonlyFields);
-
+            
+            
             $this->extend('updateEditForm', $form);
+            
+            
+            Requirements::javascript('CodeBank/javascript/CodeBank.ViewForm.js');
+            
             return $form;
         }else if($id) {
             return new Form($this, 'EditForm', new FieldList(
@@ -108,6 +131,17 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      */
     public function tree() {
         return $this->renderWith('CodeBank_TreeView');
+    }
+    
+    /**
+     * Clears the current page for this namespace
+     * @return {SS_HTTPResponse} Response
+     */
+    public function clear() {
+        Session::clear($this->sessionNamespace() . ".currentPage");
+        
+        $this->redirect($this->Link('show'));
+        return $this->getResponseNegotiator()->respond($this->request);
     }
     
     /**
@@ -177,7 +211,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         // getChildrenAsUL is a flexible and complex way of traversing the tree
         $controller=$this;
-        $recordController=($this->stat('tree_class') == 'SiteTree' ?  singleton('CMSPageEditController'):$this); //@TODO
+        $recordController=singleton('CodeBank');
         $titleFn=function(&$child) use(&$controller, &$recordController) {
             $link=Controller::join_links($recordController->Link("show"), $child->ID);
             return LeftAndMain_TreeNode::create($child, $link, $controller->isCurrentPage($child))->forTemplate();

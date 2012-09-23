@@ -22,3 +22,18 @@
 .codebank-tree .class-Snippet .jstree-pageicon {
     background: url(./../../framework/admin/images/sitetree_ss_pageclass_icons_default.png) no-repeat !important;
 }
+
+.CodeBank .Actions label {
+    display: inline-block;
+    
+    line-height: 28px;
+    
+    border-left: 1px solid #D1D5D6;
+    
+    margin-left: 20px;
+    padding-left: 30px;
+}
+
+.CodeBank .Actions select {
+    padding: 5px;
+}
