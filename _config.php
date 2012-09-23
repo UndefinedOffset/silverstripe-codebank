@@ -5,4 +5,9 @@ define('CB_VERSION','@@VERSION@@');
 
 //Extensions
 Object::add_extension('Member','CodeBankMember');
+
+
+//CMS Menu
+CMSMenu::remove_menu_item('CodeBankEditSnippet');
+CMSMenu::remove_menu_item('CodeBankSettings');
 ?>

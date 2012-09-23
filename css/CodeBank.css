@@ -2,3 +2,23 @@
     width: 97%;
     max-width: 100%;
 }
+
+.codebank-tree #record-0 ins, .codebank-tree #record-0 strong {
+    display: none !important;
+}
+
+.codebank-tree #record-0 li > ins {
+    display: inline-block !important;
+}
+
+.codebank-tree .class-SnippetLanguage .jstree-pageicon {
+    background: url(./../images/tree-sheet.png) no-repeat;
+}
+
+.codebank-tree .class-SnippetLanguage.jstree-open .jstree-pageicon {
+    background-position: 0 -16px;
+}
+
+.codebank-tree .class-Snippet .jstree-pageicon {
+    background: url(./../../framework/admin/images/sitetree_ss_pageclass_icons_default.png) no-repeat !important;
+}

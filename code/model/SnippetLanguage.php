@@ -12,6 +12,10 @@ class SnippetLanguage extends DataObject {
                                 'UserLanguage'=>true
                             );
     
+    public static $extensions=array(
+                                    'SnippetHierarchy'
+                                );
+    
     public static $default_sort='Name';
     
     private $defaultLanguages=array(
@@ -140,12 +144,45 @@ class SnippetLanguage extends DataObject {
                         );
     }
     
-    /**
-     * Gets the snippets that are bound to this language
-     * @return {DataList} Data List of Snippets bound to this language
-     */
-    public function getSnippets() {
+    public function hasSnippets() {
+        return ($this->Snippets()->Count()>0);
+    }
+	
+	/**
+	 * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
+	 * @return {string} a html string ready to be directly used in a template
+	 */
+	public function getTreeTitle() {
+		$treeTitle = sprintf(
+			"<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
+			Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+		);
+		
+		return $treeTitle;
+	}
+	
+	/**
+	 * Gets the snippets that are bound to this language
+	 * @return {DataList} Data List of Snippets bound to this language
+	 */
+    public function Snippets() {
+        if($this->ID==0 && Controller::curr() instanceof LeftAndMain) {
+            return SnippetLanguage::get();
+        }
+        
         return Snippet::get()->filter('LanguageID', $this->ID);
     }
+    
+	/**
+	 * Return the CSS classes to apply to this node in the CMS tree
+	 * @return {string} Classes used in the cms tree
+	 */
+	public function CMSTreeClasses() {
+		$classes=sprintf('class-%s', $this->class);
+		
+		$classes.=$this->markingClasses();
+
+		return $classes;
+	}
 }
 ?>

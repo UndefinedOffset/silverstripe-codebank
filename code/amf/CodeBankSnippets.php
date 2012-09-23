@@ -48,8 +48,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            if($lang->getSnippets()->Count()>0) {
-                $snippets=$lang->getSnippets()->map('ID', 'Title')->toArray();
+            if($lang->Snippets()->Count()>0) {
+                $snippets=$lang->Snippets()->map('ID', 'Title')->toArray();
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
                                         'snippets'=>$snippets
@@ -79,8 +79,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $lang=SnippetLanguage::get()->byID(intval($data->id));
-        if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->getSnippets()->Count()>0) {
-            $snippets=$lang->getSnippets()->map('ID', 'Title')->toArray();
+        if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
+            $snippets=$lang->Snippets()->map('ID', 'Title')->toArray();
             $response['data'][]=array(
                                     'language'=>$lang->Name,
                                     'snippets'=>$snippets
@@ -110,8 +110,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=$lang->getSnippets()->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
-            if($lang->getSnippets()->Count()>0) {
+            $snippets=$lang->Snippets()->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            if($lang->Snippets()->Count()>0) {
                 $snippets=$snippets->map('ID', 'Title')->toArray();
                 $response['data'][]=array(
                                         'language'=>$lang->Name,

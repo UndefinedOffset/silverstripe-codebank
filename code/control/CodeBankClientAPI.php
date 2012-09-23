@@ -1,73 +1,4 @@
 <?php
-class CodeBank extends LeftAndMain implements PermissionProvider {
-    public static $url_segment='codeBank';
-    
-    public static $required_permission_codes=array(
-                                                    'CODE_BANK_ACCESS'
-                                                );
-    
-    public function init() {
-        parent::init();
-        
-        Requirements::css('CodeBank/css/CodeBank.css');
-    }
-    
-    /**
-     * @param Int $id
-     * @param FieldList $fields
-     * @return Form
-     */
-    public function getEditForm($id=null, $fields=null) {
-        $fields=new FieldList(
-                            $root=new TabSet('Root',
-                                        new Tab('Snippets', _t('CodeBank.SNIPPETS', '_Snippets'),
-                                                GridField::create('Snippets', 'Snippets', Snippet::get(), GridFieldConfig_RecordEditor::create(10))
-                                            ),
-                                        new Tab('Config', _t('CodeBank.CONFIG', '_Settings'),
-                                                new HiddenField('Contents', 'Contents')
-                                            )
-                                    )
-                        );
-        
-        $root->setTemplate('CMSTabSet');
-        
-        
-        $actions=new FieldList();
-        
-        
-        $form=new Form($this, "EditForm", $fields, $actions);
-        $form->addExtraClass('cms-edit-form');
-        $form->addExtraClass('center ss-tabset cms-tabset '.$this->BaseCSSClasses());
-        $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-        $form->setAttribute('data-pjax-fragment', 'CurrentForm');
-        
-        return $form;
-    }
-    
-    /**
-     * Gets the current version of Code Bank
-     * @return {string} Version Number Plus Build Date
-     */
-    public static function getVersion() {
-        if(CB_VERSION=='@@VERSION@@') {
-            return _t('CodeBank.DEVELOPMENT_BUILD', '_Development Build');
-        }
-        
-        return CB_VERSION.' '.CB_BUILD_DATE;
-    }
-    /**
-	 * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
-	 * array(
-	 *   'VIEW_SITE' => 'View the site',
-	 * );
-	 */
-	public function providePermissions() {
-	    return array(
-	                'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
-	            );
-	}
-}
-
 class CodeBank_ClientAPI extends Controller {
     public static $allowed_actions=array(
                                         'index',
@@ -224,6 +155,4 @@ class CodeBank_ClientAPI extends Controller {
         return $responseBase;
     }
 }
-
-interface CodeBank_APIClass {}
 ?>

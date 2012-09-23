@@ -17,6 +17,7 @@ class Snippet extends DataObject {
                              );
     
     public static $extensions=array(
+                                    'SnippetHierarchy',
                                     "FulltextSearchable('Title,Description,Tags')"
                                 );
     
@@ -30,11 +31,15 @@ class Snippet extends DataObject {
      */
     public function getCMSFields() {
         return new FieldList(
-                            new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
-                            new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
-                            TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
-                            TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth'),
-                            TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
+                            new TabSet('Root',
+                                new Tab('Main', _t('CodeBank.MAIN', '_Main'),
+                                    new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
+                                    new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
+                                    TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
+                                    TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth'),
+                                    TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
+                                )
+                            )
                         );
     }
     
@@ -109,5 +114,43 @@ class Snippet extends DataObject {
                     'Tags'=>_t('Snippet.TAGS_COLUMN', '_Tags')
                 );
     }
+	
+	/**
+	 * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
+	 * @return string a html string ready to be directly used in a template
+	 */
+	public function getTreeTitle() {
+		$treeTitle = sprintf(
+			"<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
+			Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+		);
+		
+		return $treeTitle;
+	}
+	
+	/**
+	 * Workaround to get snippets to display in tree, does nothing
+	 */
+	public function Snippets() {}
+	
+	/**
+	 * Workaround to get snippets to display
+	 * @return {bool} Returns boolean true
+	 */
+    public function hasSnippets() {
+        return true;
+    }
+    
+	/**
+	 * Return the CSS classes to apply to this node in the CMS tree
+	 * @return {string} Classes used in the cms tree
+	 */
+	public function CMSTreeClasses() {
+		$classes=sprintf('class-%s', $this->class);
+		
+		$classes.=$this->markingClasses();
+
+		return $classes;
+	}
 }
 ?>

@@ -177,7 +177,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
                                     'file_extension'=>$lang->FileExtension,
                                     'shjh_code'=>$lang->HighlightCode,
                                     'user_language'=>$lang->UserLanguage,
-                                    'snippetCount'=>$lang->getSnippets()->Count()
+                                    'snippetCount'=>$lang->Snippets()->Count()
                                 );
         }
         
@@ -245,7 +245,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         try {
             $lang=SnippetLanguage::get()->byID(intval($data->id));
             if(!empty($lang) && $lang!==false && $lang->ID!=0) {
-                if($lang->UserLanguage==false || $lang->getSnippets()->Count()>0) {
+                if($lang->UserLanguage==false || $lang->Snippets()->Count()>0) {
                     $response['status']='EROR';
                     $response['message']='Language cannot be deleted, it is either not a user language or has snippets attached to it';
                     
