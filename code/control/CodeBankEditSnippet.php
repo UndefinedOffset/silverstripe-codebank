@@ -122,5 +122,25 @@ class CodeBankEditSnippet extends CodeBank {
         
         return $this->getResponseNegotiator()->respond($this->request);
     }
+    
+    /**
+     * Deletes the snippet from the database
+     * @param {array} $data Data submitted by the user
+     * @param {Form} $form Submitting form
+     * @return {SS_HTTPResponse} Response
+     */
+    public function doDelete($data, Form $form) {
+        $record=$this->currentPage();
+    
+        if($record->canDelete()) {
+            $record->delete();
+    
+            $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.SNIPPET_DELETED', '_Snippet has been deleted')));
+        }else {
+            $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.PERMISSION_DENIED', '_Permission Denied')));
+        }
+    
+        return $this->getResponseNegotiator()->respond($this->request);
+    }
 }
 ?>

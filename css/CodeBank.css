@@ -38,6 +38,11 @@
     padding: 5px;
 }
 
+.CodeBank .cms-content-toolbar {
+    border-bottom: 0;
+    box-shadow: none;
+}
+
 .cms-container .CodeBank {
     margin-left: -1px;
 }
