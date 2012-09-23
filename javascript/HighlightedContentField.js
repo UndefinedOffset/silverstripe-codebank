@@ -15,16 +15,25 @@
                 
                 //Init highlight
                 SyntaxHighlighter.highlight();
+                
+                var self=this;
+                $('.cms-container').bind('afterstatechange', function() {self.redraw()});
             },
             
             fromWindow: {
                 onresize: function(){
                     this._super();
                     
-                    var middleColumn=this.find('.middleColumn');
-                    middleColumn.css('width', '300px');
-                    middleColumn.css('width', this.closest('.tab').width()+'px');
+                    this.redraw();
                 }
+            },
+            
+            redraw: function(){
+                this._super();
+                
+                var middleColumn=this.find('.middleColumn');
+                middleColumn.css('width', '300px');
+                middleColumn.css('width', this.closest('.tab').width()+'px');
             }
         });
     });

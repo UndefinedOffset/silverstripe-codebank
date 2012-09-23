@@ -37,3 +37,54 @@
 .CodeBank .Actions select {
     padding: 5px;
 }
+
+.cms-container .CodeBank {
+    margin-left: -1px;
+}
+
+.cms-container .CodeBank .cms-edit-form {
+    background: #e6eaed;
+}
+
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav {
+    border-bottom: none;
+    float: right;
+    margin: 8px 0 -1px 0;
+    padding: 0 24px 0 0;
+}
+
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav li {
+    float: left;
+}
+
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav li a {
+    font-weight: bold;
+    line-height: 16px;
+    padding: 8px 20px 8px;
+}
+
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-default,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-default,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-default {
+    border: 1px solid #c0c0c2;
+}
+
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-active,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-active,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-active {
+    padding-bottom: 1px;
+    background: #e6eaed;
+    border: 1px solid #c0c0c2;
+}
+
+.cms-container .CodeBank .ss-tabset .ss-tabset {
+    position: static;
+}
+
+.cms-container .CodeBank .ss-tabset .ui-tabs-panel {
+    background: #e6eaed;
+    border-top: 1px solid #c0c0c2;
+    clear: both;
+    
+    padding: 1em 1.4em;
+}
+
+.cms-container .CodeBank .ss-tabset.ss-tabset-tabshidden .ui-tabs-panel {
+    border-top: none;
+}

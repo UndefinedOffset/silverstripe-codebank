@@ -44,10 +44,10 @@ class CodeBankConfig extends DataObject {
         return new FieldList(
                             new TabSet('Root',
                                             new Tab('Main', _t('CodeBankConfig.MAIN', '_Main'),
-                                                    new HtmlEditorField('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))
+                                                    HtmlEditorField::create('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))->addExtraClass('stacked')
                                                 ),
                                             new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),
-                                                    new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), GridFieldConfig_RecordEditor::create(40))
+                                                    new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), GridFieldConfig_RecordEditor::create(30))
                                                 )
                                         )
                         );

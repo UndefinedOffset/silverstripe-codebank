@@ -32,12 +32,21 @@ en:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
         LANGUAGES: "Languages"
+    CodeBankSettings:
+        MENUTITLE: "Code Bank Settings"
     CodeBankMember:
         USE_HEARTBEAT: "Use Code Bank Heartbeat to keep client session alive?"
     Snippet:
+        SINGULARNAME: "Snippet"
+        PLURALNAME: "Snippets"
         LANGUAGE: "Language"
         TITLE: "Title"
         DESCRIPTION: "Description"
         CODE: "Code"
         TAGS: "Tags (comma separate)"
         TAGS_COLUMN: "Tags"
+    SnippetLanguage:
+        SINGULARNAME: "Language"
+        PLURALNAME: "Languages"
+        NAME: "Name"
+        FILE_EXTENSION: "File Extension"

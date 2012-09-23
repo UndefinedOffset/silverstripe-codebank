@@ -1,0 +1,4 @@
+.cms-menu-list li a .icon.icon-codebank {
+    opacity: 1;
+    filter: alpha(opacity = 100);
+}

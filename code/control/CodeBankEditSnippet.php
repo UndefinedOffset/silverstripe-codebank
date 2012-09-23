@@ -4,7 +4,9 @@ class CodeBankEditSnippet extends CodeBank {
     public static $session_namespace='CodeBankEditSnippet';
     
     public static $allowed_actions=array(
+                                        'index',
                                         'tree',
+                                        'show',
                                         'EditForm',
                                         'clear'
                                     );
@@ -87,11 +89,17 @@ class CodeBankEditSnippet extends CodeBank {
             Requirements::javascript('CodeBank/javascript/CodeBank.EditForm.js');
             
             return $form;
-        }else if($id) {
-            return new Form($this, 'EditForm', new FieldList(
-                                                            new LabelField('DoesntExistLabel', _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'))
-                                                        ), new FieldList());
         }
+        
+        $this->redirect('admin/codeBank/show');
+    }
+    
+    /**
+     * Returns the link to view/edit snippets
+     * @return {string} Link to view/edit snippets
+     */
+    public function getEditLink() {
+        return 'admin/codeBank/edit/show/'.$this->currentPageID();
     }
     
     /**
@@ -114,57 +122,5 @@ class CodeBankEditSnippet extends CodeBank {
         
         return $this->getResponseNegotiator()->respond($this->request);
     }
-    
-    /**
-     * Returns the link to view/edit snippets
-     * @return {string} Link to view/edit snippets
-     */
-    public function getEditLink() {
-        $parentLink=parent::Link('show');
-        return Controller::join_links($parentLink, $this->currentPageID());
-    }
-    
-    /**
-     * Returns the link to settings
-     * @return {string} Link to settings
-     */
-    public function getLinkSettings() {
-        return parent::Link('settings');
-    }
-
-	/**
-	 * @return ArrayList
-	 */
-	public function Breadcrumbs($unlinked = false) {
-		$defaultTitle=LeftAndMain::menu_title_for_class('CodeBank');
-		$title=_t('CodeBank.MENUTITLE', $defaultTitle);
-		$items=new ArrayList(array(
-			new ArrayData(array(
-				'Title'=>$title,
-				'Link'=>($unlinked ? false:'admin/codeBank/clear')
-			))
-		));
-		$record = $this->currentPage();
-		if($record && $record->exists()) {
-			if($record->hasExtension('Hierarchy')) {
-				$ancestors = $record->getAncestors();
-				$ancestors = new ArrayList(array_reverse($ancestors->toArray()));
-				$ancestors->push($record);
-				foreach($ancestors as $ancestor) {
-					$items->push(new ArrayData(array(
-						'Title' => $ancestor->Title,
-						'Link' => ($unlinked) ? false : Controller::join_links($this->Link('show'), $ancestor->ID)
-					)));
-				}
-			} else {
-				$items->push(new ArrayData(array(
-					'Title' => $record->Title,
-					'Link' => ($unlinked) ? false : Controller::join_links($this->Link('show'), $record->ID)
-				)));
-			}
-		}
-
-		return $items;
-	}
 }
 ?>
