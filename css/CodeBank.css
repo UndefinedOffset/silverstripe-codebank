@@ -93,3 +93,9 @@
 .cms-container .CodeBank .ss-tabset.ss-tabset-tabshidden .ui-tabs-panel {
     border-top: none;
 }
+
+.highlightedcontent .innerWrapper {
+    background: #FFFFFF;
+    
+    min-height: 470px;
+}

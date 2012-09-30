@@ -2,6 +2,8 @@
 class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $url_segment='codeBank';
     public static $tree_class='SnippetLanguage';
+    public static $url_rule='/$Action/$ID/$OtherID';
+    public static $url_priority=59;
 	public static $menu_icon='CodeBank/images/menu-icon.png';
     
     public static $required_permission_codes=array(
@@ -11,7 +13,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $allowed_actions=array(
                                         'index',
                                         'tree',
-                                        'EditForm'
+                                        'EditForm',
+                                        'show'
                                     );
     
     public static $session_namespace='CodeBank';
@@ -22,6 +25,30 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         Requirements::css('CodeBank/css/CodeBank.css');
         Requirements::javascript('CodeBank/javascript/CodeBank.Tree.js');
     }
+    
+    public function index($request) {
+		// In case we're not showing a specific record, explicitly remove any session state,
+		// to avoid it being highlighted in the tree, and causing an edit form to show.
+		if(!$request->param('Action')) $this->setCurrentPageId(null);
+
+		return parent::index($request);
+	}
+	
+	/**
+	 * Override {@link LeftAndMain} Link to allow blank URL segment for CMSMain.
+	 *
+	 * @return string
+	 */
+	public function Link($action = null) {
+		$link = Controller::join_links(
+			$this->stat('url_base', true),
+			$this->stat('url_segment', true), // in case we want to change the segment
+			'/', // trailing slash needed if $action is null!
+			"$action"
+		);
+		$this->extend('updateLink', $link);
+		return $link;
+	}
     
     /**
      * Gets the form used for viewing snippets
@@ -201,7 +228,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         if($filterFunction) {
             $obj->setMarkingFilterFunction($filterFunction);
         }
-
+        
         $obj->markPartialTree($minNodeCount, $this, $childrenMethod, $numChildrenMethod);
         
         // Ensure current page is exposed
@@ -214,7 +241,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $recordController=singleton('CodeBank');
         $titleFn=function(&$child) use(&$controller, &$recordController) {
             $link=Controller::join_links($recordController->Link("show"), $child->ID);
-            return LeftAndMain_TreeNode::create($child, $link, $controller->isCurrentPage($child))->forTemplate();
+            return CodeBank_TreeNode::create($child, $link, $controller->isCurrentPage($child))->forTemplate();
         };
         
         
@@ -339,6 +366,20 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 		}
 
 		return $items;
+	}
+}
+
+class CodeBank_TreeNode extends LeftAndMain_TreeNode {
+    /**
+     * Returns template, for further processing by {@link Hierarchy->getChildrenAsUL()}. Does not include closing tag to allow this method to inject its own children.
+     * @return {string} HTML to be used
+     */
+    public function forTemplate() {
+        $obj=$this->obj;
+        return "<li ".($this->obj instanceof SnippetLanguage ? '':"id=\"record-$obj->ID\" data-id=\"$obj->ID\"")." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
+                "<ins class=\"jstree-icon\">&nbsp;</ins>".
+                "<a href=\"".($this->obj instanceof SnippetLanguage ? '':$this->getLink())."\" title=\"$obj->class\">".
+                "<ins class=\"jstree-icon\">&nbsp;</ins><span class=\"text\">".($obj->TreeTitle)."</span></a>";
 	}
 }
 ?>

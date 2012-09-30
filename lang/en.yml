@@ -35,6 +35,8 @@ en:
         LANGUAGES: "Languages"
     CodeBankSettings:
         MENUTITLE: "Code Bank Settings"
+    CodeBankAddSnippet:
+        TITLE: "Add Snippet"
     CodeBankMember:
         USE_HEARTBEAT: "Use Code Bank Heartbeat to keep client session alive?"
     Snippet:

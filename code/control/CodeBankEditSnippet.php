@@ -1,14 +1,21 @@
 <?php
 class CodeBankEditSnippet extends CodeBank {
     public static $url_segment='codeBank/edit';
+    public static $url_rule='/$Action/$ID/$OtherID';
+    public static $url_priority=61;
     public static $session_namespace='CodeBankEditSnippet';
+    
+    public static $required_permission_codes=array(
+                                                    'CODE_BANK_ACCESS'
+                                                );
     
     public static $allowed_actions=array(
                                         'index',
                                         'tree',
                                         'show',
                                         'EditForm',
-                                        'clear'
+                                        'doSave',
+                                        'doDelete'
                                     );
     
     /**

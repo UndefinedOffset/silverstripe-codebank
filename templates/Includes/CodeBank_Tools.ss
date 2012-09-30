@@ -2,7 +2,7 @@
 	<div class="cms-panel-content center">
         <div class="cms-content-toolbar">
             <div class="cms-actions-row">
-                <a class="cms-page-add-button ss-ui-button ss-ui-action-constructive" data-icon="add" href="$LinkPageAdd" data-url-addpage="{$LinkPageAdd('?ParentID=%s')}"><%t CodeBank.ADD_NEW_SNIPPET "_Add New Snippet" %></a>
+                <a class="cms-page-add-button ss-ui-button ss-ui-action-constructive" data-icon="add" href="admin/codeBank/add" data-url-addpage="admin/codeBank/add"><%t CodeBank.ADD_NEW_SNIPPET "_Add New Snippet" %></a>
             </div>
         </div>
         
