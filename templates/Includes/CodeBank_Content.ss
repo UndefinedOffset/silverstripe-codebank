@@ -10,7 +10,7 @@
 		<div class="cms-content-header-tabs">
 			<ul>
 				<li class="content-treeview<% if class == 'CMSPageEditController' %> ui-tabs-selected<% end_if %>">
-					<a href="$EditLink" class="cms-panel-link" title="Form_EditForm" data-href="$EditLink">
+					<a href="$LinkMain" class="cms-panel-link" title="Form_EditForm" data-href="$LinkMain">
 						<%t CodeBank.MAIN "_Main" %>
 					</a>
 				</li>

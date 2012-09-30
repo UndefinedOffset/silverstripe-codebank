@@ -29,6 +29,10 @@ en:
         SNIPPET_SAVED: "Snippet has been saved"
         PERMISSION_DENIED: "Permission Denied"
         ADD_NEW_SNIPPET: "Add New Snippet"
+        KEYWORD: "Keyword"
+        ALL_LANGUAGES: "All Languages"
+        APPLY_FILTER: "Apply Filter"
+        RESET: "Reset"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"

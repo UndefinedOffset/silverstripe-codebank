@@ -49,6 +49,18 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 		$this->extend('updateLink', $link);
 		return $link;
 	}
+	
+	/**
+	 * Gets the main tab link
+	 * @return {string} URL to the main tab
+	 */
+	public function getLinkMain() {
+	    if($this->currentPageID()!=0) {
+	        return Controller::join_links($this->Link('show'), $this->currentPageID());
+	    }
+        
+        return singleton('CodeBank')->Link();
+	}
     
     /**
      * Gets the form used for viewing snippets
@@ -170,6 +182,20 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public function tree() {
         return $this->renderWith('CodeBank_TreeView');
     }
+
+	/**
+	 * Get a subtree underneath the request param 'ID'.
+	 * If ID = 0, then get the whole tree.
+	 */
+	public function getsubtree($request) {
+		$html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Snippets', null, array($this, 'hasSnippets'));
+
+		// Trim off the outer tag
+		$html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
+		$html=preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/','', $html);
+		
+		return $html;
+	}
     
     /**
      * Gets the snippet language tree as an unordered list
@@ -303,28 +329,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
-     * Gets the current version of Code Bank
-     * @return {string} Version Number Plus Build Date
-     */
-    public static function getVersion() {
-        if(CB_VERSION=='@@VERSION@@') {
-            return _t('CodeBank.DEVELOPMENT_BUILD', '_Development Build');
-        }
-        
-        return CB_VERSION.' '.CB_BUILD_DATE;
-    }
-    
-    /**
-     * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
-     * @return {array} Map of codes to label
-     */
-    public function providePermissions() {
-        return array(
-                    'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
-                );
-    }
-    
-    /**
      * Detects if a node has snippets or not
      * @return {bool} Returns the value if the language has snippets or not
      */
@@ -367,6 +371,69 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 
 		return $items;
 	}
+	
+	public function SearchForm() {
+	    $fields=new FieldList(
+                            new TextField('q[Term]', _t('CodeBank.KEYWORD', '_Keyword')),
+            	            $classDropdown=new DropdownField(
+                                    	                    'q[LanguageID]',
+                                    	                    _t('CodeBank.LANGUAGE', '_Language'),
+                                    	                    SnippetLanguage::get()->sort('Name')->map('ID', 'Name')
+            	                                        )
+                        );
+	    
+	    
+	    $classDropdown->setEmptyString(_t('CodeBank.ALL_LANGUAGES', '_All Languages'));
+	    
+	    
+	    $actions=new FieldList(
+                            FormAction::create('doSearch', _t('CodeBank.APPLY_FILTER', '_Apply Filter'))->addExtraClass('ss-ui-action-constructive')->setUseButtonTag(true),
+	                        Object::create('ResetFormAction', 'clear', _t('CodeBank.RESET', '_Reset'))->setUseButtonTag(true)
+                        );
+	    
+	    
+	    $form=Form::create($this, 'SearchForm', $fields, $actions)
+                                                        	    ->addExtraClass('cms-search-form')
+                                                        	    ->setFormMethod('GET')
+                                                        	    ->setFormAction($this->Link())
+                                                        	    ->disableSecurityToken()
+                                                        	    ->unsetValidator();
+	    $form->loadDataFrom($this->request->getVars());
+	
+	    $this->extend('updateSearchForm', $form);
+	    return $form;
+	}
+	
+	/**
+	 * Applies filters to the tree
+	 * @param {array} Array of data submitted
+	 * @param {Form} $form Form submitted
+	 */
+	public function doSearch($data, Form $form) {
+	    //return $this->getsubtree($this->request);
+	}
+    
+    /**
+     * Gets the current version of Code Bank
+     * @return {string} Version Number Plus Build Date
+     */
+    public static function getVersion() {
+        if(CB_VERSION=='@@VERSION@@') {
+            return _t('CodeBank.DEVELOPMENT_BUILD', '_Development Build');
+        }
+        
+        return CB_VERSION.' '.CB_BUILD_DATE;
+    }
+    
+    /**
+     * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
+     * @return {array} Map of codes to label
+     */
+    public function providePermissions() {
+        return array(
+                    'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
+                );
+    }
 }
 
 class CodeBank_TreeNode extends LeftAndMain_TreeNode {

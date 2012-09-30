@@ -1,9 +1,17 @@
-<div class="cms-content-tools west cms-panel cms-panel-layout" data-expandOnClick="true" data-layout-type="border" id="cms-content-tools-CMSMain">
+<div class="cms-content-tools west cms-panel cms-panel-layout" data-expandOnClick="true" data-layout-type="border" id="cms-content-tools-CodeBank">
 	<div class="cms-panel-content center">
         <div class="cms-content-toolbar">
             <div class="cms-actions-row">
                 <a class="cms-page-add-button ss-ui-button ss-ui-action-constructive" data-icon="add" href="admin/codeBank/add" data-url-addpage="admin/codeBank/add"><%t CodeBank.ADD_NEW_SNIPPET "_Add New Snippet" %></a>
             </div>
+            
+            <h3 class="cms-panel-header">&nbsp;</h3>
+            
+            <div class="cms-actions-row">
+                $SearchForm
+            </div>
+            
+            <h3 class="cms-panel-header"></h3>
         </div>
         
         
