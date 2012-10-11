@@ -73,8 +73,8 @@ class SnippetLanguage extends DataObject {
                                     'PowerShell'=>array('Extension'=>'ps', 'HighlightCode'=>'PowerShell'),
                                     'Other'=>array('Extension'=>'txt', 'HighlightCode'=>'Plain'),
                                     'SilverStripe Template'=>array('Extension'=>'ss', 'HighlightCode'=>'SilverStripe'),
-                                    'Yaml'=>array('Extension'=>'yml', 'HighlightCode'=>'yml'),
-                                    'AutoIt'=>array('Extension'=>'au3', 'HighlightCode'=>'au3')
+                                    'Yaml'=>array('Extension'=>'yml', 'HighlightCode'=>'Yaml'),
+                                    'AutoIt'=>array('Extension'=>'au3', 'HighlightCode'=>'AutoIt')
                                 );
     
     /**
