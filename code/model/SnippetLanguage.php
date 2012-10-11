@@ -74,6 +74,7 @@ class SnippetLanguage extends DataObject {
                                     'Other'=>array('Extension'=>'txt', 'HighlightCode'=>'Plain'),
                                     'SilverStripe Template'=>array('Extension'=>'ss', 'HighlightCode'=>'SilverStripe'),
                                     'Yaml'=>array('Extension'=>'yml', 'HighlightCode'=>'yml'),
+                                    'AutoIt'=>array('Extension'=>'au3', 'HighlightCode'=>'au3')
                                 );
     
     /**
