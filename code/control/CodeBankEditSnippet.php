@@ -33,7 +33,6 @@ class CodeBankEditSnippet extends CodeBank {
         $form=LeftAndMain::getEditForm($id);
         
         
-        // TODO Duplicate record fetching (see parent implementation)
         $record=$this->getRecord($id);
         if($record && !$record->canView()) {
             return Security::permissionFailure($this);
@@ -85,7 +84,6 @@ class CodeBankEditSnippet extends CodeBank {
             $form->disableDefaultAction();
             $form->addExtraClass('cms-edit-form');
             $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-            // TODO Can't merge $FormAttributes in template at the moment
             $form->addExtraClass('center '.$this->BaseCSSClasses());
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
             

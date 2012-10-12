@@ -77,7 +77,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $form=parent::getEditForm($id);
         
         
-        // TODO Duplicate record fetching (see parent implementation)
         $record=$this->getRecord($id);
         if($record && !$record->canView()) {
             return Security::permissionFailure($this);
@@ -135,7 +134,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $form->disableDefaultAction();
             $form->addExtraClass('cms-edit-form');
             $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-            // TODO Can't merge $FormAttributes in template at the moment
             $form->addExtraClass('center '.$this->BaseCSSClasses());
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
             
@@ -161,7 +159,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $form->disableDefaultAction();
         $form->addExtraClass('cms-edit-form');
         $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-        // TODO Can't merge $FormAttributes in template at the moment
         $form->addExtraClass('center '.$this->BaseCSSClasses());
         
         return $form;

@@ -29,7 +29,6 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         $form->disableDefaultAction();
         $form->addExtraClass('cms-add-form cms-edit-form');
         $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-        // TODO Can't merge $FormAttributes in template at the moment
         $form->addExtraClass('center '.$this->BaseCSSClasses());
         $form->setAttribute('data-pjax-fragment', 'CurrentForm');
         
