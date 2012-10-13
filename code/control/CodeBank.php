@@ -5,6 +5,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $url_rule='/$Action/$ID/$OtherID';
     public static $url_priority=59;
 	public static $menu_icon='CodeBank/images/menu-icon.png';
+	public static $filter_class='SnippetTreeFilter';
     
     public static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
@@ -49,6 +50,20 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 		$this->extend('updateLink', $link);
 		return $link;
 	}
+
+	protected function LinkWithSearch($link) {
+		// Whitelist to avoid side effects
+		$params = array(
+			'q' => (array)$this->request->getVar('q'),
+			'ParentID' => $this->request->getVar('ParentID')
+		);
+		$link = Controller::join_links(
+			$link,
+			array_filter(array_values($params)) ? '?' . http_build_query($params) : null
+		);
+		$this->extend('updateLinkWithSearch', $link);
+		return $link;
+	}
 	
 	/**
 	 * Gets the main tab link
@@ -56,10 +71,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 	 */
 	public function getLinkMain() {
 	    if($this->currentPageID()!=0) {
-	        return Controller::join_links($this->Link('show'), $this->currentPageID());
+	        return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID()));
 	    }
         
-        return singleton('CodeBank')->Link();
+        return $this->LinkWithSearch(singleton('CodeBank')->Link());
 	}
     
     /**
@@ -169,7 +184,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} Link to the tree load
      */
     public function getLinkTreeView() {
-        return $this->Link('tree');
+        return $this->LinkWithSearch($this->Link('tree'));
     }
     
     /**
@@ -193,13 +208,21 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 		
 		return $html;
 	}
+	
+	/**
+	 * Checks to see if the tree should be filtered or not
+	 * @return {bool}
+	 */
+	public function TreeIsFiltered() {
+	    return $this->request->getVar('q');
+	}
     
     /**
      * Gets the snippet language tree as an unordered list
      * @return {string} XHTML forming the tree of languages to snippets
      */
     public function SiteTreeAsUL() {
-        $html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Snippets', null, array($this, 'hasSnippets'));
+        $html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Snippets', null);
         
         $this->extend('updateSiteTreeAsUL', $html);
         
@@ -216,8 +239,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public function getSiteTreeFor($className, $rootID=null, $childrenMethod=null, $numChildrenMethod=null, $filterFunction=null, $minNodeCount=30) {
         // Filter criteria
         $params=$this->request->getVar('q');
-        if(isset($params['FilterClass']) && $filterClass=$params['FilterClass']) {
-            if(!is_subclass_of($filterClass, 'CMSSiteTreeFilter')) {
+        if($params) {
+            $filterClass=CodeBank::$filter_class;
+            if($filterClass!='SnippetTreeFilter' && !is_subclass_of($filterClass, 'SnippetTreeFilter')) {
                 throw new Exception(sprintf('Invalid filter class passed: %s', $filterClass));
             }
             
@@ -239,7 +263,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         if(!$filterFunction) {
-            $filterFunction=($filter ? array($filter, 'isPageIncluded'):null);
+            $filterFunction=($filter ? array($filter, 'isSnippetLanguageIncluded'):array($this, 'hasSnippets'));
         }
         
         
@@ -314,7 +338,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} Link to view/edit snippets
      */
     public function getEditLink() {
-        return 'admin/codeBank/show/'.$this->currentPageID();
+        return $this->LinkWithSearch('admin/codeBank/show/'.$this->currentPageID());
     }
     
     /**
@@ -322,7 +346,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} Link to settings
      */
     public function getLinkSettings() {
-        return 'admin/codeBank/settings';
+        return $this->LinkWithSearch('admin/codeBank/settings');
     }
     
     /**
