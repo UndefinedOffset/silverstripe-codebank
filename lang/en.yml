@@ -57,3 +57,4 @@ en:
         PLURALNAME: "Languages"
         NAME: "Name"
         FILE_EXTENSION: "File Extension"
+        USER_LANGUAGE: "User Language"

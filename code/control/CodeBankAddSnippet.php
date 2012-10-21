@@ -36,7 +36,7 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         $this->extend('updateAddForm', $form);
         
         
-        Requirements::javascript('CodeBank/javascript/CodeBank.EditForm.js');
+        Requirements::javascript(CB_DIR.'/javascript/CodeBank.EditForm.js');
         
         return $form;
     }

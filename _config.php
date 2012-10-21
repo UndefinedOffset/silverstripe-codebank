@@ -1,6 +1,7 @@
 <?php
-define('CB_BUILD_DATE','@@BUILD_DATE@@');
-define('CB_VERSION','@@VERSION@@');
+define('CB_BUILD_DATE', '@@BUILD_DATE@@');
+define('CB_VERSION', '@@VERSION@@');
+define('CB_DIR', basename(dirname(__FILE__)));
 
 
 //Extensions
@@ -14,5 +15,5 @@ CMSMenu::remove_menu_item('CodeBankSettings');
 
 
 //Inject Menu Styles
-LeftAndMain::require_css('CodeBank/css/CodeBankMenu.css');
+LeftAndMain::require_css(CB_DIR.'/css/CodeBankMenu.css');
 ?>

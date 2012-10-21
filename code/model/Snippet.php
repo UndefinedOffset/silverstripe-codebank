@@ -92,14 +92,11 @@ class Snippet extends DataObject {
     }
     
     /**
-     * Gets the text from the latest snippet version
-     * @return {string} Snippet text
+     * Gets the current version
+     * @return {SnippetVersion} Current version of the snippet
      */
-    public function getSnippetText() {
-        $version=$this->Versions()->First();
-        if($version) {
-            return $version->Text;
-        }
+    public function getCurrentVersion() {
+        return $this->Versions()->First();
     }
     
     /**
@@ -107,9 +104,20 @@ class Snippet extends DataObject {
      * @return {string} Snippet text
      */
     public function getCurrentVersionID() {
-        $version=$this->Versions()->First();
+        $version=$this->CurrentVersion;
         if($version) {
             return $version->ID;
+        }
+    }
+    
+    /**
+     * Gets the text from the latest snippet version
+     * @return {string} Snippet text
+     */
+    public function getSnippetText() {
+        $version=$this->CurrentVersion;
+        if($version) {
+            return $version->Text;
         }
     }
     

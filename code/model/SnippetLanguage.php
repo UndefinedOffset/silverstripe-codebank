@@ -90,7 +90,7 @@ class SnippetLanguage extends DataObject {
                                         ->Count();
         if($dbLangCount<count($defaultLangs)) {
             foreach($this->defaultLanguages as $name=>$data) {
-                if(!SnippetLanguage::get()->find('Language', $name)) {
+                if(!SnippetLanguage::get()->find('Name', $name)) {
                     $lang=new SnippetLanguage();
                     $lang->Name=$name;
                     $lang->FileExtension=$data['Extension'];
@@ -184,6 +184,13 @@ class SnippetLanguage extends DataObject {
 		$classes.=$this->markingClasses();
 
 		return $classes;
+	}
+	
+	public function summaryFields() {
+	    return array(
+	                'Name'=>_t('SnippetLanguage.NAME', '_Name'),
+	                'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language')
+	            );
 	}
 }
 ?>

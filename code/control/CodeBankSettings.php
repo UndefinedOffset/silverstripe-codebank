@@ -16,8 +16,8 @@ class CodeBankSettings extends CodeBank {
     public function init() {
         parent::init();
         
-        Requirements::css('CodeBank/css/CodeBank.css');
-        Requirements::block('CodeBank/javascript/CodeBank.Tree.js');
+        Requirements::css(CB_DIR.'/css/CodeBank.css');
+        Requirements::block(CB_DIR.'/javascript/CodeBank.Tree.js');
     }
     
     public function getResponseNegotiator() {

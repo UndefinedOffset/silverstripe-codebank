@@ -21,6 +21,22 @@ class CodeBankConfig extends DataObject {
             
             DB::alteration_message('Default Code Bank Config Created', 'created');
         }
+        
+        if(!Group::get()->filter('Code', 'code-bank-api')->first()) {
+            $group=new Group();
+            $group->Title='Code Bank Users';
+            $group->Description='Code Bank Access Group';
+            $group->Code='code-bank-api';
+            $group->write();
+            
+            $permission=new Permission();
+            $permission->Code='CODE_BANK_ACCESS';
+            $permission->Type=1;
+            $permission->GroupID=$group->ID;
+            $permission->write();
+            
+            DB::alteration_message('Code Bank Users Group Created', 'created');
+        }
     }
     
     /**
@@ -41,13 +57,19 @@ class CodeBankConfig extends DataObject {
      * @return {FieldList} Fields to be used
      */
     public function getCMSFields() {
+        $langGridConfig=GridFieldConfig_RecordEditor::create(30);
+        $langGridConfig->getComponentByType('GridFieldDataColumns')->setFieldCasting(array(
+                                                                                            'UserLanguage'=>'Boolean->Nice'
+                                                                                        ));
+        
+        
         return new FieldList(
                             new TabSet('Root',
                                             new Tab('Main', _t('CodeBankConfig.MAIN', '_Main'),
                                                     HtmlEditorField::create('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))->addExtraClass('stacked')
                                                 ),
                                             new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),
-                                                    new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), GridFieldConfig_RecordEditor::create(30))
+                                                    new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), $langGridConfig)
                                                 )
                                         )
                         );

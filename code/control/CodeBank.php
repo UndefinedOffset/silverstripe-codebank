@@ -4,7 +4,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $tree_class='SnippetLanguage';
     public static $url_rule='/$Action/$ID/$OtherID';
     public static $url_priority=59;
-	public static $menu_icon='CodeBank/images/menu-icon.png';
 	public static $filter_class='SnippetTreeFilter';
     
     public static $required_permission_codes=array(
@@ -20,11 +19,22 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     
     public static $session_namespace='CodeBank';
     
+    /**
+     * Constructor
+     * @see LeftAndMain::__construct()
+     */
+    public function __construct() {
+        parent::__construct();
+        
+        //Work around to allow dynamic path
+        Config::inst()->update('CodeBank', 'menu_icon', CB_DIR.'/images/menu-icon.png');
+    }
+    
     public function init() {
         parent::init();
         
-        Requirements::css('CodeBank/css/CodeBank.css');
-        Requirements::javascript('CodeBank/javascript/CodeBank.Tree.js');
+        Requirements::css(CB_DIR.'/css/CodeBank.css');
+        Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
     }
     
     public function index($request) {
@@ -140,7 +150,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
-            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), DBField::create_field('SS_DateTime', $record->LastEdited)->Nice())->setForm($form));
+            $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditor', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
             $fields->push(new HiddenField('ID', 'ID'));
             
@@ -160,7 +170,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $this->extend('updateEditForm', $form);
             
             
-            Requirements::javascript('CodeBank/javascript/CodeBank.ViewForm.js');
+            Requirements::javascript(CB_DIR.'/javascript/CodeBank.ViewForm.js');
             
             return $form;
         }else if($id) {
@@ -444,6 +454,24 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         }
         
         return CB_VERSION.' '.CB_BUILD_DATE;
+    }
+    
+    /**
+     * Return the version number of this application.
+     * Uses the subversion path information in <mymodule>/silverstripe_version
+     * (automacially replaced by build scripts).
+     *
+     * @return string
+     */
+    public function CMSVersion() {
+        $frameworkVersion = file_get_contents(FRAMEWORK_PATH . '/silverstripe_version');
+        if(!$frameworkVersion) $frameworkVersion = _t('LeftAndMain.VersionUnknown', 'Unknown');
+    
+        return sprintf(
+                "Code Bank: %s Framework: %s",
+                self::getVersion(),
+                $frameworkVersion
+        );
     }
     
     /**

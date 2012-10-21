@@ -35,14 +35,14 @@ class HighlightedContentField extends FormField {
         $obj=($properties ? $this->customise($properties):$this);
         
         
-        Requirements::css('CodeBank/javascript/external/syntaxhighlighter/themes/shCore.css');
-        Requirements::css('CodeBank/javascript/external/syntaxhighlighter/themes/shCoreDefault.css');
-        Requirements::css('CodeBank/javascript/external/syntaxhighlighter/themes/shThemeDefault.css');
-        Requirements::css('CodeBank/css/HighlightedContentField.css');
+        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCore.css');
+        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCoreDefault.css');
+        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shThemeDefault.css');
+        Requirements::css(CB_DIR.'/css/HighlightedContentField.css');
         
-        Requirements::javascript('CodeBank/javascript/external/syntaxhighlighter/brushes/shCore.js');
-        Requirements::javascript('CodeBank/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
-        Requirements::javascript('CodeBank/javascript/HighlightedContentField.js');
+        Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/shCore.js');
+        Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
+        Requirements::javascript(CB_DIR.'/javascript/HighlightedContentField.js');
         
         
         return $obj->renderWith('HighlightedContentField');
