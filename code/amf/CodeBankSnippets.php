@@ -426,7 +426,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         //Generate the diff file
-        $diff=new Text_Diff('auto', array(preg_split('/\n/', $snippet1), preg_split('/\n/', $snippet2)));
+        $diff=new Text_Diff('auto', array(preg_split('/\n/', $snippet2), preg_split('/\n/', $snippet1)));
         $renderer=new Text_Diff_Renderer_unified(array('leading_context_lines'=>1, 'trailing_context_lines'=>1));
         
         $response['data']=array('mainRev'=>$snippet1, 'compRev'=>$snippet2, 'diff'=>$renderer->render($diff));

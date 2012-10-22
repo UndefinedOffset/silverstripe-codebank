@@ -20,8 +20,8 @@ en:
         PRINT: "Print"
         REVISION: "Revision"
         CURRENT_REVISION: "Current Revision"
+        COMPARED_REVISION: "Compared Revision"
         COMPARE_WITH_CURRENT: "Compare with Current"
-        CURRENT_REVISION: "Current Revision"
         DELETE: "Delete"
         SAVE: "Save"
         MAIN: "Main"
@@ -33,6 +33,7 @@ en:
         ALL_LANGUAGES: "All Languages"
         APPLY_FILTER: "Apply Filter"
         RESET: "Reset"
+        NOT_CURRENT_VERSION: "You are viewing a past version of this snippet's content, {linkopen}click here{linkclose} to view the current version"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"

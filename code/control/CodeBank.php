@@ -35,6 +35,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         parent::init();
         
         Requirements::css(CB_DIR.'/css/CodeBank.css');
+        
+        Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
     }
     
@@ -165,7 +167,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
             $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
-            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditor', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditorName', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
             $fields->push(new HiddenField('ID', 'ID'));
             
             $form=new Form($this, 'EditForm', $fields, $actions, $validator);
@@ -176,6 +178,19 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $form->addExtraClass('center '.$this->BaseCSSClasses());
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
             
+            
+            //Swap content for version text
+            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+                $version=$record->Version(intval($this->urlParams['OtherID']));
+                if(!empty($version) && $version!==false && $version->ID!=0) {
+                    $fields->dataFieldByName('SnippetText')->setValue($version->Text);
+                    $fields->dataFieldByName('LastModified')->setValue($version->LastEdited);
+                }
+                
+                $form->setMessage(_t('CodeBank.NOT_CURRENT_VERSION', '_You are viewing a past version of this snippet\'s content, {linkopen}click here{linkclose} to view the current version', array('linkopen'=>'<a href="admin/codeBank/show/'.$record->ID.'">', 'linkclose'=>'</a>')), 'warning');
+            }
+            
+            
             $readonlyFields=$form->Fields()->makeReadonly();
             
             $form->setFields($readonlyFields);
@@ -184,7 +199,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $this->extend('updateEditForm', $form);
             
             
-            Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
             Requirements::add_i18n_javascript(CB_DIR.'/javascript/lang');
             Requirements::add_i18n_javascript('mysite/javascript/lang');
             Requirements::javascript(CB_DIR.'/javascript/external/jquery-zclip/jquery.zclip.min.js');
@@ -554,8 +568,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                     $lTable.='</tbody></table>';
                     $rTable.='</tbody></table>';
                     
-                    $compareContent='<div class="compare leftSide">'.$lTable.'</div>'.
-                                    '<div class="compare rightSide">'.$rTable.'</div>';
+                    $compareContent='<div class="compare leftSide">'.$rTable.'</div>'.
+                                    '<div class="compare rightSide">'.$lTable.'</div>';
                 }
             }
         }

@@ -96,16 +96,28 @@ table.diff td,table.diff th {
     border: none;
 }
 
-table.diff .diff-deletedline del,table.diff .diff-addedline ins {
+table.diff td {
+    background: #EEEEEE;
+}
+
+table.diff .diff-context {
+    background: #FFFFFF;
+}
+
+table.diff .diff-deletedline del, table.diff .diff-addedline ins {
     text-decoration: none;
 }
 
 table.diff .diff-deletedline {
     background-color: #FFDDDD;
+    
+    text-decoration: line-through;
 }
 
 table.diff .diff-deletedline del {
     background-color: #FF9999;
+    
+    text-decoration: line-through;
 }
 
 table.diff .diff-addedline {

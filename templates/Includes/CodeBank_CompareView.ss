@@ -7,8 +7,8 @@
     <body class="cms">
         <div class="cms-container">
             <div class="compareDialogWrapper">
-                <h4>Current Revision</h4>
-                <h4>Compared Revision</h4>
+                <h4><%t CodeBank.CURRENT_REVISION "_Current Revision" %></h4>
+                <h4><%t CodeBank.COMPARED_REVISION "_Compared Revision" %></h4>
                 
                 <div id="compareDialogContent">
                     $CompareContent
