@@ -21,6 +21,8 @@ class Snippet extends DataObject {
                                     "FulltextSearchable('Title,Description,Tags')"
                                 );
     
+    public static $default_sort='Title, ID';
+    
     public static $create_table_options=array(
                                     		'MySQLDatabase'=>'ENGINE=MyISAM'
                                     	);
@@ -119,6 +121,15 @@ class Snippet extends DataObject {
         if($version) {
             return $version->Text;
         }
+    }
+    
+    /**
+     * Gets the version by its id
+     * @param {int} $id Version to fetch
+     * @return {SnippetVersion} Snippet Version record
+     */
+    public function Version($id) {
+        return $this->Versions()->byID($id);
     }
     
     /**

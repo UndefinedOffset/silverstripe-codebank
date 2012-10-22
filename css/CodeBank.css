@@ -99,3 +99,11 @@
     
     min-height: 470px;
 }
+
+.CodeBank .zclip embed, .CodeBank .zclip object {
+    height: 28px !important;
+}
+
+.CodeBank .zclip embed:focus, .CodeBank .zclip object:focus {
+    outline: 0;
+}

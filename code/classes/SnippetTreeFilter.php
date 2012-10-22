@@ -44,6 +44,10 @@ class SnippetTreeFilter extends Object {
             $this->populateSnippetIDs();
         }
         
+        if(empty($this->_cache_snippet_ids)) {
+            return array();
+        }
+        
         $ids=array();
         
         $q=new SQLQuery();

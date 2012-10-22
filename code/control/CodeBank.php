@@ -14,7 +14,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'index',
                                         'tree',
                                         'EditForm',
-                                        'show'
+                                        'show',
+                                        'compare'
                                     );
     
     public static $session_namespace='CodeBank';
@@ -47,30 +48,38 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 	
 	/**
 	 * Override {@link LeftAndMain} Link to allow blank URL segment for CMSMain.
-	 *
-	 * @return string
+	 * @param {string} $action Action to be used
+	 * @return {string} Resulting link
 	 */
-	public function Link($action = null) {
+	public function Link($action=null) {
 		$link = Controller::join_links(
 			$this->stat('url_base', true),
 			$this->stat('url_segment', true), // in case we want to change the segment
 			'/', // trailing slash needed if $action is null!
 			"$action"
 		);
+		
 		$this->extend('updateLink', $link);
 		return $link;
 	}
-
+	
+	/**
+	 * Generates the link with search params
+	 * @param {string} Link to
+	 * @return {string} Link with search params
+	 */
 	protected function LinkWithSearch($link) {
 		// Whitelist to avoid side effects
-		$params = array(
-			'q' => (array)$this->request->getVar('q'),
-			'ParentID' => $this->request->getVar('ParentID')
-		);
-		$link = Controller::join_links(
-			$link,
-			array_filter(array_values($params)) ? '?' . http_build_query($params) : null
-		);
+		$params=array(
+        			'q'=>(array)$this->request->getVar('q'),
+        			'ParentID'=>$this->request->getVar('ParentID')
+        		);
+		
+		$link=Controller::join_links(
+                        			$link,
+                        			(array_filter(array_values($params)) ? '?'.http_build_query($params):null)
+                        		);
+		
 		$this->extend('updateLinkWithSearch', $link);
 		return $link;
 	}
@@ -81,7 +90,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 	 */
 	public function getLinkMain() {
 	    if($this->currentPageID()!=0) {
-	        return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID()));
+	        $otherID=null;
+	        if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+	            $otherID=intval($this->urlParams['OtherID']);
+	        }
+	        
+	        return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID(), $otherID));
 	    }
         
         return $this->LinkWithSearch(singleton('CodeBank')->Link());
@@ -124,8 +138,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                     new FormAction('doExport', _t('CodeBank.EXPORT', '_Export')),
                                     new FormAction('doPrint', _t('CodeBank.PRINT', '_Print')),
                                     new LabelField('Revision', _t('CodeBank.REVISION', '_Revision').': '),
-                                    DropdownField::create('RevisionID', '', $record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created'), null, null, '{'._t('CodeBank.CURRENT_REVISION', '_Current Revision').'}')->setDisabled($record->Versions()->Count()<=1)->addExtraClass('no-change-track'),
-                                    FormAction::create('compareRevision', _t('CodeBank.COMPARE_WITH_CURRENT', '_Compare with Current'))->setDisabled($record->Versions()->Count()<=1)
+                                    DropdownField::create('RevisionID', '', $record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created'), $this->urlParams['OtherID'], null, '{'._t('CodeBank.CURRENT_REVISION', '_Current Revision').'}')->setDisabled($record->Versions()->Count()<=1)->addExtraClass('no-change-track'),
+                                    FormAction::create('compareRevision', _t('CodeBank.COMPARE_WITH_CURRENT', '_Compare with Current'))->setDisabled($record->Versions()->Count()<=1 || empty($this->urlParams['OtherID']) || !is_numeric($this->urlParams['OtherID']))
                                 );
             
             
@@ -170,6 +184,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $this->extend('updateEditForm', $form);
             
             
+            Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
+            Requirements::add_i18n_javascript(CB_DIR.'/javascript/lang');
+            Requirements::add_i18n_javascript('mysite/javascript/lang');
+            Requirements::javascript(CB_DIR.'/javascript/external/jquery-zclip/jquery.zclip.min.js');
             Requirements::javascript(CB_DIR.'/javascript/CodeBank.ViewForm.js');
             
             return $form;
@@ -348,6 +366,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} Link to view/edit snippets
      */
     public function getEditLink() {
+        if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+            return $this->LinkWithSearch('admin/codeBank/show/'.$this->currentPageID().'/'.intval($this->urlParams['OtherID']));
+        }
+        
         return $this->LinkWithSearch('admin/codeBank/show/'.$this->currentPageID());
     }
     
@@ -403,6 +425,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 		return $items;
 	}
 	
+	/**
+	 * Generates the search form
+	 * @return {Form} Form used for searching
+	 */
 	public function SearchForm() {
 	    $fields=new FieldList(
                             new TextField('q[Term]', _t('CodeBank.KEYWORD', '_Keyword')),
@@ -434,15 +460,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 	    $this->extend('updateSearchForm', $form);
 	    return $form;
 	}
-	
-	/**
-	 * Applies filters to the tree
-	 * @param {array} Array of data submitted
-	 * @param {Form} $form Form submitted
-	 */
-	public function doSearch($data, Form $form) {
-	    //return $this->getsubtree($this->request);
-	}
     
     /**
      * Gets the current version of Code Bank
@@ -464,14 +481,92 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return string
      */
     public function CMSVersion() {
-        $frameworkVersion = file_get_contents(FRAMEWORK_PATH . '/silverstripe_version');
-        if(!$frameworkVersion) $frameworkVersion = _t('LeftAndMain.VersionUnknown', 'Unknown');
+        $frameworkVersion=file_get_contents(FRAMEWORK_PATH.'/silverstripe_version');
+        if(!$frameworkVersion) {
+            $frameworkVersion=_t('LeftAndMain.VersionUnknown', 'Unknown');
+        }
     
-        return sprintf(
-                "Code Bank: %s Framework: %s",
-                self::getVersion(),
-                $frameworkVersion
-        );
+        return sprintf('Code Bank: %s Framework: %s', self::getVersion(), $frameworkVersion);
+    }
+    
+    /**
+     * Handles rendering of the compare view
+     * @return {string} HTML to be sent to the browser
+     */
+    public function compare() {
+        $compareContent=false;
+        
+        
+        //Get the Main Revision
+        $snippet1=Snippet::get()->byID(intval($this->urlParams['ID']));
+        if(empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
+            $snippet1=false;
+        }
+        
+        if($snippet1!==false) {
+            //Get the Comparision Revision
+            $snippet2=$snippet1->Version(intval($this->urlParams['OtherID']));
+            if(empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
+                $snippet2=false;
+            }
+            
+            if($snippet2!==false) {
+                $snippet1Text=preg_replace('/\r\n|\n|\r/', "\n", $snippet1->SnippetText);
+                $snippet2Text=preg_replace('/\r\n|\n|\r/', "\n", $snippet2->Text);
+                
+                //Generate the diff file
+                $diff=new Text_Diff('auto', array(preg_split('/\n/', $snippet1Text), preg_split('/\n/', $snippet2Text)));
+                $renderer=new WP_Text_Diff_Renderer_Table();
+                
+                $renderedDiff=$renderer->render($diff);
+                if(!empty($renderedDiff)) {
+                    $lTable='<table cellspacing="0" cellpadding="0" border="0" class="diff">'.
+                                '<colgroup>'.
+                                	'<col class="ltype"/>'.
+                                	'<col class="content"/>'.
+                            	'</colgroup>'.
+                        		'<tbody>';
+                    $rTable=$lTable;
+                    
+                    header('content-type: text/plain');
+                    $xml=simplexml_load_string('<tbody>'.str_replace('&nbsp;', ' ', $renderedDiff).'</tbody>');
+                    foreach($xml->children() as $row) {
+                        $i=0;
+                        $lTable.='<tr>';
+                        $rTable.='<tr>';
+                        
+                        foreach($row->children() as $td) {
+                            $attr=$td->attributes();
+                            
+                            if($i==0) {
+                                $lTable.=$td->asXML();
+                            }else {
+                                $rTable.=$td->asXML();
+                            }
+                            
+                            $i++;
+                        }
+                        
+                        $lTable.='</tr>';
+                        $rTable.='</tr>';
+                    }
+                    
+                    $lTable.='</tbody></table>';
+                    $rTable.='</tbody></table>';
+                    
+                    $compareContent='<div class="compare leftSide">'.$lTable.'</div>'.
+                                    '<div class="compare rightSide">'.$rTable.'</div>';
+                }
+            }
+        }
+        
+        
+        Requirements::css(CB_DIR.'/css/CompareView.css');
+        Requirements::javascript(CB_DIR.'/javascript/CodeBank.CompareView.js');
+        
+        return $this->renderWith('CodeBank_CompareView', array(
+                                                                'CompareContent'=>$compareContent
+                                                            ));
     }
     
     /**

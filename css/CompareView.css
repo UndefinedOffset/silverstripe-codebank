@@ -1,0 +1,121 @@
+.compareDialogWrapper {
+    position: relative;
+    
+    width: 100%;
+    height: 100%;
+}
+
+.compareDialogWrapper h4 {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    
+    font-size: 16px;
+    
+    width: 468px;
+    
+    margin: 0 !important;
+}
+
+.compareDialogWrapper h4 + h4 {
+    left: auto;
+    right: 10px;
+}
+
+.compareDialogWrapper .compare {
+    background: #FFFFFF;
+    
+    position: absolute;
+    top: 35px;
+    bottom: 10px;
+    
+    width: 468px;
+    
+    border: 1px solid #A6A6A6;
+    
+    overflow: auto;
+}
+
+.compareDialogWrapper .compare.leftSide {
+    left: 10px;
+}
+
+.compareDialogWrapper .compare.rightSide {
+    right: 10px;
+}
+
+.compareDialogWrapper .Actions {
+    position: absolute;
+    left: 7px;
+    right: 7px;
+    bottom: 10px;
+    
+    text-align: center;
+    padding-top: 16px;
+}
+
+#CompareDialog_Close {
+    background-position: -907px 0;
+    
+    width: 73px;
+}
+
+#CompareDialog_Close:hover, #CompareDialog_Close:active {
+    background-position: -907px -24px;
+}
+
+#CompareDialog_Close:disabled {
+    background-position: -907px -48px;
+}
+
+/* Diff */
+table.diff {
+    width: 100%;
+}
+
+table.diff col.ltype {
+    width: 20px;
+}
+
+table.diff col.content {
+    width: 100%;
+}
+
+table.diff tr {
+    background-color: transparent;
+}
+
+table.diff td {
+    min-height: 1em;
+    
+    white-space: pre;
+}
+
+table.diff td,table.diff th {
+    font-family: Consolas, Monaco, Courier, monospace;
+    border: none;
+}
+
+table.diff .diff-deletedline del,table.diff .diff-addedline ins {
+    text-decoration: none;
+}
+
+table.diff .diff-deletedline {
+    background-color: #FFDDDD;
+}
+
+table.diff .diff-deletedline del {
+    background-color: #FF9999;
+}
+
+table.diff .diff-addedline {
+    background-color: #DDFFDD;
+}
+
+table.diff .diff-addedline ins {
+    background-color: #99FF99;
+}
+
+#att-info {
+    background-color: #E4F2FD;
+}
