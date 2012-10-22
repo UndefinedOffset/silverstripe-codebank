@@ -16,4 +16,8 @@ CMSMenu::remove_menu_item('CodeBankSettings');
 
 //Inject Menu Styles
 LeftAndMain::require_css(CB_DIR.'/css/CodeBankMenu.css');
+
+
+//Register Short Code
+ShortcodeParser::get_active()->register('snippet', array('CodeBankShortCode', 'parse'));
 ?>

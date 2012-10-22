@@ -34,6 +34,8 @@ en:
         APPLY_FILTER: "Apply Filter"
         RESET: "Reset"
         NOT_CURRENT_VERSION: "You are viewing a past version of this snippet's content, {linkopen}click here{linkclose} to view the current version"
+        ID: "ID"
+        VERSION: "Version"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
@@ -59,3 +61,6 @@ en:
         NAME: "Name"
         FILE_EXTENSION: "File Extension"
         USER_LANGUAGE: "User Language"
+    CodeBankShortCode:
+        MISSING_ID_ATTRIBUTE: "Short Code missing the id attribute"
+        SNIPPET_NOT_FOUND: "Snippet not found"

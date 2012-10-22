@@ -168,6 +168,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
             $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditorName', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('SnippetID', _t('CodeBank.ID', '_ID'), $record->ID));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('CurrentVersionID', _t('CodeBank.VERSION', '_Version')));
             $fields->push(new HiddenField('ID', 'ID'));
             
             $form=new Form($this, 'EditForm', $fields, $actions, $validator);
@@ -185,6 +187,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 if(!empty($version) && $version!==false && $version->ID!=0) {
                     $fields->dataFieldByName('SnippetText')->setValue($version->Text);
                     $fields->dataFieldByName('LastModified')->setValue($version->LastEdited);
+                    $fields->dataFieldByName('CurrentVersionID')->setValue($version->ID);
                 }
                 
                 $form->setMessage(_t('CodeBank.NOT_CURRENT_VERSION', '_You are viewing a past version of this snippet\'s content, {linkopen}click here{linkclose} to view the current version', array('linkopen'=>'<a href="admin/codeBank/show/'.$record->ID.'">', 'linkclose'=>'</a>')), 'warning');
