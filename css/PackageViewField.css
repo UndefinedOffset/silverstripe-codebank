@@ -1,0 +1,21 @@
+.packageview .middleColumn {
+    padding-top: 2px;
+}
+
+.packageview p {
+    margin: 5px 0;
+}
+
+.packageview li {
+    list-style: disc;
+    
+    margin: 5px 0;
+}
+
+.packageview li span {
+    font-style: italic;
+}
+
+.packageview ul {
+    margin-left: 20px;
+}

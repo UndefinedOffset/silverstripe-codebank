@@ -145,6 +145,10 @@ class SnippetLanguage extends DataObject {
                         );
     }
     
+    /**
+     * Determins if the language has snippets
+     * return {bool} Counts how many children snippets there are if there are more than 0 returns true, false otherwise
+     */
     public function hasSnippets() {
         return ($this->Snippets()->Count()>0);
     }

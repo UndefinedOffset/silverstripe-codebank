@@ -11,7 +11,7 @@
 			<ul>
 				<li class="content-treeview<% if class == 'CMSPageEditController' %> ui-tabs-selected<% end_if %>">
 					<a href="$LinkMain" class="cms-panel-link" title="Form_EditForm" data-href="$LinkMain">
-						<%t CodeBank.MAIN "_Main" %>
+						<%t CodeBank.SNIPPETS "_Snippets" %>
 					</a>
 				</li>
 				<li class="content-listview<% if $class=='CodeBankSettings' %> ui-tabs-selected<% end_if %>">

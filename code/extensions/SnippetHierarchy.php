@@ -1,7 +1,33 @@
 <?php
-class SnippetHierarchy extends Hierarchy {
-    public static function get_extra_config($class, $extension, $args) {}
-
+class SnippetHierarchy extends DataExtension {
+    protected $markedNodes;
+    
+    protected $markingFilter;
+    
+    /**
+     * @var Int
+     */
+    protected $_cache_numChildren;
+    
+    /**
+     * True if this DataObject is marked.
+     * @var boolean
+     */
+    protected static $marked=array();
+    
+    /**
+     * True if this DataObject is expanded.
+     * @var boolean
+     */
+    protected static $expanded=array();
+    
+    /**
+     * True if this DataObject is opened.
+     * @var boolean
+     */
+    protected static $treeOpened=array();
+    
+    
 	/**
 	 * Validate the owner object - check for existence of infinite loops.
 	 */
@@ -11,7 +37,7 @@ class SnippetHierarchy extends Hierarchy {
 		if (!$this->owner->isChanged('LanguageID')) return; // The parent has not changed, skip the check for performance reasons.
 
 		// Walk the hierarchy upwards until we reach the top, or until we reach the originating node again.
-		$node = $this->owner;
+		$node=$this->owner;
 		while($node) {
 			if ($node->LanguageID==$this->owner->ID) {
 				// Hierarchy is looping.
@@ -26,7 +52,7 @@ class SnippetHierarchy extends Hierarchy {
 				);
 				break;
 			}
-			$node = $node->LanguageID ? $node->Language() : null;
+			$node=$node->LanguageID ? $node->Language() : null;
 		}
 
 		// At this point the $validationResult contains the response.
@@ -37,11 +63,11 @@ class SnippetHierarchy extends Hierarchy {
 	 * @return array
 	 */
 	public function parentStack() {
-		$p = $this->owner;
+		$p=$this->owner;
 		
 		while($p) {
-			$stack[] = $p;
-			$p = $p->LanguageID ? $p->Language() : null;
+			$stack[]=$p;
+			$p=$p->LanguageID ? $p->Language() : null;
 		}
 		
 		return $stack;
@@ -51,7 +77,7 @@ class SnippetHierarchy extends Hierarchy {
 	 * Get the parent of this class.
 	 * @return DataObject
 	 */
-	public function getParent($filter = '') {
+	public function getParent($filter='') {
 		return $this->owner->Language();
 	}
 	
@@ -61,10 +87,10 @@ class SnippetHierarchy extends Hierarchy {
 	 * @return SS_List
 	 */
 	public function getAncestors() {
-		$ancestors = new ArrayList();
-		$object    = $this->owner;
+		$ancestors=new ArrayList();
+		$object   =$this->owner;
 		
-		while($object = $object->Language()) {
+		while($object=$object->Language()) {
 			$ancestors->push($object);
 		}
 		
@@ -79,7 +105,7 @@ class SnippetHierarchy extends Hierarchy {
 	 * @param DataObject afterNode Used for recursive calls to this function
 	 * @return DataObject
 	 */
-	public function naturalNext( $className = null, $root = 0, $afterNode = null ) {
+	public function naturalNext( $className=null, $root=0, $afterNode=null ) {
 		// If this node is not the node we are searching from, then we can possibly return this
 		// node as a solution
 		if($afterNode && $afterNode->ID != $this->owner->ID) {
@@ -88,18 +114,18 @@ class SnippetHierarchy extends Hierarchy {
 			}
 		}
 			
-		$nextNode = null;
-		$baseClass = ClassInfo::baseDataClass($this->owner->class);
+		$nextNode=null;
+		$baseClass=ClassInfo::baseDataClass($this->owner->class);
 		
-		$children = DataObject::get(ClassInfo::baseDataClass($this->owner->class), "\"$baseClass\".\"LanguageID\"={$this->owner->ID}" . ( ( $afterNode ) ? " AND \"Sort\" > " . sprintf( '%d', $afterNode->Sort ) : "" ), '"Sort" ASC');
+		$children=DataObject::get(ClassInfo::baseDataClass($this->owner->class), "\"$baseClass\".\"LanguageID\"={$this->owner->ID}" . ( ( $afterNode ) ? " AND \"Sort\" > " . sprintf( '%d', $afterNode->Sort ) : "" ), '"Sort" ASC');
 		
 		// Try all the siblings of this node after the given node
-		/*if( $siblings = DataObject::get( ClassInfo::baseDataClass($this->owner->class), "\"LanguageID\"={$this->owner->LanguageID}" . ( $afterNode ) ? "\"Sort\" > {$afterNode->Sort}" : "" , '\"Sort\" ASC' ) )
+		/*if( $siblings=DataObject::get( ClassInfo::baseDataClass($this->owner->class), "\"LanguageID\"={$this->owner->LanguageID}" . ( $afterNode ) ? "\"Sort\" > {$afterNode->Sort}" : "" , '\"Sort\" ASC' ) )
 			$searchNodes->merge( $siblings );*/
 		
 		if($children) {
 			foreach($children as $node) {
-				if($nextNode = $node->naturalNext($className, $node->ID, $this->owner)) {
+				if($nextNode=$node->naturalNext($className, $node->ID, $this->owner)) {
 					break;
 				}
 			}
@@ -110,7 +136,7 @@ class SnippetHierarchy extends Hierarchy {
 		}
 		
 		// if this is not an instance of the root class or has the root id, search the parent
-		if(!(is_numeric($root) && $root == $this->owner->ID || $root == $this->owner->class) && ($parent = $this->owner->Language())) {
+		if(!(is_numeric($root) && $root == $this->owner->ID || $root == $this->owner->class) && ($parent=$this->owner->Language())) {
 			return $parent->naturalNext( $className, $root, $this->owner );
 		}
 		
@@ -128,8 +154,8 @@ class SnippetHierarchy extends Hierarchy {
 	 * @param int $minNodeCount The minimum amount of nodes to mark.
 	 * @return int The actual number of nodes marked.
 	 */
-	public function markPartialTree($minNodeCount = 30, $context = null, $childrenMethod="AllChildrenIncludingDeleted", $numChildrenMethod="numChildren") {
-		if(!is_numeric($minNodeCount)) $minNodeCount = 30;
+	public function markPartialTree($minNodeCount=30, $context=null, $childrenMethod="AllChildrenIncludingDeleted", $numChildrenMethod="numChildren") {
+		if(!is_numeric($minNodeCount)) $minNodeCount=30;
 
 		$this->markedNodes=array($this->owner->ClassName.'_'.$this->owner->ID=>$this->owner);
 		$this->owner->markUnexpanded();
@@ -151,7 +177,7 @@ class SnippetHierarchy extends Hierarchy {
 	 */
 	public function markChildren($node, $context=null, $childrenMethod='AllChildrenIncludingDeleted', $numChildrenMethod='numChildren') {
 		if($node->hasMethod($childrenMethod)) {
-			$children = $node->$childrenMethod($context);
+			$children=$node->$childrenMethod($context);
 		}else {
 			user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children", $childrenMethod, get_class($node)), E_USER_ERROR);
 		}
@@ -196,7 +222,7 @@ class SnippetHierarchy extends Hierarchy {
 	 */
 	public function markToExpose($childObj) {
 		if(is_object($childObj)){
-			$stack = array_reverse($childObj->parentStack());
+			$stack=array_reverse($childObj->parentStack());
 			foreach($stack as $stackItem) {
 				$this->markById($stackItem->ID, true, $stackItem->ClassName);
 			}
@@ -211,7 +237,7 @@ class SnippetHierarchy extends Hierarchy {
 	 * @param Boolean $cache
 	 * @return int
 	 */
-	public function numChildren($cache = true) {
+	public function numChildren($cache=true) {
 		// Build the cache for this class if it doesn't exist.
 		if(!$cache || !is_numeric($this->_cache_numChildren)) {
 		    if($this->owner instanceof SnippetLanguage) {
@@ -223,6 +249,374 @@ class SnippetHierarchy extends Hierarchy {
 
 		// If theres no value in the cache, it just means that it doesn't have any children.
 		return $this->_cache_numChildren;
+	}
+	
+	/**
+	 * Returns the children of this DataObject as an XHTML UL. This will be called recursively on each child,
+	 * so if they have children they will be displayed as a UL inside a LI.
+	 * @param string $attributes Attributes to add to the UL.
+	 * @param string|callable $titleEval PHP code to evaluate to start each child - this should include '<li>'
+	 * @param string $extraArg Extra arguments that will be passed on to children, for if they overload this function.
+	 * @param boolean $limitToMarked Display only marked children.
+	 * @param string $childrenMethod The name of the method used to get children from each object
+	 * @param boolean $rootCall Set to true for this first call, and then to false for calls inside the recursion. You should not change this.
+	 * @param int $minNodeCount
+	 * @return string
+	 */
+	public function getChildrenAsUL($attributes="", $titleEval='"<li>" . $child->Title', $extraArg=null, $limitToMarked=false, $childrenMethod="AllChildrenIncludingDeleted", $numChildrenMethod="numChildren", $rootCall=true, $minNodeCount=30) {
+	    if($limitToMarked && $rootCall) {
+	        $this->markingFinished($numChildrenMethod);
+	    }
+	
+	    if($this->owner->hasMethod($childrenMethod)) {
+	        $children=$this->owner->$childrenMethod($extraArg);
+	    } else {
+	        user_error(sprintf("Can't find the method '%s' on class '%s' for getting tree children",
+	                $childrenMethod, get_class($this->owner)), E_USER_ERROR);
+	    }
+	
+	    if($children) {
+	        if($attributes) {
+	            $attributes=" $attributes";
+	        }
+	        	
+	        $output="<ul$attributes>\n";
+	
+	        foreach($children as $child) {
+	            if(!$limitToMarked || $child->isMarked()) {
+	                $foundAChild=true;
+	                $output .= (is_callable($titleEval)) ? $titleEval($child) : eval("return $titleEval;");
+	                $output .= "\n" .
+	                        $child->getChildrenAsUL("", $titleEval, $extraArg, $limitToMarked, $childrenMethod, $numChildrenMethod, false, $minNodeCount) . "</li>\n";
+	            }
+	        }
+	        	
+	        $output .= "</ul>\n";
+	    }
+	
+	    if(isset($foundAChild) && $foundAChild) {
+	        return $output;
+	    }
+	}
+	
+	/**
+	 * Filter the marking to only those object with $node->$parameterName=$parameterValue
+	 * @param string $parameterName The parameter on each node to check when marking.
+	 * @param mixed $parameterValue The value the parameter must be to be marked.
+	 */
+	public function setMarkingFilter($parameterName, $parameterValue) {
+	    $this->markingFilter=array(
+	            "parameter" => $parameterName,
+	            "value" => $parameterValue
+	    );
+	}
+	
+	/**
+	 * Filter the marking to only those where the function returns true.
+	 * The node in question will be passed to the function.
+	 * @param string $funcName The function name.
+	 */
+	public function setMarkingFilterFunction($funcName) {
+	    $this->markingFilter=array(
+	            "func" => $funcName,
+	    );
+	}
+	
+	/**
+	 * Returns true if the marking filter matches on the given node.
+	 * @param DataObject $node Node to check.
+	 * @return boolean
+	 */
+	public function markingFilterMatches($node) {
+	    if(!$this->markingFilter) {
+	        return true;
+	    }
+	
+	    if(isset($this->markingFilter['parameter']) && $parameterName=$this->markingFilter['parameter']) {
+	        if(is_array($this->markingFilter['value'])){
+	            $ret=false;
+	            foreach($this->markingFilter['value'] as $value) {
+	                $ret=$ret||$node->$parameterName==$value;
+	                if($ret == true) {
+	                    break;
+	                }
+	            }
+	            return $ret;
+	        } else {
+	            return ($node->$parameterName == $this->markingFilter['value']);
+	        }
+	    } else if ($func=$this->markingFilter['func']) {
+	        return call_user_func($func, $node);
+	    }
+	}
+	
+	/**
+	 * Ensure marked nodes that have children are also marked expanded.
+	 * Call this after marking but before iterating over the tree.
+	 */
+	protected function markingFinished($numChildrenMethod="numChildren") {
+	    // Mark childless nodes as expanded.
+	    if($this->markedNodes) {
+	        foreach($this->markedNodes as $id => $node) {
+	            if(!$node->isExpanded() && !$node->$numChildrenMethod()) {
+	                $node->markExpanded();
+	            }
+	        }
+	    }
+	}
+	
+	/**
+	 * Return CSS classes of 'unexpanded', 'closed', both, or neither, depending on
+	 * the marking of this DataObject.
+	 */
+	public function markingClasses() {
+	    $classes='';
+	    if(!$this->isExpanded()) {
+	        $classes .= " unexpanded jstree-closed";
+	    }
+	    if($this->isTreeOpened()) {
+	        if($this->numChildren() > 0) $classes .= " jstree-open";
+	    } else {
+	        $classes .= " closed";
+	    }
+	    return $classes;
+	}
+	
+	/**
+	 * Return the IDs of all the marked nodes
+	 */
+	public function markedNodeIDs() {
+	    return array_keys($this->markedNodes);
+	}
+	
+	/**
+	 * Mark this DataObject as expanded.
+	 */
+	public function markExpanded() {
+	    self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=true;
+	    self::$expanded[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=true;
+	}
+	
+	/**
+	 * Mark this DataObject as unexpanded.
+	 */
+	public function markUnexpanded() {
+	    self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=true;
+	    self::$expanded[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=false;
+	}
+	
+	/**
+	 * Mark this DataObject's tree as opened.
+	 */
+	public function markOpened() {
+	    self::$marked[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=true;
+	    self::$treeOpened[ClassInfo::baseDataClass($this->owner->class)][$this->owner->ID]=true;
+	}
+	
+	/**
+	 * Check if this DataObject is marked.
+	 * @return boolean
+	 */
+	public function isMarked() {
+	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
+	    $id=$this->owner->ID;
+	    return isset(self::$marked[$baseClass][$id]) ? self::$marked[$baseClass][$id] : false;
+	}
+	
+	/**
+	 * Check if this DataObject is expanded.
+	 * @return boolean
+	 */
+	public function isExpanded() {
+	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
+	    $id=$this->owner->ID;
+	    return isset(self::$expanded[$baseClass][$id]) ? self::$expanded[$baseClass][$id] : false;
+	}
+	
+	/**
+	 * Check if this DataObject's tree is opened.
+	 */
+	public function isTreeOpened() {
+	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
+	    $id=$this->owner->ID;
+	    return isset(self::$treeOpened[$baseClass][$id]) ? self::$treeOpened[$baseClass][$id] : false;
+	}
+	
+	/**
+	 * Return a partial tree as an HTML UL.
+	 */
+	public function partialTreeAsUL($minCount=50) {
+	    $children=$this->owner->AllChildren();
+	    if($children) {
+	        if($attributes) $attributes=" $attributes";
+	        $output="<ul$attributes>\n";
+	
+	        foreach($children as $child) {
+	            $output .= eval("return $titleEval;") . "\n" .
+	                    $child->getChildrenAsUL("", $titleEval, $extraArg) . "</li>\n";
+	        }
+	        $output .= "</ul>\n";
+	    }
+	    return $output;
+	}
+	
+	/**
+	 * Get a list of this DataObject's and all it's descendants IDs.
+	 * @return int
+	 */
+	public function getDescendantIDList() {
+	    $idList=array();
+	    $this->loadDescendantIDListInto($idList);
+	    return $idList;
+	}
+	
+	/**
+	 * Get a list of this DataObject's and all it's descendants ID, and put it in $idList.
+	 * @var array $idList Array to put results in.
+	 */
+	public function loadDescendantIDListInto(&$idList) {
+	    if($children=$this->AllChildren()) {
+	        foreach($children as $child) {
+	            if(in_array($child->ID, $idList)) {
+	                continue;
+	            }
+	            $idList[]=$child->ID;
+	            $ext=$child->getExtensionInstance('Hierarchy');
+	            $ext->setOwner($child);
+	            $ext->loadDescendantIDListInto($idList);
+	            $ext->clearOwner();
+	        }
+	    }
+	}
+	
+	/**
+	 * Get the children for this DataObject.
+	 * @return SS_List
+	 */
+	public function Children() {
+	    if(!(isset($this->_cache_children) && $this->_cache_children)) {
+	        $result=$this->owner->stageChildren(false);
+	        if(isset($result)) {
+	            $this->_cache_children=new ArrayList();
+	            foreach($result as $child) {
+	                if($child->canView()) {
+	                    $this->_cache_children->push($child);
+	                }
+	            }
+	        }
+	    }
+	    return $this->_cache_children;
+	}
+	
+	/**
+	 * Return all children, including those 'not in menus'.
+	 * @return SS_List
+	 */
+	public function AllChildren() {
+	    return $this->owner->stageChildren(true);
+	}
+	
+	/**
+	 * Return all children, including those that have been deleted but are still in live.
+	 * Deleted children will be marked as "DeletedFromStage"
+	 * Added children will be marked as "AddedToStage"
+	 * Modified children will be marked as "ModifiedOnStage"
+	 * Everything else has "SameOnStage" set, as an indicator that this information has been looked up.
+	 * @return SS_List
+	 */
+	public function AllChildrenIncludingDeleted($context=null) {
+	    return $this->doAllChildrenIncludingDeleted($context);
+	}
+	
+	/**
+	 * @see AllChildrenIncludingDeleted
+	 *
+	 * @param unknown_type $context
+	 * @return SS_List
+	 */
+	public function doAllChildrenIncludingDeleted($context=null) {
+	    if(!$this->owner) user_error('Hierarchy::doAllChildrenIncludingDeleted() called without $this->owner');
+	
+	    $idxStageChildren=array();
+	    $idxLiveChildren=array();
+	
+	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
+	    if($baseClass) {
+	        $stageChildren=$this->owner->stageChildren(true);
+	
+	        $this->owner->extend("augmentAllChildrenIncludingDeleted", $stageChildren, $context);
+	        	
+	    }else {
+	        user_error("SnippetHierarchy::AllChildren() Couldn't determine base class for '{$this->owner->class}'", E_USER_ERROR);
+	    }
+	
+	    return $stageChildren;
+	}
+	
+	/**
+	 * Return children from the stage site
+	 *
+	 * @param showAll Inlcude all of the elements, even those not shown in the menus.
+	 *   (only applicable when extension is applied to {@link SiteTree}).
+	 * @return SS_List
+	 */
+	public function stageChildren($showAll=false) {
+	    if($this->owner->db('ShowInMenus')) {
+	        $extraFilter=($showAll) ? '' : " AND \"ShowInMenus\"=1";
+	    } else {
+	        $extraFilter='';
+	    }
+	
+	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
+	    
+	    if($baseClass=='Snippet') {
+	        $staged=DataObject::get($baseClass, "\"{$baseClass}\".\"LanguageID\"=".intval($this->owner->ID)." AND \"{$baseClass}\".\"ID\"!=".intval($this->owner->ID).$extraFilter, "");
+	    }else {
+	        $staged=DataObject::get($baseClass, "\"{$baseClass}\".\"ID\"!=".intval($this->owner->ID).$extraFilter, "");
+	    }
+	    
+	    	
+	    $this->owner->extend("augmentStageChildren", $staged, $showAll);
+	    return $staged;
+	}
+	
+	/**
+	 * Returns a human-readable, flattened representation of the path to the object,
+	 * using its {@link Title()} attribute.
+	 *
+	 * @param String
+	 * @return String
+	 */
+	public function getBreadcrumbs($separator=' &raquo; ') {
+	    $crumbs=array();
+	    $ancestors=array_reverse($this->owner->getAncestors()->toArray());
+	    foreach($ancestors as $ancestor) $crumbs[]=$ancestor->Title;
+	    $crumbs[]=$this->owner->Title;
+	    return implode($separator, $crumbs);
+	}
+	
+	/**
+	 * Get the next node in the tree of the type. If there is no instance of the className descended from this node,
+	 * then search the parents.
+	 *
+	 * @todo Write!
+	 */
+	public function naturalPrev( $className, $afterNode=null ) {
+	    return null;
+	}
+	
+	function flushCache() {
+	    $this->_cache_children=null;
+	    $this->_cache_numChildren=null;
+	    self::$marked=array();
+	    self::$expanded=array();
+	    self::$treeOpened=array();
+	}
+	
+	public static function reset() {
+	    self::$marked=array();
+	    self::$expanded=array();
+	    self::$treeOpened=array();
 	}
 }
 ?>

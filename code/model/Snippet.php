@@ -16,6 +16,14 @@ class Snippet extends DataObject {
                                 'Versions'=>'SnippetVersion'
                              );
     
+    public static $many_many=array(
+                                    'PackageSnippets'=>'Snippet'
+                                );
+    
+    public static $belongs_many_many=array(
+                                            'SiblingSnippets'=>'Snippet'
+                                        );
+    
     public static $extensions=array(
                                     'SnippetHierarchy',
                                     "FulltextSearchable('Title,Description,Tags')"
@@ -32,17 +40,35 @@ class Snippet extends DataObject {
      * @return {FieldList} Fields to be used
      */
     public function getCMSFields() {
-        return new FieldList(
+        $fields=new FieldList(
                             new TabSet('Root',
-                                new Tab('Main', _t('CodeBank.MAIN', '_Main'),
+                                new Tab('Main', _t('Snippet.MAIN', '_Main'),
                                     new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
                                     TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
+                                ),
+                                new Tab('Package', _t('Snippet.PACKAGE', '_Package'),
+                                    $packageGrid=new GridField('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $this->PackageSnippets(), GridFieldConfig_RelationEditor::create(10)),
+                                    $siblingGrid=new PackageViewField('SiblingSnippets', _t('Snippet.BELONGS_TO_PACKAGES', '_Belongs to Packages'), $this->SiblingSnippets())
                                 )
                             )
                         );
+        
+        
+        if($this->ID==0) {
+            $fields->replaceField('PackageSnippets', new LabelField('PackageSnippets', _t('CodeBank.PACKAGE_SNIPPETS_AFTER_SAVE', '_Package Snippets can be assigned after saving for the first time')));
+            $fields->removeByName('SiblingSnippets');
+        }else {
+            $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
+                                    ->removeComponentsByType('GridFieldDeleteAction')
+                                    ->addComponent(new PackageViewButton())
+                                    ->addComponent(new GridFieldDeleteAction(true));
+        }
+        
+        
+        return $fields;
     }
     
     /**
@@ -138,10 +164,8 @@ class Snippet extends DataObject {
      */
     public function summaryFields() {
         return array(
-                    'Title'=>_t('Snippet.TITLE', '_Title'),
-                    'Description'=>_t('Snippet.DESCRIPTION', '_Description'),
                     'Language.Name'=>_t('Snippet.LANGUAGE', '_Language'),
-                    'Tags'=>_t('Snippet.TAGS_COLUMN', '_Tags')
+                    'Title'=>_t('Snippet.TITLE', '_Title')
                 );
     }
 	

@@ -143,21 +143,22 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $snippet=Snippet::get()->byID($data->id);
         if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+            //@TODO Need to include the snippet package information in data being sent
             $response['data'][]=array(
-                        'id'=>$snippet->ID,
-                        'title'=>$snippet->Title,
-                        'text'=>$snippet->getSnippetText(),
-                        'description'=>$snippet->Description,
-                        'tags'=>$snippet->Tags,
-                        'languageID'=>$snippet->LanguageID,
-                        'lastModified'=>$snippet->LastEdited,
-                        'creatorID'=>$snippet->CreatorID,
-                        'creator'=>($snippet->Creator() ? $snippet->Creator()->Name:'Deleted User'),
-                        'lastEditor'=>($snippet->LastEditor() ? $snippet->LastEditor()->Name:($snippet->LastEditorID!=0 ? 'Deleted User':'')),
-                        'language'=>$snippet->Language()->Name,
-                        'fileType'=>$snippet->Language()->FileExtension,
-                        'shjs_code'=>$snippet->Language()->HighlightCode
-                    );
+                                    'id'=>$snippet->ID,
+                                    'title'=>$snippet->Title,
+                                    'text'=>$snippet->getSnippetText(),
+                                    'description'=>$snippet->Description,
+                                    'tags'=>$snippet->Tags,
+                                    'languageID'=>$snippet->LanguageID,
+                                    'lastModified'=>$snippet->LastEdited,
+                                    'creatorID'=>$snippet->CreatorID,
+                                    'creator'=>($snippet->Creator() ? $snippet->Creator()->Name:'Deleted User'),
+                                    'lastEditor'=>($snippet->LastEditor() ? $snippet->LastEditor()->Name:($snippet->LastEditorID!=0 ? 'Deleted User':'')),
+                                    'language'=>$snippet->Language()->Name,
+                                    'fileType'=>$snippet->Language()->FileExtension,
+                                    'shjs_code'=>$snippet->Language()->HighlightCode
+                                );
             
             $response['data'][0]['text']=preg_replace('/\r\n|\n|\r/', "\n", $response['data'][0]['text']);
             $response['data'][0]['formatedText']='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'.

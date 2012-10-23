@@ -24,7 +24,7 @@ en:
         COMPARE_WITH_CURRENT: "Compare with Current"
         DELETE: "Delete"
         SAVE: "Save"
-        MAIN: "Main"
+        SNIPPETS: "Snippets"
         SETTINGS: "Settings"
         SNIPPET_SAVED: "Snippet has been saved"
         PERMISSION_DENIED: "Permission Denied"
@@ -56,6 +56,11 @@ en:
         CODE: "Code"
         TAGS: "Tags (comma separate)"
         TAGS_COLUMN: "Tags"
+        MAIN: "Main"
+        PACKAGE: "Package"
+        PACKAGE_SNIPPETS: "Package Snippets"
+        BELONGS_TO_PACKAGES: "Belongs to Packages"
+        PACKAGE_SNIPPETS_AFTER_SAVE: "Package Snippets can be assigned after saving for the first time"
     SnippetLanguage:
         SINGULARNAME: "Language"
         PLURALNAME: "Languages"
@@ -65,3 +70,5 @@ en:
     CodeBankShortCode:
         MISSING_ID_ATTRIBUTE: "Short Code missing the id attribute"
         SNIPPET_NOT_FOUND: "Snippet not found"
+    PackageViewField:
+        NO_PACKAGES: "No Packages"

@@ -4,7 +4,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public static $tree_class='SnippetLanguage';
     public static $url_rule='/$Action/$ID/$OtherID';
     public static $url_priority=59;
-	public static $filter_class='SnippetTreeFilter';
+    public static $filter_class='SnippetTreeFilter';
     
     public static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
@@ -41,70 +41,72 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
+        
+        //@TODO IP Agreement handing
     }
     
     public function index($request) {
-		// In case we're not showing a specific record, explicitly remove any session state,
-		// to avoid it being highlighted in the tree, and causing an edit form to show.
-		if(!$request->param('Action')) $this->setCurrentPageId(null);
+        // In case we're not showing a specific record, explicitly remove any session state,
+        // to avoid it being highlighted in the tree, and causing an edit form to show.
+        if(!$request->param('Action')) $this->setCurrentPageId(null);
 
-		return parent::index($request);
-	}
-	
-	/**
-	 * Override {@link LeftAndMain} Link to allow blank URL segment for CMSMain.
-	 * @param {string} $action Action to be used
-	 * @return {string} Resulting link
-	 */
-	public function Link($action=null) {
-		$link = Controller::join_links(
-			$this->stat('url_base', true),
-			$this->stat('url_segment', true), // in case we want to change the segment
-			'/', // trailing slash needed if $action is null!
-			"$action"
-		);
-		
-		$this->extend('updateLink', $link);
-		return $link;
-	}
-	
-	/**
-	 * Generates the link with search params
-	 * @param {string} Link to
-	 * @return {string} Link with search params
-	 */
-	protected function LinkWithSearch($link) {
-		// Whitelist to avoid side effects
-		$params=array(
-        			'q'=>(array)$this->request->getVar('q'),
-        			'ParentID'=>$this->request->getVar('ParentID')
-        		);
-		
-		$link=Controller::join_links(
-                        			$link,
-                        			(array_filter(array_values($params)) ? '?'.http_build_query($params):null)
-                        		);
-		
-		$this->extend('updateLinkWithSearch', $link);
-		return $link;
-	}
-	
-	/**
-	 * Gets the main tab link
-	 * @return {string} URL to the main tab
-	 */
-	public function getLinkMain() {
-	    if($this->currentPageID()!=0) {
-	        $otherID=null;
-	        if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
-	            $otherID=intval($this->urlParams['OtherID']);
-	        }
-	        
-	        return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID(), $otherID));
-	    }
+        return parent::index($request);
+    }
+    
+    /**
+     * Override {@link LeftAndMain} Link to allow blank URL segment for CMSMain.
+     * @param {string} $action Action to be used
+     * @return {string} Resulting link
+     */
+    public function Link($action=null) {
+        $link = Controller::join_links(
+            $this->stat('url_base', true),
+            $this->stat('url_segment', true), // in case we want to change the segment
+            '/', // trailing slash needed if $action is null!
+            "$action"
+        );
+        
+        $this->extend('updateLink', $link);
+        return $link;
+    }
+    
+    /**
+     * Generates the link with search params
+     * @param {string} Link to
+     * @return {string} Link with search params
+     */
+    protected function LinkWithSearch($link) {
+        // Whitelist to avoid side effects
+        $params=array(
+                    'q'=>(array)$this->request->getVar('q'),
+                    'ParentID'=>$this->request->getVar('ParentID')
+                );
+        
+        $link=Controller::join_links(
+                                    $link,
+                                    (array_filter(array_values($params)) ? '?'.http_build_query($params):null)
+                                );
+        
+        $this->extend('updateLinkWithSearch', $link);
+        return $link;
+    }
+    
+    /**
+     * Gets the main tab link
+     * @return {string} URL to the main tab
+     */
+    public function getLinkMain() {
+        if($this->currentPageID()!=0) {
+            $otherID=null;
+            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+                $otherID=intval($this->urlParams['OtherID']);
+            }
+            
+            return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID(), $otherID));
+        }
         
         return $this->LinkWithSearch(singleton('CodeBank')->Link());
-	}
+    }
     
     /**
      * Gets the form used for viewing snippets
@@ -197,6 +199,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
+            $fields->replaceField('PackageSnippets', PackageViewField::create('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $record->PackageSnippets())->setShowNested(false));
+            
             $readonlyFields=$form->Fields()->makeReadonly();
             
             $form->setFields($readonlyFields);
@@ -257,27 +261,67 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         return $this->renderWith('CodeBank_TreeView');
     }
 
-	/**
-	 * Get a subtree underneath the request param 'ID'.
-	 * If ID = 0, then get the whole tree.
-	 */
-	public function getsubtree($request) {
-		$html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Snippets', null, array($this, 'hasSnippets'));
+    /**
+     * Get a subtree underneath the request param 'ID'.
+     * If ID = 0, then get the whole tree.
+     */
+    public function getsubtree($request) {
+        $languageID=(strpos($request->getVar('ID'), 'language-')!==false ? intval(str_replace('language-', '', $request->getVar('ID'))):null);
+        $html=$this->getSiteTreeFor($this->stat('tree_class'), $languageID, 'Snippets', null, array($this, 'hasSnippets'));
 
-		// Trim off the outer tag
-		$html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
-		$html=preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/','', $html);
-		
-		return $html;
-	}
-	
-	/**
-	 * Checks to see if the tree should be filtered or not
-	 * @return {bool}
-	 */
-	public function TreeIsFiltered() {
-	    return $this->request->getVar('q');
-	}
+        // Trim off the outer tag
+        $html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
+        $html=preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/','', $html);
+        
+        return $html;
+    }
+
+    /**
+     * Allows requesting a view update on specific tree nodes.
+     * Similar to {@link getsubtree()}, but doesn't enforce loading
+     * all children with the node. Useful to refresh views after
+     * state modifications, e.g. saving a form.
+     *
+     * @return String JSON
+     */
+    public function updatetreenodes($request) {
+        $data=array();
+        $ids=explode(',', $request->getVar('ids'));
+        foreach($ids as $id) {
+            $record=$this->getRecord($id);
+            $recordController=singleton('CodeBank');
+            
+            //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
+            $next=$prev=null;
+            
+            $className=$this->stat('tree_class');
+            $next=DataObject::get('Snippet')->filter('LanguageID', $record->LanguageID)->filter('Title:GreaterThan', $record->Title)->first();
+            if(!$next) {
+                $prev=DataObject::get('Snippet')->filter('LanguageID', $record->LanguageID)->filter('Title:LessThan', $record->Title)->reverse()->first();
+            }
+            
+            $link=Controller::join_links($recordController->Link("show"), $record->ID);
+            $html=CodeBank_TreeNode::create($record, $link, $this->isCurrentPage($record))->forTemplate().'</li>';
+            
+            $data[$id]=array(
+                            'html'=>$html,
+                            'ParentID'=>'language-'.$record->LanguageID,
+                            'NextID'=>($next ? $next->ID:null),
+                            'PrevID'=>($prev ? $prev->ID:null)
+                        );
+        }
+        
+        //$this->response->addHeader('Content-Type', 'text/json');
+        return Convert::raw2json($data);
+    }
+    
+    /**
+     * Checks to see if the tree should be filtered or not
+     * @return {bool}
+     */
+    public function TreeIsFiltered() {
+        return $this->request->getVar('q');
+    }
     
     /**
      * Gets the snippet language tree as an unordered list
@@ -330,7 +374,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         // Get the tree root
-        $record=($rootID ? $this->getRecord($rootID):null);
+        $record=($rootID ? SnippetLanguage::get()->byID($rootID):null);
         $obj=($record ? $record:singleton($className));
         
         // Mark the nodes of the tree to return
@@ -423,77 +467,77 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         return $node->hasSnippets();
     }
     
-	/**
-	 * @return ArrayList
-	 */
-	public function Breadcrumbs($unlinked=false) {
-		$defaultTitle=LeftAndMain::menu_title_for_class('CodeBank');
-		$title=_t('CodeBank.MENUTITLE', $defaultTitle);
-		$items=new ArrayList(array(
-                        			new ArrayData(array(
-                                        				'Title'=>$title,
-                                        				'Link'=>($unlinked ? false:'admin/codeBank/show/'.$this->currentPageID())
-                                        			))
-                        		));
-		
-		$record=$this->currentPage();
-		if($record && $record->exists()) {
-			if($record->hasExtension('Hierarchy')) {
-				$ancestors=$record->getAncestors();
-				$ancestors=new ArrayList(array_reverse($ancestors->toArray()));
-				$ancestors->push($record);
-				foreach($ancestors as $ancestor) {
-					$items->push(new ArrayData(array(
-                            						'Title'=>$ancestor->Title,
-                            						'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $ancestor->ID))
-                            					)));
-				}
-			}else {
-				$items->push(new ArrayData(array(
-                            					'Title'=>$record->Title,
-                            					'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $record->ID))
-                            				)));
-			}
-		}
+    /**
+     * @return ArrayList
+     */
+    public function Breadcrumbs($unlinked=false) {
+        $defaultTitle=LeftAndMain::menu_title_for_class('CodeBank');
+        $title=_t('CodeBank.MENUTITLE', $defaultTitle);
+        $items=new ArrayList(array(
+                                    new ArrayData(array(
+                                                        'Title'=>$title,
+                                                        'Link'=>($unlinked ? false:'admin/codeBank/show/'.$this->currentPageID())
+                                                    ))
+                                ));
+        
+        $record=$this->currentPage();
+        if($record && $record->exists()) {
+            if($record->hasExtension('Hierarchy')) {
+                $ancestors=$record->getAncestors();
+                $ancestors=new ArrayList(array_reverse($ancestors->toArray()));
+                $ancestors->push($record);
+                foreach($ancestors as $ancestor) {
+                    $items->push(new ArrayData(array(
+                                                    'Title'=>$ancestor->Title,
+                                                    'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $ancestor->ID))
+                                                )));
+                }
+            }else {
+                $items->push(new ArrayData(array(
+                                                'Title'=>$record->Title,
+                                                'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $record->ID))
+                                            )));
+            }
+        }
 
-		return $items;
-	}
-	
-	/**
-	 * Generates the search form
-	 * @return {Form} Form used for searching
-	 */
-	public function SearchForm() {
-	    $fields=new FieldList(
+        return $items;
+    }
+    
+    /**
+     * Generates the search form
+     * @return {Form} Form used for searching
+     */
+    public function SearchForm() {
+        $fields=new FieldList(
                             new TextField('q[Term]', _t('CodeBank.KEYWORD', '_Keyword')),
-            	            $classDropdown=new DropdownField(
-                                    	                    'q[LanguageID]',
-                                    	                    _t('CodeBank.LANGUAGE', '_Language'),
-                                    	                    SnippetLanguage::get()->sort('Name')->map('ID', 'Name')
-            	                                        )
+                            $classDropdown=new DropdownField(
+                                                            'q[LanguageID]',
+                                                            _t('CodeBank.LANGUAGE', '_Language'),
+                                                            SnippetLanguage::get()->sort('Name')->map('ID', 'Name')
+                                                        )
                         );
-	    
-	    
-	    $classDropdown->setEmptyString(_t('CodeBank.ALL_LANGUAGES', '_All Languages'));
-	    
-	    
-	    $actions=new FieldList(
+        
+        
+        $classDropdown->setEmptyString(_t('CodeBank.ALL_LANGUAGES', '_All Languages'));
+        
+        
+        $actions=new FieldList(
                             FormAction::create('doSearch', _t('CodeBank.APPLY_FILTER', '_Apply Filter'))->addExtraClass('ss-ui-action-constructive')->setUseButtonTag(true),
-	                        Object::create('ResetFormAction', 'clear', _t('CodeBank.RESET', '_Reset'))->setUseButtonTag(true)
+                            Object::create('ResetFormAction', 'clear', _t('CodeBank.RESET', '_Reset'))->setUseButtonTag(true)
                         );
-	    
-	    
-	    $form=Form::create($this, 'SearchForm', $fields, $actions)
-                                                        	    ->addExtraClass('cms-search-form')
-                                                        	    ->setFormMethod('GET')
-                                                        	    ->setFormAction($this->Link())
-                                                        	    ->disableSecurityToken()
-                                                        	    ->unsetValidator();
-	    $form->loadDataFrom($this->request->getVars());
-	
-	    $this->extend('updateSearchForm', $form);
-	    return $form;
-	}
+        
+        
+        $form=Form::create($this, 'SearchForm', $fields, $actions)
+                                                                ->addExtraClass('cms-search-form')
+                                                                ->setFormMethod('GET')
+                                                                ->setFormAction($this->Link())
+                                                                ->disableSecurityToken()
+                                                                ->unsetValidator();
+        $form->loadDataFrom($this->request->getVars());
+    
+        $this->extend('updateSearchForm', $form);
+        return $form;
+    }
     
     /**
      * Gets the current version of Code Bank
@@ -556,10 +600,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 if(!empty($renderedDiff)) {
                     $lTable='<table cellspacing="0" cellpadding="0" border="0" class="diff">'.
                                 '<colgroup>'.
-                                	'<col class="ltype"/>'.
-                                	'<col class="content"/>'.
-                            	'</colgroup>'.
-                        		'<tbody>';
+                                    '<col class="ltype"/>'.
+                                    '<col class="content"/>'.
+                                '</colgroup>'.
+                                '<tbody>';
                     $rTable=$lTable;
                     
                     header('content-type: text/plain');
@@ -621,10 +665,10 @@ class CodeBank_TreeNode extends LeftAndMain_TreeNode {
      */
     public function forTemplate() {
         $obj=$this->obj;
-        return "<li ".($this->obj instanceof SnippetLanguage ? '':"id=\"record-$obj->ID\" data-id=\"$obj->ID\"")." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
+        return "<li ".($this->obj instanceof SnippetLanguage ? "id=\"language-$obj->ID\" data-id=\"language-$obj->ID\"":"id=\"record-$obj->ID\" data-id=\"$obj->ID\"")." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
                 "<ins class=\"jstree-icon\">&nbsp;</ins>".
                 "<a href=\"".($this->obj instanceof SnippetLanguage ? '':$this->getLink())."\" title=\"$obj->class\">".
                 "<ins class=\"jstree-icon\">&nbsp;</ins><span class=\"text\">".($obj->TreeTitle)."</span></a>";
-	}
+    }
 }
 ?>
