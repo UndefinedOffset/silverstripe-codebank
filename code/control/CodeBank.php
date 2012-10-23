@@ -31,6 +31,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         Config::inst()->update('CodeBank', 'menu_icon', CB_DIR.'/images/menu-icon.png');
     }
     
+    /**
+     * Initializes the code bank admin
+     */
     public function init() {
         parent::init();
         
@@ -207,6 +210,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             Requirements::javascript(CB_DIR.'/javascript/external/jquery-zclip/jquery.zclip.min.js');
             Requirements::javascript(CB_DIR.'/javascript/CodeBank.ViewForm.js');
             
+            
+            //Display message telling user to run dev/build because the version numbers are out of sync
+            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+                $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+            }
+            
+            
             return $form;
         }else if($id) {
             $form=new Form($this, 'EditForm', new FieldList(
@@ -215,6 +225,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         }else {
             $form=$this->EmptyForm();
         }
+        
+        
+        //Display message telling user to run dev/build because the version numbers are out of sync
+        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+        }
+        
         
         $form->disableDefaultAction();
         $form->addExtraClass('cms-edit-form');

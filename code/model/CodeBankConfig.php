@@ -22,6 +22,7 @@ class CodeBankConfig extends DataObject {
             DB::alteration_message('Default Code Bank Config Created', 'created');
         }
         
+        
         if(!Group::get()->filter('Code', 'code-bank-api')->first()) {
             $group=new Group();
             $group->Title='Code Bank Users';
@@ -36,6 +37,77 @@ class CodeBankConfig extends DataObject {
             $permission->write();
             
             DB::alteration_message('Code Bank Users Group Created', 'created');
+        }
+        
+        
+        //Check for and perform any needed updates
+        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            $updateXML=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/airUpdate.xml'));
+            $latestVersion=strip_tags($updateXML->version->asXML());
+            $versionTmp=explode(' ', $latestVersion);
+            
+            //Sanity Check code version against latest
+            if($versionTmp[1]<CB_BUILD_DATE) {
+                DB::alteration_message('Unknown Code Bank server version '.CB_VERSION.' '.CB_BUILD_DATE.', current version available for download is '.$latestVersion, 'error');
+                return;
+            }
+            
+            //Sanity Check make sure latest version is installed
+            if(CB_VERSION.' '.CB_BUILD_DATE!=$latestVersion) {
+                DB::alteration_message('A Code Bank Server update is available, please <a href="http://programs.edchipman.ca/applications/code-bank/">download</a> and install the update then run dev/build again.', 'error');
+                return;
+            }
+            
+            //Sanity Check database version against latest
+            $dbVerTmp=explode(' ', $dbVersion);
+            if($versionTmp[1]<CodeBankConfig::CurrentConfig()->Version) {
+                DB::alteration_message('Code Bank Server database version '.$dbVersion.', current version available for download is '.$latestVersion, 'error');
+                return;
+            }
+            
+            
+            $data=array(
+                        'version'=>CodeBankConfig::CurrentConfig()->Version,
+                        'db_type'=>'SERVER'
+                    );
+            
+            $data=http_build_query($data);
+            
+            
+            $context=stream_context_create(array(
+                                                'http'=>array(
+                                                            'method'=>'POST',
+                                                            'header'=>"Content-type: application/x-www-form-urlencoded\r\n"
+                                                                        ."Content-Length: ".strlen($data)."\r\n",
+                                                            'content'=>$data
+                                                        )
+                                            ));
+            
+            
+            //Download and run queries needed
+            $sql=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/DatabaseUpgrade.php', false, $context));
+            $sets=count($sql->query);
+            foreach($sql->query as $query) {
+                $queries=explode('$',$query);
+                $t=count($queries);
+            
+                foreach($queries as $query) {
+                    if(empty($query)) {
+                        continue;
+                    }
+            
+                    DB::query($query);
+                }
+            }
+            
+            
+            //Update Database Version
+            $codeBankConfig=CodeBankConfig::CurrentConfig();
+            $codeBankConfig->Version=$latestVersion;
+            $codeBankConfig->write();
+            
+            
+            DB::alteration_message('Code Bank Server database upgraded', 'changed');
         }
     }
     

@@ -64,6 +64,7 @@
             }
         });
         
+        
         //Compare Revision Button
         $('.CodeBank #Form_EditForm_action_compareRevision').entwine({
             onclick: function(e) {
