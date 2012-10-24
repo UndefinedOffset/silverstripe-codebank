@@ -21,6 +21,7 @@ class CodeBankIPAgreement extends CodeBank {
         LeftAndMain::init();
     
         Requirements::css(CB_DIR.'/css/CodeBank.css');
+        Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         
         if(empty(CodeBankConfig::CurrentConfig()->IPMessage) || Session::get('CodeBankIPAgreed')===true) {
             $this->redirect('admin/codeBank');
