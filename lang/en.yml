@@ -43,6 +43,10 @@ en:
         LANGUAGES: "Languages"
     CodeBankSettings:
         MENUTITLE: "Code Bank Settings"
+    CodeBankIPAgreement:
+        MENUTITLE: "Code Bank IP Agreement"
+        DISAGREE: "Disagree"
+        AGREE: "Agree"
     CodeBankAddSnippet:
         TITLE: "Add Snippet"
     CodeBankMember:

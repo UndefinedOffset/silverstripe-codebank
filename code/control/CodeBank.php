@@ -42,7 +42,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
         
-        //@TODO IP Agreement handing
+        if(!empty(CodeBankConfig::CurrentConfig()->IPMessage) && Session::get('CodeBankIPAgreed')!==true) {
+            $this->redirect('admin/codeBank/agreement');
+        }
     }
     
     public function index($request) {

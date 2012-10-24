@@ -12,6 +12,7 @@ Object::add_extension('Member','CodeBankMember');
 CMSMenu::remove_menu_item('CodeBankAddSnippet');
 CMSMenu::remove_menu_item('CodeBankEditSnippet');
 CMSMenu::remove_menu_item('CodeBankSettings');
+CMSMenu::remove_menu_item('CodeBankIPAgreement');
 
 
 //Inject Menu Styles
