@@ -478,7 +478,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $items=new ArrayList(array(
                                     new ArrayData(array(
                                                         'Title'=>$title,
-                                                        'Link'=>($unlinked ? false:'admin/codeBank/show/'.$this->currentPageID())
+                                                        'Link'=>($unlinked ? false:'admin/codeBank')
                                                     ))
                                 ));
         

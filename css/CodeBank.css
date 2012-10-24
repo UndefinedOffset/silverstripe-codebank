@@ -23,6 +23,10 @@
     background: url(./../../framework/admin/images/sitetree_ss_pageclass_icons_default.png) no-repeat !important;
 }
 
+.CodeBank .cms-content-fields {
+    background: url(./../images/edit-form-background.png) no-repeat center center;
+}
+
 .CodeBank .Actions label {
     display: inline-block;
     
