@@ -66,6 +66,7 @@ class PackageViewField extends FormField {
         
         
         Requirements::css(CB_DIR.'/css/PackageViewField.css');
+        Requirements::javascript(CB_DIR.'/javascript/PackageViewField.js');
         
         return $obj->renderWith($this->getFieldHolderTemplates());
     }

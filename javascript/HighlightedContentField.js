@@ -17,7 +17,20 @@
                 SyntaxHighlighter.highlight();
                 
                 var self=this;
-                $('.cms-container').bind('afterstatechange', function() {self.redraw()});
+                var parentTab=$(this).closest('.tab').get(0);
+                
+                
+                //Redraw on cms state change
+                $('.cms-container').bind('afterstatechange', function() {
+                                                                        self.redraw();
+                                                                    });
+                
+                //Redraw on tab show
+                $(this).closest('.tabset').bind('tabsshow', function(event, ui) {
+                                                                                if(parentTab==ui.panel) {
+                                                                                    self.redraw();
+                                                                                }
+                                                                            });
             },
             
             fromWindow: {

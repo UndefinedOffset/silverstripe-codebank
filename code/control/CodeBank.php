@@ -669,7 +669,7 @@ class CodeBank_TreeNode extends LeftAndMain_TreeNode {
         $obj=$this->obj;
         return "<li ".($this->obj instanceof SnippetLanguage ? "id=\"language-$obj->ID\" data-id=\"language-$obj->ID\"":"id=\"record-$obj->ID\" data-id=\"$obj->ID\"")." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
                 "<ins class=\"jstree-icon\">&nbsp;</ins>".
-                "<a href=\"".($this->obj instanceof SnippetLanguage ? '':$this->getLink())."\" title=\"$obj->class\">".
+                "<a href=\"".($this->obj instanceof SnippetLanguage ? '':$this->getLink())."\" title=\"$obj->class: ".strip_tags($obj->TreeTitle)."\">".
                 "<ins class=\"jstree-icon\">&nbsp;</ins><span class=\"text\">".($obj->TreeTitle)."</span></a>";
     }
 }
