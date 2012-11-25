@@ -7,15 +7,42 @@
 }
 
 .packageview li {
-    list-style: disc;
+    font-size: 14px;
+    font-weight: bold;
     
-    margin: 5px 0;
+    list-style: none;
+    
+    padding-left: 10px;
 }
 
 .packageview li span {
     font-style: italic;
 }
 
-.packageview ul {
-    margin-left: 20px;
+.packageview li + li {
+    border-top: 1px solid rgba(201, 205, 206, 0.8);
+    
+    margin-top: 1em;
+    padding-top: 1em;
+}
+
+.packageview ul li ul {
+    margin: 5px 0 0 40px;
+}
+
+.packageview ul li ul li {
+    font-size: 12px;
+    font-weight: normal;
+    
+    list-style: url(./../images/tree.gif);
+    
+    margin: 0;
+    padding-left: 0;
+}
+
+.packageview ul li ul li + li {
+    border-top: 0;
+    
+    margin-top: 0;
+    padding-top: 0;
 }

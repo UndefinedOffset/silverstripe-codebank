@@ -201,7 +201,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
-            $fields->replaceField('PackageSnippets', PackageViewField::create('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $record->PackageSnippets())->setShowNested(false));
+            $fields->replaceField('PackageSnippets', PackageViewField::create('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $record->PackageSnippets(), $record->ID)->setShowNested(false));
             
             $readonlyFields=$form->Fields()->makeReadonly();
             

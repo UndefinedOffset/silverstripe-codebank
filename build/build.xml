@@ -21,7 +21,7 @@
                     <contains value="assets/releases/SilverStripe-framework-v3.0"/>
                 </linecontains>
                 <tokenfilter>
-                    <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot;&gt;&lt;div class=&quot;green-button action-download&quot;&gt;&lt;span&gt;Download for free&lt;/span&gt;&lt;/div&gt;&lt;/a&gt;" replace="\2"/>
+                    <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/>
                 </tokenfilter>
             </filterchain>
         </loadfile>

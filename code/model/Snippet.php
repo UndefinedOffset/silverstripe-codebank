@@ -51,7 +51,7 @@ class Snippet extends DataObject {
                                 ),
                                 new Tab('Package', _t('Snippet.PACKAGE', '_Package'),
                                     $packageGrid=new GridField('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $this->PackageSnippets(), GridFieldConfig_RelationEditor::create(10)),
-                                    $siblingGrid=new PackageViewField('SiblingSnippets', _t('Snippet.BELONGS_TO_PACKAGES', '_Belongs to Packages'), $this->SiblingSnippets())
+                                    $siblingGrid=new PackageViewField('SiblingSnippets', _t('Snippet.BELONGS_TO_PACKAGES', '_Belongs to Packages'), $this->SiblingSnippets(), $this->ID)
                                 )
                             )
                         );
@@ -63,6 +63,7 @@ class Snippet extends DataObject {
         }else {
             $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
                                     ->removeComponentsByType('GridFieldDeleteAction')
+                                    ->removeComponentsByType('GridFieldAddNewButton')
                                     ->addComponent(new PackageViewButton())
                                     ->addComponent(new GridFieldDeleteAction(true));
         }
