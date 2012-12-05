@@ -23,7 +23,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['data'][]=array(
                         'language'=>$lang->Name,
                         'file_extension'=>$lang->FileExtension,
-                        'shjs_code'=>$lang->HighlightCode
+                        'shjs_code'=>$lang->HighlightCode,
+                        'id'=>$lang->ID
                     );
         }
         
@@ -49,7 +50,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
             if($lang->Snippets()->Count()>0) {
-                $snippets=$lang->Snippets()->map('ID', 'Title')->toArray();
+                $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
                                         'snippets'=>$snippets
@@ -80,7 +81,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $lang=SnippetLanguage::get()->byID(intval($data->id));
         if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
-            $snippets=$lang->Snippets()->map('ID', 'Title')->toArray();
+            $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
             $response['data'][]=array(
                                     'language'=>$lang->Name,
                                     'snippets'=>$snippets
@@ -112,7 +113,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         foreach($languages as $lang) {
             $snippets=$lang->Snippets()->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
             if($lang->Snippets()->Count()>0) {
-                $snippets=$snippets->map('ID', 'Title')->toArray();
+                $snippets=$this->arrayUnmap($snippets->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
                                         'snippets'=>$snippets
@@ -432,9 +433,30 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $response['data']=array('mainRev'=>$snippet1, 'compRev'=>$snippet2, 'diff'=>$renderer->render($diff));
         
-        $conn->Close();
         
         return $response;
+    }
+    
+    /**
+     * Converts an array where the key and value should be mapped to a nested array
+     * @param {array} $array Source Array
+     * @param {string} $keyLbl Array's Key mapping name
+     * @param {string} $valueLbl Key's value mapping name
+     * @return {array} Unmapped array
+     */
+    final protected function arrayUnmap($array, $keyLbl='id', $valueLbl='title') {
+        $result=array();
+        
+        foreach($array as $key=>$value) {
+            $result[]=array(
+                            $keyLbl=>$key,
+                            $valueLbl=>$value
+                        );
+        }
+        
+        
+        //Return the resulting array
+        return $result;
     }
 }
 ?>

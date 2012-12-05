@@ -1,5 +1,5 @@
 <?php
-class CodeBankClientAPI extends Controller {
+class CodeBank_ClientAPI extends Controller {
     public static $allowed_actions=array(
                                         'index',
                                         'export_snippet'
@@ -66,8 +66,6 @@ class CodeBankClientAPI extends Controller {
         
         
         try {
-            $fileID=uniqId(time());
-            
             $snippet=Snippet::get()->byID(intval($request->getVar('id')));
             if(empty($snippet) || $snippet===false || $snippet->ID==0) {
                 header("HTTP/1.1 404 Not Found");
@@ -77,6 +75,10 @@ class CodeBankClientAPI extends Controller {
                 Session::save();
                 exit;
             }
+            
+            
+            $urlFilter=URLSegmentFilter::create();
+            $fileID=$urlFilter->filter($snippet->Title);
             
             
             //If the temp dir doesn't exist create it
