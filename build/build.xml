@@ -30,10 +30,10 @@
         
         <untar src="cache/silverstripe-3.0.tar.gz" dest="./../../" compression="gzip">
             <patternset>
-                <exclude name="framework/mysite"/>
-                <exclude name="framework/mysite/*"/>
-                <exclude name="framework/themes"/>
-                <exclude name="framework/themes/*"/>
+                <exclude name="mysite"/>
+                <exclude name="mysite/*"/>
+                <exclude name="themes"/>
+                <exclude name="themes/*"/>
             </patternset>
             <cutdirsmapper dirs="1"/>
         </untar>
@@ -61,12 +61,15 @@
             <fileset dir="./">
                 <exclude name="**/.svn"/>
                 <exclude name="**/build"/>
+                <exclude name=".project"/>
+                <exclude name=".settings"/>
+                <exclude name=".buildpath"/>
             </fileset>
         </copy>
         
         <!-- Zip Module Release -->
         <echo message="Building Module Archive"/>
-        <zip destfile="${releaseDir}/${moduleReleaseArchive}" basedir="${releaseFolder}/CodeBank" update="true" level="9"/>
+        <zip destfile="${releaseDir}/${moduleReleaseArchive}" basedir="${releaseFolder}/CodeBank" update="true" level="9" excludes="code/CodeBankRedirecter.php"/>
         
         
         
@@ -81,13 +84,23 @@
             <fileset dir="build/_config"/>
         </copy>
         
+        
+        <!-- Copy theme -->
+        <copy todir="${releaseFolder}/CodeBank">
+            <fileset dir="../themes">
+                <exclude name="**/.svn"/>
+                <exclude name="**/build"/>
+                <exclude name="**/.project"/>
+                <exclude name="**/.settings"/>
+                <exclude name="**/.buildpath"/>
+            </fileset>
+        </copy>
+        
         <!-- Untar Framework -->
         <untar src="cache/silverstripe-3.0.tar.gz" dest="${releaseFolder}" compression="gzip">
             <patternset>
-                <exclude name="framework/mysite"/>
-                <exclude name="framework/mysite/*"/>
-                <exclude name="framework/themes"/>
-                <exclude name="framework/themes/*"/>
+                <exclude name="themes"/>
+                <exclude name="themes/*"/>
                 <exclude name="phpunit*"/>
                 <exclude name="Makefile"/>
                 <exclude name="favicon.ico"/>
