@@ -133,10 +133,17 @@ class CodeBank_ClientAPI extends Controller {
         exit;
     }
     
+    /**
+     * Builds a json export file for importing on the client
+     */
     public function export_to_client() {
         if(!Permission::check('CODE_BANK_ACCESS')) {
             return Security::permissionFailure($this);
         }
+        
+        
+        //Bump up time limit we may need it
+        set_time_limit(480);
         
         
         //Snippet Containers
@@ -148,12 +155,13 @@ class CodeBank_ClientAPI extends Controller {
         
         //Build final response
         $response=array(
-                        array(
-                            'languages'=>$languages,
-                            'snippets'=>$snippets,
-                            'versions'=>$versions,
-                            'packages'=>$packages
-                        )
+                        'format'=>'ToClient',
+                        'data'=>array(
+                                    'languages'=>$languages,
+                                    'snippets'=>$snippets,
+                                    'versions'=>$versions,
+                                    'packages'=>$packages
+                                )
                     );
         
         
