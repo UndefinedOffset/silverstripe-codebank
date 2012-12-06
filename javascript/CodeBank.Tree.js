@@ -1,6 +1,6 @@
 (function($) {
     $.entwine('ss.tree', function($) {
-        $('.cms-tree').entwine({
+        $('.CodeBank .cms-tree').entwine({
             onadd:function() {
                 this._super();
                 

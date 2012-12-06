@@ -9,13 +9,18 @@
 	
 		<div class="cms-content-header-tabs">
 			<ul>
-				<li class="content-treeview<% if class == 'CMSPageEditController' %> ui-tabs-selected<% end_if %>">
-					<a href="$LinkMain" class="cms-panel-link" title="Form_EditForm" data-href="$LinkMain">
+				<li<% if $class=='CodeBank' %> class="ui-tabs-selected"<% end_if %>>
+					<a href="$LinkMain" class="cms-panel-link" data-href="$LinkMain">
 						<%t CodeBank.SNIPPETS "_Snippets" %>
 					</a>
 				</li>
-				<li class="content-listview<% if $class=='CodeBankSettings' %> ui-tabs-selected<% end_if %>">
-					<a href="$LinkSettings" class="cms-panel-link" title="Form_EditForm" data-href="$LinkSettings">
+                <li<% if $class == 'CodeBankPackages' %> class="ui-tabs-selected"<% end_if %>>
+                    <a href="$LinkPackages" class="cms-panel-link" data-href="$LinkPackages">
+                        <%t CodeBank.PACKAGES "_Packages" %>
+                    </a>
+                </li>
+				<li<% if $class=='CodeBankSettings' %> class="ui-tabs-selected"<% end_if %>>
+					<a href="$LinkSettings" class="cms-panel-link" data-href="$LinkSettings">
 						<%t CodeBank.SETTINGS "_Settings" %>
 					</a>
 				</li>

@@ -38,6 +38,7 @@ en:
         VERSION: "Version"
         UPDATE_NEEDED: "A database upgrade is required please run {startlink}dev/build{endlink}."
         EXPORT_TO_CLIENT: "Export To Desktop Client"
+        PACKAGES: "Packages"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
@@ -52,6 +53,13 @@ en:
         TITLE: "Add Snippet"
     CodeBankMember:
         USE_HEARTBEAT: "Use Code Bank Heartbeat to keep client session alive?"
+    CodeBankPackages:
+        MENUTITLE: "Snippet Packages"
+        ADD_NEW_PACKAGE: "Add New Package"
+        PACKAGE_DELETED: "Snippet Package has been deleted"
+        PACKAGE_SAVED: "Snippet Package has been saved"
+        PACKAGE_CREATED: "Snippet Package has been created"
+        EXPORT: "Export"
     Snippet:
         SINGULARNAME: "Snippet"
         PLURALNAME: "Snippets"
@@ -62,10 +70,13 @@ en:
         TAGS: "Tags (comma separate)"
         TAGS_COLUMN: "Tags"
         MAIN: "Main"
-        PACKAGE: "Package"
-        PACKAGE_SNIPPETS: "Package Snippets"
+        PACKAGES: "Packages"
         BELONGS_TO_PACKAGES: "Belongs to Packages"
-        PACKAGE_SNIPPETS_AFTER_SAVE: "Package Snippets can be assigned after saving for the first time"
+    SnippetPackage:
+        MAIN: "Main"
+        TITLE: "Title"
+        PACKAGE_SNIPPETS: "Package Snippets"
+        SNIPPETS_AFTER_FIRST_SAVE: "Snippets can be added after saving for the first time"
     SnippetLanguage:
         SINGULARNAME: "Language"
         PLURALNAME: "Languages"

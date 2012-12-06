@@ -98,7 +98,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} URL to the main tab
      */
     public function getLinkMain() {
-        if($this->currentPageID()!=0) {
+        if($this->currentPageID()!=0 && $this->class=='CodeBank') {
             $otherID=null;
             if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
                 $otherID=intval($this->urlParams['OtherID']);
@@ -201,8 +201,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
-            $fields->replaceField('PackageSnippets', PackageViewField::create('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $record->PackageSnippets(), $record->ID)->setShowNested(false));
-            
             $readonlyFields=$form->Fields()->makeReadonly();
             
             $form->setFields($readonlyFields);
@@ -262,7 +260,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public function tree() {
         return $this->renderWith('CodeBank_TreeView');
     }
-
+    
     /**
      * Get a subtree underneath the request param 'ID'.
      * If ID = 0, then get the whole tree.
@@ -297,9 +295,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $next=$prev=null;
             
             $className=$this->stat('tree_class');
-            $next=DataObject::get('Snippet')->filter('LanguageID', $record->LanguageID)->filter('Title:GreaterThan', $record->Title)->first();
+            $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('Title:GreaterThan', $record->Title)->first();
             if(!$next) {
-                $prev=DataObject::get('Snippet')->filter('LanguageID', $record->LanguageID)->filter('Title:LessThan', $record->Title)->reverse()->first();
+                $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('Title:LessThan', $record->Title)->reverse()->first();
             }
             
             $link=Controller::join_links($recordController->Link("show"), $record->ID);
@@ -313,7 +311,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                         );
         }
         
-        //$this->response->addHeader('Content-Type', 'text/json');
+        $this->response->addHeader('Content-Type', 'text/json');
         return Convert::raw2json($data);
     }
     
@@ -454,6 +452,25 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
+     * Returns the link to packages
+     * @return {string} Link to packages
+     */
+    public function getLinkPackages() {
+        if($this->urlParams['Action']=='add' && $this->class=='CodeBankPackages') {
+            return $this->LinkWithSearch($this->Link('add'));
+        }else if($this->currentPageID()!=0 && $this->class=='CodeBankPackages') {
+            $otherID=null;
+            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+                $otherID=intval($this->urlParams['OtherID']);
+            }
+            
+            return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID(), $otherID));
+        }
+        
+        return $this->LinkWithSearch('admin/codeBank/packages');
+    }
+    
+    /**
      * Returns the link to settings
      * @return {string} Link to settings
      */
@@ -561,12 +578,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return string
      */
     public function CMSVersion() {
-        $frameworkVersion=file_get_contents(FRAMEWORK_PATH.'/silverstripe_version');
-        if(!$frameworkVersion) {
-            $frameworkVersion=_t('LeftAndMain.VersionUnknown', 'Unknown');
-        }
+        $frameworkVersions=parent::CMSVersion();
     
-        return sprintf('Code Bank: %s Framework: %s', self::getVersion(), $frameworkVersion);
+        return sprintf('Code Bank: %s, %s', self::getVersion(), $frameworkVersions);
     }
     
     /**

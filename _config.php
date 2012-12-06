@@ -13,6 +13,7 @@ CMSMenu::remove_menu_item('CodeBankAddSnippet');
 CMSMenu::remove_menu_item('CodeBankEditSnippet');
 CMSMenu::remove_menu_item('CodeBankSettings');
 CMSMenu::remove_menu_item('CodeBankIPAgreement');
+CMSMenu::remove_menu_item('CodeBankPackages');
 
 
 //Inject Menu Styles

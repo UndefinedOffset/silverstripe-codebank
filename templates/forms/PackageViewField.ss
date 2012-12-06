@@ -1,10 +1,10 @@
 <% if $SourceList.Count %>
     <ul>
         <% loop $SourceList %>
-            <li><% if $ID!=$Top.CurrentSnippetID %><a href="admin/codeBank/show/$ID">$Title.XML</a><% else %>$Title.XML<% end_if %> <span>($Language.Name.XML)</span>
-                <% if $Top.ShowNested && $ClassName=="Snippet" && $PackageSnippets.Count %>
+            <li><a href="admin/codeBank/packages/show/$ID">$Title.XML</a>
+                <% if $Top.ShowNested && $Snippets.Count %>
                     <ul>
-                        <% loop $PackageSnippets %>
+                        <% loop $Snippets %>
                             <li><% if $ID!=$Top.CurrentSnippetID %><a href="admin/codeBank/show/$ID">$Title.XML</a><% else %>$Title.XML<% end_if %> <span>($Language.Name.XML)</span></li>
                         <% end_loop %>
                     </ul>

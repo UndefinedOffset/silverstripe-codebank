@@ -16,12 +16,8 @@ class Snippet extends DataObject {
                                 'Versions'=>'SnippetVersion'
                              );
     
-    public static $many_many=array(
-                                    'PackageSnippets'=>'Snippet'
-                                );
-    
     public static $belongs_many_many=array(
-                                            'SiblingSnippets'=>'Snippet'
+                                            'Packages'=>'SnippetPackage'
                                         );
     
     public static $extensions=array(
@@ -49,24 +45,11 @@ class Snippet extends DataObject {
                                     TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
                                 ),
-                                new Tab('Package', _t('Snippet.PACKAGE', '_Package'),
-                                    $packageGrid=new GridField('PackageSnippets', _t('Snippet.PACKAGE_SNIPPETS', '_Package Snippets'), $this->PackageSnippets(), GridFieldConfig_RelationEditor::create(10)),
-                                    $siblingGrid=new PackageViewField('SiblingSnippets', _t('Snippet.BELONGS_TO_PACKAGES', '_Belongs to Packages'), $this->SiblingSnippets(), $this->ID)
+                                new Tab('Package', _t('Snippet.PACKAGES', '_Packages'),
+                                    new PackageViewField('Packages', _t('Snippet.PACKAGES', '_Packages'), $this->Packages(), $this->ID)
                                 )
                             )
                         );
-        
-        
-        if($this->ID==0) {
-            $fields->replaceField('PackageSnippets', new LabelField('PackageSnippets', _t('CodeBank.PACKAGE_SNIPPETS_AFTER_SAVE', '_Package Snippets can be assigned after saving for the first time')));
-            $fields->removeByName('SiblingSnippets');
-        }else {
-            $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
-                                    ->removeComponentsByType('GridFieldDeleteAction')
-                                    ->removeComponentsByType('GridFieldAddNewButton')
-                                    ->addComponent(new PackageViewButton())
-                                    ->addComponent(new GridFieldDeleteAction(true));
-        }
         
         
         return $fields;

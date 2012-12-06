@@ -23,6 +23,10 @@
     background: url(./../../framework/admin/images/sitetree_ss_pageclass_icons_default.png) no-repeat !important;
 }
 
+.codebank-tree .class-SnippetPackage .jstree-pageicon {
+    background: url(./../images/tree-sheet.png) no-repeat 0 -48px !important;
+}
+
 .CodeBank .cms-content-fields {
     background: url(./../images/edit-form-background.png) no-repeat center center;
 }
@@ -72,11 +76,11 @@
     padding: 8px 20px 8px;
 }
 
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-default,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-default,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-default {
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-default {
     border: 1px solid #c0c0c2;
 }
 
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-active,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-active,.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-active {
+.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-active {
     padding-bottom: 1px;
     background: #e6eaed;
     border: 1px solid #c0c0c2;
@@ -114,4 +118,12 @@
 
 .CodeBankSettings .ui-button .btn-icon-export {
     background: url(./../images/database-export.png) no-repeat;
+}
+
+#cms-content-tools-CodeBankPackages .cms-actions-row {
+    height: 40px;
+}
+
+.CodeBankPackages .codebank-tree #record-0 ins, .CodeBankPackages .codebank-tree #record-0 strong {
+    display: none !important;
 }
