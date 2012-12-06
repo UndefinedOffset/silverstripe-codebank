@@ -158,7 +158,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                     'lastEditor'=>($snippet->LastEditor() ? $snippet->LastEditor()->Name:($snippet->LastEditorID!=0 ? 'Deleted User':'')),
                                     'language'=>$snippet->Language()->Name,
                                     'fileType'=>$snippet->Language()->FileExtension,
-                                    'shjs_code'=>$snippet->Language()->HighlightCode
+                                    'shjs_code'=>$snippet->Language()->HighlightCode,
+                                    'packages'=>$this->overviewList($snippet->Packages())
                                 );
             
             $response['data'][0]['text']=preg_replace('/\r\n|\n|\r/', "\n", $response['data'][0]['text']);
@@ -456,6 +457,24 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         //Return the resulting array
+        return $result;
+    }
+    
+    /**
+     * Converts an SS_List into an array of items with and id and a title key
+     * @param {SS_List} $list List to parse
+     * @return {array} Nested array of items, each item has an id and a title key
+     */
+    final protected function overviewList(SS_List $list) {
+        $result=array();
+        
+        foreach($list as $item) {
+            $result[]=array(
+                            'id'=>$item->ID,
+                            'title'=>$item->Title
+                        );
+        }
+        
         return $result;
     }
 }
