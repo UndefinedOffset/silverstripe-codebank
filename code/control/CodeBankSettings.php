@@ -18,8 +18,14 @@ class CodeBankSettings extends CodeBank {
         
         Requirements::css(CB_DIR.'/css/CodeBank.css');
         Requirements::block(CB_DIR.'/javascript/CodeBank.Tree.js');
+        Requirements::javascript(CB_DIR.'/javascript/CodeBank.Settings.js');
     }
     
+    /**
+     * @return {PjaxResponseNegotiator}
+     *
+     * @see LeftAndMain::getResponseNegotiator()
+     */
     public function getResponseNegotiator() {
 		$neg=parent::getResponseNegotiator();
 		$controller=$this;
@@ -37,7 +43,8 @@ class CodeBankSettings extends CodeBank {
 		$config=CodeBankConfig::CurrentConfig();
 		$fields=$config->getCMSFields();
         $actions=new FieldList(
-                                FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
+                                FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'),
+                                FormAction::create('doExportToClient', _t('CodeBank.EXPORT_TO_CLIENT', '_Export To Desktop Client'))->setAttribute('data-exporturl', Director::absoluteURL('code-bank-api/export-to-client'))->setAttribute('data-icon', 'export')
                             );
         
 		$form=new Form($this, 'EditForm', $fields, $actions);

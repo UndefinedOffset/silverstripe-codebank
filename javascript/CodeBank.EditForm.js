@@ -1,6 +1,6 @@
 (function($) {
     $.entwine('ss', function($) {
-        $('#Form_EditForm_Text').entwine({
+        $('.CodeBankAddSnippet #Form_AddForm_Text, .CodeBankEditSnippet #Form_EditForm_Text').entwine({
             onkeydown: function(e) {
                 if(e.keyCode===9) { // tab was pressed
                     var domElm=$(this).get(0);
@@ -22,7 +22,7 @@
             }
         });
         
-        $('.cms-edit-form input[name=Title]').entwine({
+        $('.CodeBankEditSnippet input[name=Title]').entwine({
             onchange: function() {
                 this.updatedRelatedFields();
             },

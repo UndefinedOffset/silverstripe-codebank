@@ -40,7 +40,6 @@
             onclick: function(e) {
                 window.open('code-bank-api/export-snippet?id='+$('#Form_EditForm_ID').val());
                 
-                e.stopPropagation();
                 return false;
             }
         });
@@ -51,7 +50,6 @@
             onclick: function(e) {
                 window.print();
                 
-                e.stopPropagation();
                 return false;
             }
         });
@@ -76,6 +74,7 @@
                 }
                 
                 dialog.ssdialog({iframeUrl: 'admin/codeBank/compare/'+$('#Form_EditForm_ID').val()+'/'+$('#Form_EditForm_RevisionID').val(), autoOpen: true, dialogExtraClass: 'code-bank-compare-popup'});
+                
                 return false;
             }
         });

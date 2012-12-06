@@ -111,3 +111,7 @@
 .CodeBank .zclip embed:focus, .CodeBank .zclip object:focus {
     outline: 0;
 }
+
+.CodeBankSettings .ui-button .btn-icon-export {
+    background: url(./../images/database-export.png) no-repeat;
+}

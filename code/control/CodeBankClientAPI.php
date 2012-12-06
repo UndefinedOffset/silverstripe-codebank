@@ -2,7 +2,8 @@
 class CodeBank_ClientAPI extends Controller {
     public static $allowed_actions=array(
                                         'index',
-                                        'export_snippet'
+                                        'export_snippet',
+                                        'export_to_client'
                                     );
     
     public function init() {
@@ -115,23 +116,49 @@ class CodeBank_ClientAPI extends Controller {
                     chmod(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip',0600);
                     
                     
-                    header('Content-Type: application/octet-stream');
-                    header('Content-Disposition: attachment;  filename="'.$fileID.'.zip"');
-                    header('Content-Transfer-Encoding: binary');
-                    
-                    readfile(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
+                    //Send File
+                    SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
                     unlink(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
                 }
             }else {
-                header('Content-Type: application/octet-stream');
-                header('Content-Disposition: attachment;  filename="'.$fileID.'.'.$snippet->Language()->FileExtension.'"');
-                header('Content-Transfer-Encoding: binary');
-                
-                print $snippet->getSnippetText();
+                SS_HTTPRequest::send_file($snippet->getSnippetText(), $fileID.'.'.$snippet->Language()->FileExtension, 'text/plain')->output();
             }
         }catch (Exception $e) {
             header("HTTP/1.1 500 Internal Server Error");
         }
+        
+        
+        //Save session and exit
+        Session::save();
+        exit;
+    }
+    
+    public function export_to_client() {
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            return Security::permissionFailure($this);
+        }
+        
+        
+        //Snippet Containers
+        $languages=$this->queryToArray(DB::query('SELECT "ID", "Name", "FileExtension", "HighlightCode", "UserLanguage" FROM "SnippetLanguage"'));
+        $snippets=$this->queryToArray(DB::query('SELECT "ID", "Title", "Description", "Tags", "LanguageID" FROM "Snippet"'));
+        $versions=$this->queryToArray(DB::query('SELECT "ID", "Created", "Text", "ParentID" FROM "SnippetVersion"'));
+        $packages=$this->queryToArray(DB::query('SELECT "ID", "SnippetID", "ChildID" FROM "Snippet_PackageSnippets"'));
+        
+        
+        //Build final response
+        $response=array(
+                        array(
+                            'languages'=>$languages,
+                            'snippets'=>$snippets,
+                            'versions'=>$versions,
+                            'packages'=>$packages
+                        )
+                    );
+        
+        
+        //Send File
+        SS_HTTPRequest::send_file(json_encode($response), date('Y-m-d_hi').'.cbexport', 'application/json')->output();
         
         
         //Save session and exit
@@ -155,6 +182,21 @@ class CodeBank_ClientAPI extends Controller {
         $responseBase['session']=(Member::currentUserID()==0 ? 'expired':'valid');
         
         return $responseBase;
+    }
+    
+    /**
+     * Merges a database resultset into an array
+     * @param {SS_Query} $source SS_Query containing the result set
+     * @return {array} Merged array
+     */
+    private function queryToArray(SS_Query $source) {
+        $result=array();
+        
+        foreach($source as $row) {
+            $result[]=$row;
+        }
+        
+        return $result;
     }
 }
 ?>
