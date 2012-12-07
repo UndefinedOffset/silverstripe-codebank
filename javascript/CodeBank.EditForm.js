@@ -22,6 +22,15 @@
             }
         });
         
+        
+        //Cancel Button
+        $('.CodeBankEditSnippet #Form_EditForm_action_doCancel').entwine({
+            onclick: function(e) {
+                $('.cms-container').loadPanel('admin/codeBank/show/'+$('#Form_EditForm_ID').val());
+            }
+        });
+        
+        
         $('.CodeBankEditSnippet input[name=Title]').entwine({
             onchange: function() {
                 this.updatedRelatedFields();

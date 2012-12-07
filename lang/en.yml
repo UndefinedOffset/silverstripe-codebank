@@ -23,6 +23,7 @@ en:
         COMPARED_REVISION: "Compared Revision"
         COMPARE_WITH_CURRENT: "Compare with Current"
         DELETE: "Delete"
+        CANCEL: "Cancel"
         SAVE: "Save"
         SNIPPETS: "Snippets"
         SETTINGS: "Settings"
@@ -70,8 +71,8 @@ en:
         TAGS: "Tags (comma separate)"
         TAGS_COLUMN: "Tags"
         MAIN: "Main"
-        PACKAGES: "Packages"
-        BELONGS_TO_PACKAGES: "Belongs to Packages"
+        PACKAGE: "Package"
+        NOT_IN_PACKAGE: "Not Part of a Package"
     SnippetPackage:
         MAIN: "Main"
         TITLE: "Title"
@@ -87,4 +88,5 @@ en:
         MISSING_ID_ATTRIBUTE: "Short Code missing the id attribute"
         SNIPPET_NOT_FOUND: "Snippet not found"
     PackageViewField:
-        NO_PACKAGES: "No Packages"
+        NOT_IN_PACKAGE: "Not in a Package"
+        EXPORT_PACKAGE: "Export Package"

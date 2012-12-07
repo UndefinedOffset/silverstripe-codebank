@@ -4,7 +4,7 @@ class SnippetPackage extends DataObject {
                             'Title'=>'Varchar(300)'
                          );
     
-    public static $many_many=array(
+    public static $has_many=array(
                                     'Snippets'=>'Snippet'
                                  );
     

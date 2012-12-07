@@ -146,14 +146,14 @@ class CodeBank_ClientAPI extends Controller {
         set_time_limit(480);
         
         
-        //Snippet Containers
-        $languages=$this->queryToArray(DB::query('SELECT "ID", "Name", "FileExtension", "HighlightCode", "UserLanguage" FROM "SnippetLanguage"'));
+        //Dump Data
+        $languages=$this->queryToArray(DB::query('SELECT "ID", "Name", "FileExtension", "HighlightCode", "UserLanguage", "PackageID" FROM "SnippetLanguage"'));
         $snippets=$this->queryToArray(DB::query('SELECT "ID", "Title", "Description", "Tags", "LanguageID" FROM "Snippet"'));
         $versions=$this->queryToArray(DB::query('SELECT "ID", "Created", "Text", "ParentID" FROM "SnippetVersion"'));
-        $packages=$this->queryToArray(DB::query('SELECT "ID", "SnippetID", "ChildID" FROM "Snippet_PackageSnippets"'));
+        $packages=$this->queryToArray(DB::query('SELECT "ID", "Title" FROM "SnippetPackage"'));
         
         
-        //Build final response
+        //Build final response array
         $response=array(
                         'format'=>'ToClient',
                         'data'=>array(

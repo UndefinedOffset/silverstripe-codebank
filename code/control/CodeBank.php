@@ -98,7 +98,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} URL to the main tab
      */
     public function getLinkMain() {
-        if($this->currentPageID()!=0 && $this->class=='CodeBank') {
+        if($this->currentPageID()!=0 && $this->class=='CodeBankEditSnippet') {
+            return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID()));
+        }else if($this->currentPageID()!=0 && $this->class=='CodeBank') {
             $otherID=null;
             if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
                 $otherID=intval($this->urlParams['OtherID']);
@@ -170,6 +172,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
+            $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), new ArrayList(array($record->Package())), $record->ID));
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));

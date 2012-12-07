@@ -144,7 +144,16 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $snippet=Snippet::get()->byID($data->id);
         if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
-            //@TODO Need to include the snippet package information in data being sent
+            $packageDetails=null;
+            if($snippet->Package()) {
+                $packageDetails=array(
+                                        'id'=>$snippet->Package()->ID,
+                                        'title'=>$snippet->Package()->Title,
+                                        'snippets'=>$this->overviewList($snippet->Package()->Snippets())
+                                    );
+            }
+            
+            
             $response['data'][]=array(
                                     'id'=>$snippet->ID,
                                     'title'=>$snippet->Title,
@@ -159,7 +168,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                     'language'=>$snippet->Language()->Name,
                                     'fileType'=>$snippet->Language()->FileExtension,
                                     'shjs_code'=>$snippet->Language()->HighlightCode,
-                                    'packages'=>$this->overviewList($snippet->Packages())
+                                    'package'=>$packageDetails
                                 );
             
             $response['data'][0]['text']=preg_replace('/\r\n|\n|\r/', "\n", $response['data'][0]['text']);

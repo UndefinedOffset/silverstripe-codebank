@@ -50,12 +50,13 @@ class CodeBankEditSnippet extends CodeBank {
         if($record) {
             $fields->push($idField=new HiddenField("ID", false, $id));
             $actions=new FieldList(
+                                    FormAction::create('doCancel', _t('CodeBank.CANCEL', '_Cancel')),
                                     FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
                                 );
             
             
             if($record->canDelete()) {
-                $actions->insertBefore(FormAction::create('doDelete', _t('CodeBank.DELETE', '_Delete'))->addExtraClass('ss-ui-action-destructive'), 'action_doSave');
+                $actions->insertBefore(FormAction::create('doDelete', _t('CodeBank.DELETE', '_Delete'))->addExtraClass('ss-ui-action-destructive'), 'action_doCancel');
             }
             
             

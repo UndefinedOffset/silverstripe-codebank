@@ -8,7 +8,7 @@
             }
         });
         
-        $('.packageview a').entwine({
+        $('.packageview a:not(.exportPackageButton)').entwine({
             onclick: function(e) {
                 var container=$('.cms-container');
                 

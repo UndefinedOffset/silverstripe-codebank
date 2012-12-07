@@ -9,16 +9,13 @@ class Snippet extends DataObject {
     public static $has_one=array(
                                 'Language'=>'SnippetLanguage',
                                 'Creator'=>'Member',
-                                'LastEditor'=>'Member'
+                                'LastEditor'=>'Member',
+                                'Package'=>'SnippetPackage'
                              );
     
     public static $has_many=array(
                                 'Versions'=>'SnippetVersion'
                              );
-    
-    public static $belongs_many_many=array(
-                                            'Packages'=>'SnippetPackage'
-                                        );
     
     public static $extensions=array(
                                     'SnippetHierarchy',
@@ -42,11 +39,9 @@ class Snippet extends DataObject {
                                     new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
+                                    new DropdownField('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'), null, null, _t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
                                     TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
-                                ),
-                                new Tab('Package', _t('Snippet.PACKAGES', '_Packages'),
-                                    new PackageViewField('Packages', _t('Snippet.PACKAGES', '_Packages'), $this->Packages(), $this->ID)
                                 )
                             )
                         );
