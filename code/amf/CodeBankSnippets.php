@@ -448,6 +448,28 @@ class CodeBankSnippets implements CodeBank_APIClass {
     }
     
     /**
+     * Gets the list of packages
+     * @return {array} Standard response base
+     */
+    public function getPackages() {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+            
+            return $response;
+        }
+        
+        
+        $response['data']=$this->overviewList(SnippetPackage::get());
+        
+        
+        return $response;
+    }
+    
+    /**
      * Converts an array where the key and value should be mapped to a nested array
      * @param {array} $array Source Array
      * @param {string} $keyLbl Array's Key mapping name
@@ -474,15 +496,19 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {SS_List} $list List to parse
      * @return {array} Nested array of items, each item has an id and a title key
      */
-    final protected function overviewList(SS_List $list) {
+    final protected function overviewList(SS_List $list, $labelField='Title', $idField='ID') {
         $result=array();
+        $idFieldLower=strtolower($idField);
+        $labelFieldLower=strtolower($labelField);
+        
         
         foreach($list as $item) {
             $result[]=array(
-                            'id'=>$item->ID,
-                            'title'=>$item->Title
+                            $idFieldLower=>$item->$idField,
+                            $labelFieldLower=>$item->$labelField
                         );
         }
+        
         
         return $result;
     }
