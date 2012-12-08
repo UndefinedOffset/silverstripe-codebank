@@ -149,7 +149,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $packageDetails=array(
                                         'id'=>$snippet->Package()->ID,
                                         'title'=>$snippet->Package()->Title,
-                                        'snippets'=>$this->overviewList($snippet->Package()->Snippets())
+                                        'snippets'=>$this->sortToTop($snippet->ID, 'id', $this->overviewList($snippet->Package()->Snippets()))
                                     );
             }
             
@@ -312,6 +312,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippet->Tags=$data->tags;
             $snippet->LanguageID=$data->language;
             $snippet->CreatorID=Member::currentUserID();
+            $snippet->PackageID=$data->packageID;
             $snippet->write();
             
             
@@ -351,6 +352,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $snippet->Tags=$data->tags;
                 $snippet->LanguageID=$data->language;
                 $snippet->LastEditorID=Member::currentUserID();
+                $snippet->PackageID=$data->packageID;
                 $snippet->write();
                 
                 
@@ -503,14 +505,33 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         foreach($list as $item) {
-            $result[]=array(
-                            $idFieldLower=>$item->$idField,
-                            $labelFieldLower=>$item->$labelField
-                        );
+            $obj=new stdClass();
+            $obj->$idFieldLower=$item->$idField;
+            $obj->$labelFieldLower=$item->$labelField;
+            $result[]=$obj;
         }
         
         
         return $result;
+    }
+    
+    /**
+     * Sorts an item to the top of the list
+     * @param {mixed} $value Value to look for
+     * @param {mixed} $field Field to look on
+     * @param {array} $array Array to sort
+     * @return {array} Finalized array
+     */
+    final protected function sortToTop($value, $field, $array) {
+        foreach($array as $key=>$item) {
+            if($item->$field==$value) {
+                unset($array[$key]);
+                array_unshift($array, $item);
+                break;
+            }
+        }
+        
+        return $array;
     }
 }
 ?>
