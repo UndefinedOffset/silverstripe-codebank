@@ -472,6 +472,139 @@ class CodeBankSnippets implements CodeBank_APIClass {
     }
     
     /**
+     * Gets the details of a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function getPackageInfo($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        $package=SnippetPackage::get()->byID(intval($data->id));
+        if(!empty($package) && $package!==false && $package->ID!=0) {
+            $response['data']=array(
+                                    'id'=>$package->ID,
+                                    'title'=>$package->Title,
+                                    'snippets'=>$this->overviewList($package->Snippets(), 'Title', 'ID', 'Language.Title')
+                                );
+            
+            
+            $response['status']='HELO';
+        }else {
+            $response['status']='EROR';
+            $response['message']='Package not found';
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Removes a snippet from a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function packageRemoveSnippet($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        $package=SnippetPackage::get()->byID(intval($data->packageID));
+        if(!empty($package) && $package!==false && $package->ID!=0) {
+            $package->Snippets()->removeByID(intval($data->snippetID));
+            
+            
+            $response['status']='HELO';
+        }else {
+            $response['status']='EROR';
+            $response['message']='Package not found';
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Finds a snippet begining with the data passed
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function findSnippetAutoComplete($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        //Lookup snippets
+        $snippets=Snippet::get()->where("\"Snippet\".\"Title\" LIKE '".Convert::raw2sql($data->pattern)."%'")->limit(20);
+        
+        
+        $response['status']='HELO';
+        $response['data']=$this->overviewList($snippets);
+        
+        return $response;
+    }
+    
+    /**
+     * Adds a snippet to a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function addSnippetToPackage($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+            
+            return $response;
+        }
+        
+        
+        $package=SnippetPackage::get()->byID(intval($data->packageID));
+        if(!empty($package) && $package!==false && $package->ID!=0) {
+            $snippet=Snippet::get()->byID(intval($data->snippetID));
+            if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+                $package->Snippets()->add($snippet);
+                
+                
+                $response['status']='HELO';
+            }else {
+                $response['status']='EROR';
+                $response['message']='Snippet not found';
+            }
+            
+            $response['status']='HELO';
+        }else {
+            $response['status']='EROR';
+            $response['message']='Package not found';
+        }
+        
+        
+        return $response;
+    }
+    
+    /**
      * Converts an array where the key and value should be mapped to a nested array
      * @param {array} $array Source Array
      * @param {string} $keyLbl Array's Key mapping name
@@ -496,6 +629,9 @@ class CodeBankSnippets implements CodeBank_APIClass {
     /**
      * Converts an SS_List into an array of items with and id and a title key
      * @param {SS_List} $list List to parse
+     * @param {string} $labelField Label Field
+     * @param {string} $idField ID Field
+     * @param {string} ... Overloaded for additional fields, allows for silverstripe relation formatting ex: Relationship.Field the dot is replaced with a dash in the resulting object
      * @return {array} Nested array of items, each item has an id and a title key
      */
     final protected function overviewList(SS_List $list, $labelField='Title', $idField='ID') {
@@ -504,10 +640,45 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $labelFieldLower=strtolower($labelField);
         
         
+        $args=func_get_args();
+        unset($args[0]);
+        unset($args[1]);
+        unset($args[2]);
+        
+        
         foreach($list as $item) {
             $obj=new stdClass();
             $obj->$idFieldLower=$item->$idField;
             $obj->$labelFieldLower=$item->$labelField;
+            
+            if(count($args)>0) {
+                foreach($args as $field) {
+                    $fieldLower=strtolower($field);
+                    
+                    //If the field contains a dot assume relationship and loop through till field is found
+                    if(strpos($field, '.')!==false) {
+                        $fieldLower=str_replace('.', '-', $fieldLower);
+                        $fieldBits=explode('.', $field);
+                        
+                        $value=$item;
+                        for($i=0;$i<count($fieldBits);$i++) {
+                            $fieldBit=$fieldBits[$i];
+                            if($i==count($fieldBits)-1) {
+                                $value=$value->$fieldBit;
+                            }else {
+                                $value=$value->$fieldBit();
+                            }
+                        }
+                        
+                        if(!is_object($value)) {
+                            $obj->$fieldLower=$value;
+                        }
+                    }else {
+                        $obj->$fieldLower=$item->$field;
+                    }
+                }
+            }
+            
             $result[]=$obj;
         }
         
