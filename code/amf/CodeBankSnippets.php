@@ -605,6 +605,107 @@ class CodeBankSnippets implements CodeBank_APIClass {
     }
     
     /**
+     * Saves a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function savePackage($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        $package=SnippetPackage::get()->byID(intval($data->packageID));
+        if(!empty($package) && $package!==false && $package->ID!=0) {
+            if(!empty($data->title)) {
+                $package->Title=$data->title;
+                $package->write();
+                
+                
+                $response['status']='HELO';
+            }else {
+                $response['status']='EROR';
+                $response['message']='Packages must have a title';
+            }
+        }else {
+            $response['status']='EROR';
+            $response['message']='Package not found';
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Saves a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function createPackage($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        if(!empty($data->title)) {
+            $package=new SnippetPackage();
+            $package->Title=$data->title;
+            $package->write();
+            
+            
+            $response['status']='HELO';
+            $response['data']=$package->ID;
+        }else {
+            $response['status']='EROR';
+            $response['message']='Packages must have a title';
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Deletes a package
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function deletePackage($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']='Permission Denied';
+        
+            return $response;
+        }
+        
+        
+        $package=SnippetPackage::get()->byID(intval($data->id));
+        if(!empty($package) && $package!==false && $package->ID!=0) {
+            $package->delete();
+            
+            
+            $response['status']='HELO';
+        }else {
+            $response['status']='EROR';
+            $response['message']='Package not found';
+        }
+        
+        return $response;
+    }
+    
+    /**
      * Converts an array where the key and value should be mapped to a nested array
      * @param {array} $array Source Array
      * @param {string} $keyLbl Array's Key mapping name
