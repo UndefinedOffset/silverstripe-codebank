@@ -19,6 +19,7 @@
             <filterchain>
                 <linecontains>
                     <contains value="assets/releases/SilverStripe-framework-v3.0"/>
+                    <contains value=".tar.gz"/>
                 </linecontains>
                 <tokenfilter>
                     <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/>
@@ -58,12 +59,14 @@
         <echo message="Copying Files" />
         
         <copy todir="${releaseFolder}/CodeBank">
-            <fileset dir="./">
+            <fileset dir="./../">
                 <exclude name="**/.svn"/>
-                <exclude name="**/build"/>
+                <exclude name="build"/>
                 <exclude name=".project"/>
                 <exclude name=".settings"/>
                 <exclude name=".buildpath"/>
+                <exclude name="release"/>
+            	<exclude name="release/*"/>
             </fileset>
         </copy>
         
@@ -80,14 +83,14 @@
         
         
         <!-- Copy _config -->
-        <copy todir="${releaseFolder}/CodeBank" overwrite="yes">
-            <fileset dir="build/_config"/>
+        <copy todir="${releaseFolder}/CodeBank/_config" overwrite="yes">
+            <fileset dir="_config"/>
         </copy>
         
         
         <!-- Copy theme -->
-        <copy todir="${releaseFolder}/CodeBank">
-            <fileset dir="../themes">
+        <copy todir="${releaseFolder}/themes">
+            <fileset dir="../../themes">
                 <exclude name="**/.svn"/>
                 <exclude name="**/build"/>
                 <exclude name="**/.project"/>
@@ -105,8 +108,6 @@
                 <exclude name="Makefile"/>
                 <exclude name="favicon.ico"/>
                 <exclude name="build.properties.default"/>
-                <include name=".htaccess"/>
-                <include name="**/.htaccess"/>
             </patternset>
             
             <cutdirsmapper dirs="1"/>
