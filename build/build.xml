@@ -141,15 +141,16 @@
         <replace file="${releaseFolder}/framework/dev/install/config-form.html">
             <replacefilter token="&lt;/head&gt;" value="&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;CodeBank/css/install.css&quot;/&gt;&lt;/head&gt;"/>
             <replacefilter token="SilverStripe CMS / Framework Installation" value="Code Bank"/>
+        	<replacefilter token="CMS / Framework Installation" value="Code Bank"/>
             <replacefilter token="SilverStripe" value="Code Bank"/>
             <replacefilter token="http://doc.silverstripe.org/sapphire/en/installation/server-requirements" value="http://programs.edchipman.ca/applications/code-bank/server-requirements"/>
             <replacefilter token="http://doc.silverstripe.org/doku.php?id=server-requirements" value="http://programs.edchipman.ca/applications/code-bank/server-requirements"/>
             <replacefilter token="&lt;h3 class=&quot;sectionHeading&quot;&gt;Theme selection &lt;small&gt;Step 4 of 5&lt;/small&gt;&lt;/h3&gt;" value=""/>
             <replacefilter token="&lt;p class=&quot;helpText&quot;&gt;You can change the theme or &lt;a href=&quot;http://silverstripe.org/themes&quot;&gt;download&lt;/a&gt; another from the SilverStripe website after installation.&lt;/p&gt;" value=""/>
             <replacefilter token="&lt;ul id=&quot;Themes&quot;&gt;" value=""/>
-            <replacefilter token="&lt;li&gt;&lt;input type=&quot;radio&quot; name=&quot;template&quot; value=&quot;simple&quot; id=&quot;Simple&quot; &lt;?php if(!isset($_POST['template']) || $_POST['template'] == 'simple') {?&gt;checked=&quot;checked&quot;&lt;?php }?&gt;&gt;&lt;label for=&quot;Simple&quot;&gt;&lt;a href=&quot;https://github.com/silverstripe-themes/silverstripe-simple&quot;&gt;Simple&lt;/a&gt; - our default theme ready to use.&lt;/label&gt;&lt;/li&gt;" value=""/>
+            <replacefilter token="&lt;li&gt;&lt;input type=&quot;radio&quot; name=&quot;template&quot; value=&quot;simple\&quot; id=\&quot;Simple&quot; &lt;?php if(!isset($_POST['template']) || $_POST['template'] == 'simple') {?&gt;checked=&quot;checked&quot;&lt;?php }?&gt;&gt;&lt;label for=&quot;Simple&quot;&gt;&lt;a href=&quot;https://github.com/silverstripe-themes/silverstripe-simple&quot;&gt;Simple&lt;/a&gt; - our default theme ready to use.&lt;/label&gt;&lt;/li&gt;" value=""/>
             <replacefilter token="&lt;li&gt;&lt;input type=&quot;radio&quot; name=&quot;template&quot; value=&quot;tutorial&quot; id=&quot;EmptyTemplate&quot; &lt;?php if(isset($_POST['template']) &amp;&amp; $_POST['template'] == 'tutorial') {?&gt;checked=&quot;checked&quot;&lt;?php }?&gt;&gt;&lt;label for=&quot;EmptyTemplate&quot;&gt;Empty template - ready to begin the &lt;a href=&quot;http://doc.silverstripe.org/sapphire/en/tutorials&quot; target=&quot;_blank&quot;&gt;tutorial&lt;/a&gt;.&lt;/label&gt;&lt;/li&gt;" value=""/>
-            <replacefilter token="&lt;/ul&gt;" value="&lt;input type=&quot;hidden&quot; name=&quot;template&quot; value=&quot;codeBank&quot;/&gt;"/>
+            <replacefilter token="&lt;/ul&gt;" value="&lt;input type=\&quot;hidden\&quot; name=\&quot;template\&quot; value=\&quot;codeBank\&quot;/&gt;"/>
             <replacefilter token="Step 5 of 5" value="Step 4 of 4"/>
             <replacefilter token="of 5" value="of 4"/>
         </replace>
