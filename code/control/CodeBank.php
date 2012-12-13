@@ -172,7 +172,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             
-            $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), new ArrayList(array($record->Package())), $record->ID));
+            if($record->Package() && $record->Package()!==false && $record->Package()->ID!=0) {
+                $package=new ArrayList(array($record->Package()));
+            }else {
+                $package=null;
+            }
+            
+            $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), $package, $record->ID));
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
