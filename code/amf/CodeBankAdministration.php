@@ -9,7 +9,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -37,7 +37,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -49,10 +49,10 @@ class CodeBankAdministration implements CodeBank_APIClass {
             }
             
             $response['status']='HELO';
-            $response['message']='User deleted successfully';
+            $response['message']=_t('CodeBankAPI.USER_DELETED', '_User deleted successfully');
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -73,7 +73,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
                 $e=PasswordEncryptor::create_for_algorithm($this->PasswordEncryption);
                 if(!$e->check($member->Password, $data->currPassword, $member->Salt, $member)) {
                     $response['status']='EROR';
-                    $response['message']='Current password does not match';
+                    $response['message']=_t('CodeBankAPI.CURRENT_PASSWORD_MATCH', '_Current password does not match');
                     
                     return $response;
                 }
@@ -81,7 +81,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
                 $member=Member::get()->byID(intval($data->id));
                 if(empty($member) || $member===false || $member->ID==0) {
                     $response['status']='EROR';
-                    $response['message']='Member not found';
+                    $response['message']=_t('CodeBankAPI.MEMBER_NOT_FOUND', '_Member not found');
                     
                     return $response;
                 }
@@ -89,17 +89,17 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             if(!$member->changePassword($data->password)) {
                 $response['status']='EROR';
-                $response['message']='New password is not valid';
+                $response['message']=_t('CodeBankAPI.NEW_PASSWORD_NOT_VALID', '_New password is not valid');
                 
                 return $response;
             }
             
             
             $response['status']='HELO';
-            $response['message']="User's password changed successfully";
+            $response['message']=_t('CodeBankAPI.PASSWORD_CHANGED', '_User\'s password changed successfully');
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -115,15 +115,15 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
         
         try {
-            if(Member::get()->filter('Email', Convert::raw2sql($data->username))) {
+            if(Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>1) {
                 $response['status']='EROR';
-                $response['message']='Username already exists';
+                $response['message']=_t('CodeBankAPI.EMAIL_EXISTS', '_An account with that email already exists');
                 
                 return $response;
             }
@@ -137,7 +137,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             if(!$member->validate()) {
                 $response['status']='EROR';
-                $response['message']='Password is not valid';
+                $response['message']=_t('CodeBankAPI.PASSWORD_NOT_VALID', '_Password is not valid');
                 
                 return $response;
             }
@@ -149,7 +149,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['message']="User added successfully";
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -164,7 +164,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -195,7 +195,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -203,7 +203,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         try {
             if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
                 $response['status']='EROR';
-                $response['message']='Language already exists';
+                $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
                 
                 return $response;
             }
@@ -221,7 +221,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['message']="Language added successfully";
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -237,7 +237,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -247,13 +247,13 @@ class CodeBankAdministration implements CodeBank_APIClass {
             if(!empty($lang) && $lang!==false && $lang->ID!=0) {
                 if($lang->UserLanguage==false || $lang->Snippets()->Count()>0) {
                     $response['status']='EROR';
-                    $response['message']='Language cannot be deleted, it is either not a user language or has snippets attached to it';
+                    $response['message']=_t('CodeBankAPI.LANGUAGE_DELETE_ERROR', '_Language cannot be deleted, it is either not a user language or has snippets attached to it');
                     
                     return $response;
                 }
             }else {
                 $response['status']='EROR';
-                $response['message']='Language not found';
+                $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
                 
                 return $response;
             }
@@ -266,7 +266,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['message']="Language deleted successfully";
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -282,7 +282,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -291,7 +291,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $lang=SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."' AND ID<>=".intval($data->id));
             if(empty($lang) || $lang===false || $lang->ID==0) {
                 $response['status']='EROR';
-                $response['message']='Language already exists';
+                $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
             
                 return $response;
             }
@@ -301,13 +301,13 @@ class CodeBankAdministration implements CodeBank_APIClass {
             if(!empty($lang) && $lang!==false && $lang->ID!=0) {
                 if($lang->UserLanguage==false) {
                     $response['status']='EROR';
-                    $response['message']='Language cannot be edited, it is not a user language';
+                    $response['message']=_t('CodeBankAPI.NOT_USER_LANGUAGE', '_Language cannot be edited, it is not a user language');
                     
                     return $response;
                 }
             }else {
                 $response['status']='EROR';
-                $response['message']='Language not found';
+                $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
                 
                 return $response;
             }
@@ -323,7 +323,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['message']="Language edited successfully";
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;

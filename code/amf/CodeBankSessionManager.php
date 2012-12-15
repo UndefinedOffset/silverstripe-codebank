@@ -29,7 +29,7 @@ class CodeBankSessionManager implements CodeBank_APIClass {
                 
 		        //Set the response to HELO
 		        $response['status']='HELO';
-		        $response['message']='Welcome '.htmlentities($member->Name); //Set the message to "Welcome ...."
+		        $response['message']=_t('CodeBankAPI.WELCOME_USER', '_Welcome {user}', array('user'=>htmlentities($member->Name))); //Set the message to "Welcome ...."
 		        $response['data']=array(
                 		                'id'=>Member::currentUserID(),
                 		                'hasIPAgreement'=>!empty($ipAgrement),
@@ -39,12 +39,12 @@ class CodeBankSessionManager implements CodeBank_APIClass {
 		    }catch (Exception $e) {
 		    	//Something happend on the server
 		        $response['status']='EROR';
-		        $response['message']='Internal Error Occured, Please try again later';
+		        $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
 		    }
 		}else {
 			//Bad username/pass combo
 		    $response['status']='EROR';
-            $response['message']='Invalid Login';
+            $response['message']=_t('CodeBankAPI.INVALID_LOGIN', '_Invalid Login');
 		}
 		
 		

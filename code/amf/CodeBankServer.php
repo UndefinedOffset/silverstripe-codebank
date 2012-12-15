@@ -22,7 +22,7 @@ class CodeBankServer implements CodeBank_APIClass {
         
         if(!Permission::check('ADMIN')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             return $response;
         }
         
@@ -34,10 +34,10 @@ class CodeBankServer implements CodeBank_APIClass {
             
             
             $response['status']='HELO';
-            $response['message']='Intellectual Property message changed successfully';
+            $response['message']=_t('CodeBankAPI.IP_MESSAGE_CHANGE', '_Intellectual Property message changed successfully');
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;
@@ -70,10 +70,10 @@ class CodeBankServer implements CodeBank_APIClass {
             
             
             $response['status']='HELO';
-            $response['message']='Preferences saved successfully';
+            $response['message']=_t('CodeBankAPI.PREFERENCES_SAVED', '_Preferences saved successfully');
         }catch (Exception $e) {
             $response['status']='EROR';
-            $response['message']='Internal server error has occured';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
         
         return $response;

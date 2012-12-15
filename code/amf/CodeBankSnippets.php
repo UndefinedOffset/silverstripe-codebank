@@ -10,7 +10,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -41,7 +41,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -73,7 +73,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -103,7 +103,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -136,7 +136,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -195,7 +195,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             }
         }else {
             $response['status']='EROR';
-            $response['message']='Snippet not found';
+            $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
         }
         
         
@@ -213,7 +213,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -233,7 +233,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             }
         }else {
             $response['status']='EROR';
-            $response['message']='Snippet not found';
+            $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
         }
         
         return $response;
@@ -250,7 +250,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -279,7 +279,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                  '</html>';
         }else {
             $response['status']='EROR';
-            $response['message']='Revision not found';
+            $response['message']=_t('CodeBankAPI.REVISION_NOT_FOUND', '_Revision not found');
         }
         
         
@@ -298,7 +298,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -337,7 +337,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -359,7 +359,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $response['status']='HELO';
             }else {
                 $response['status']='EROR';
-                $response['message']='Snippet not found';
+                $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
         }catch(Exception $e) {
             $response['status']="EROR";
@@ -396,7 +396,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $response['status']='HELO';
             }else {
                 $response['status']='EROR';
-                $response['message']='Snippet not found';
+                $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
         }catch(Exception $e) {
             $response['status']="EROR";
@@ -419,7 +419,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $snippet1=SnippetVersion::get()->byID(intval($data->mainRev));
         if(empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
             $response['status']='EROR';
-            $response['message']='Main revision not found';
+            $response['message']=_t('CodeBankAPI.MAIN_REVISION_NOT_FOUND', '_Main revision not found');
         
             return $response;
         }
@@ -431,7 +431,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $snippet2=SnippetVersion::get()->byID(intval($data->compRev));
         if(empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
             $response['status']='EROR';
-            $response['message']='Compare revision not found';
+            $response['message']=_t('CodeBankAPI.COMPARE_REVISION_NOT_FOUND', '_Compare revision not found');
         
             return $response;
         }
@@ -459,7 +459,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -482,7 +482,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -500,7 +500,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['status']='HELO';
         }else {
             $response['status']='EROR';
-            $response['message']='Package not found';
+            $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
         
         return $response;
@@ -517,7 +517,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -531,7 +531,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['status']='HELO';
         }else {
             $response['status']='EROR';
-            $response['message']='Package not found';
+            $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
         
         return $response;
@@ -548,7 +548,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -575,7 +575,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
             return $response;
         }
@@ -591,13 +591,13 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $response['status']='HELO';
             }else {
                 $response['status']='EROR';
-                $response['message']='Snippet not found';
+                $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
             
             $response['status']='HELO';
         }else {
             $response['status']='EROR';
-            $response['message']='Package not found';
+            $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
         
         
@@ -615,7 +615,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -631,11 +631,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $response['status']='HELO';
             }else {
                 $response['status']='EROR';
-                $response['message']='Packages must have a title';
+                $response['message']=_t('CodeBankAPI.PACKAGES_TITLE_REQUIRED', '_Packages must have a title');
             }
         }else {
             $response['status']='EROR';
-            $response['message']='Package not found';
+            $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
         
         return $response;
@@ -652,7 +652,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -668,7 +668,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['data']=$package->ID;
         }else {
             $response['status']='EROR';
-            $response['message']='Packages must have a title';
+            $response['message']=_t('CodeBankAPI.PACKAGES_TITLE_REQUIRED', '_Packages must have a title');
         }
         
         return $response;
@@ -685,7 +685,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         //Ensure logged in
         if(!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
-            $response['message']='Permission Denied';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
             return $response;
         }
@@ -699,7 +699,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['status']='HELO';
         }else {
             $response['status']='EROR';
-            $response['message']='Package not found';
+            $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
         
         return $response;
