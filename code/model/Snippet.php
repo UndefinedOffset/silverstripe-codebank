@@ -83,10 +83,12 @@ class Snippet extends DataObject {
         parent::onAfterWrite();
         
         //Write the snippet version record
-        $version=new SnippetVersion();
-        $version->Text=$this->Text;
-        $version->ParentID=$this->ID;
-        $version->write();
+        if(!empty($this->Text)) {
+            $version=new SnippetVersion();
+            $version->Text=$this->Text;
+            $version->ParentID=$this->ID;
+            $version->write();
+        }
     }
     
     /**
