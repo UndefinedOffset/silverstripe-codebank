@@ -120,6 +120,10 @@
     background: url(./../images/database-export.png) no-repeat;
 }
 
+.CodeBankSettings .ui-button .btn-icon-import {
+    background: url(./../images/database-import.png) no-repeat;
+}
+
 #cms-content-tools-CodeBankPackages .cms-actions-row {
     height: 40px;
 }

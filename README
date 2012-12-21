@@ -1,8 +1,7 @@
 @TODO Update
 Requirements:
 -------------
-    PHP 5.3.x or greater
-    MySQL 5.x or greater
+    See http://www.silverstripe.org/system-requirements/ as Code Bank is built on the SilverStripe Framework
 
 
 Installation:
@@ -25,3 +24,8 @@ Upgrading to new versions:
     6. Backup your code bank server database
     7. Hit update.php in your browser this will automatically upgrade the server database if needed
     8. Ensure the updater removed all install files (install.php, install.css, install.sql and update.php) before using your server again
+
+Attribution:
+-----------
+    * Some Icons are from the Fudge Icon Set http://p.yusukekamiyamane.com/
+    * Code Bank Logo is derived from the Tango Desktop Project http://tango.freedesktop.org

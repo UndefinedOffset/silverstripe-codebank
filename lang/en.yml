@@ -40,6 +40,13 @@ en:
         UPDATE_NEEDED: "A database upgrade is required please run {startlink}dev/build{endlink}."
         EXPORT_TO_CLIENT: "Export To Desktop Client"
         PACKAGES: "Packages"
+        IMPORT_FROM_CLIENT: "Import From Desktop Client"
+        EXPORT_FILE: "Client Export File"
+        IMPORT: "Import"
+        IMPORT_DATA_WARNING: "Warning clicking import will erase all snippets in the database, it is recommended you backup your database before proceeding"
+        IMPORT_READ_ERROR: "Could not read the file to be imported"
+        IMPORT_FILE_FORMAT_INCORRECT: "Import file format is incorrect"
+        IMPORT_COMPLETE: "Import Completed"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
