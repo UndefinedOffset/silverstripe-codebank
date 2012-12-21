@@ -28,6 +28,7 @@ en:
         SNIPPETS: "Snippets"
         SETTINGS: "Settings"
         SNIPPET_SAVED: "Snippet has been saved"
+        SNIPPET_DELETED: "Snippet has been deleted"
         PERMISSION_DENIED: "Permission Denied"
         ADD_NEW_SNIPPET: "Add New Snippet"
         KEYWORD: "Keyword"

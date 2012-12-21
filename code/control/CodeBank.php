@@ -233,10 +233,21 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             return $form;
         }else if($id) {
             $form=new Form($this, 'EditForm', new FieldList(
-                                                            new LabelField('DoesntExistLabel', _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'))
+                                                            new TabSet('Root',
+                                                                            new Tab('Main', ' ',
+                                                                                        new LabelField('DoesntExistLabel', _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'))
+                                                                                    )
+                                                                    )
                                                         ), new FieldList());
+            $form->addExtraClass('cms-edit-form');
+            $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
+            $form->addExtraClass('center '.$this->BaseCSSClasses());
+            $form->setAttribute('data-pjax-fragment', 'CurrentForm');
         }else {
             $form=$this->EmptyForm();
+            if(Session::get('CodeBank.deletedSnippetID')) {
+                $form->Fields()->push(new HiddenField('ID', 'ID', Session::get('CodeBank.deletedSnippetID')));
+            }
         }
         
         
@@ -297,6 +308,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $data=array();
         $ids=explode(',', $request->getVar('ids'));
         foreach($ids as $id) {
+            if($id==Session::get('CodeBank.deletedSnippetID')) {
+                Session::clear('CodeBank.deletedSnippetID');
+                $this->response->addHeader('Content-Type', 'text/json');
+                return '{"'.$id.'": false}';
+            }
             $record=$this->getRecord($id);
             $recordController=singleton('CodeBank');
             

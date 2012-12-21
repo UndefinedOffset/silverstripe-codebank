@@ -97,7 +97,14 @@ class CodeBankEditSnippet extends CodeBank {
             return $form;
         }
         
-        $this->redirect('admin/codeBank/show');
+        $form=$this->EmptyForm();
+        if(Session::get('CodeBank.deletedSnippetID')) {
+            $form->Fields()->push(new HiddenField('ID', 'ID', Session::get('CodeBank.deletedSnippetID')));
+        }
+        
+        
+        $this->redirect('admin/codeBank/');
+        return $form;
     }
     
     /**
@@ -139,13 +146,15 @@ class CodeBankEditSnippet extends CodeBank {
         $record=$this->currentPage();
     
         if($record->canDelete()) {
+            Session::set('CodeBank.deletedSnippetID', $record->ID);
             $record->delete();
     
             $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.SNIPPET_DELETED', '_Snippet has been deleted')));
         }else {
             $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.PERMISSION_DENIED', '_Permission Denied')));
         }
-    
+        
+        $this->redirect('admin/codeBank/');
         return $this->getResponseNegotiator()->respond($this->request);
     }
 }
