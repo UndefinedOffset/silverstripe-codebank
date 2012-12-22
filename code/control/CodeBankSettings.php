@@ -90,6 +90,11 @@ class CodeBankSettings extends CodeBank {
 	 */
 	public function import_from_client() {
 	    $form=$this->ImportFromClientForm();
+	    if(Session::get('reloadOnImportDialogClose')) {
+	        Requirements::javascript(CB_DIR.'/javascript/CodeBank.ImportDialog.js');
+	        Session::clear('reloadOnImportDialogClose');
+	    }
+	    
 	    return $this->customise(array(
                     	            'Content'=>' ',
                     	            'Form'=>$form
@@ -220,6 +225,7 @@ class CodeBankSettings extends CodeBank {
         
         
         //Display success after redirecting back
+        Session::set('reloadOnImportDialogClose', true);
         $form->sessionMessage(_t('CodeBank.IMPORT_COMPLETE', '_Import Completed'), 'good');
         return $this->redirectBack();
 	}

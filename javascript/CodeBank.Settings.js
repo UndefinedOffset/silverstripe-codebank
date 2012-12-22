@@ -18,7 +18,7 @@
                 this._super();
                 this.setUUID(new Date().getTime());
             },
-            onclick: function() {
+            onclick: function(e) {
                 var self = this, id = 'ss-ui-dialog-' + this.getUUID();
                 var dialog = $('#' + id);
                 if(!dialog.length) {
@@ -26,9 +26,7 @@
                     $('body').append(dialog);
                 }
                 
-                var extraClass = this.data('popupclass')?this.data('popupclass'):'';
-                
-                dialog.ssdialog({iframeUrl: this.data('importurl'), autoOpen: true, dialogExtraClass: extraClass});
+                dialog.ssdialog({iframeUrl: this.data('importurl'), autoOpen: true, dialogExtraClass: 'import-dialog', close: function(e, ui) {dialog.trigger('importDialogClosed');}});
                 
                 $(this).blur().focusout().removeClass('ui-state-hover ui-state-active');
                 e.stopPropagation();
