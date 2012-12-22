@@ -22,18 +22,22 @@ class SnippetPackage extends DataObject {
         $fields=new FieldList(
                             new TabSet('Root',
                                             new Tab('Main', _t('SnippetPackage.MAIN', '_Main'),
-                                                            new TextField('Title', _t('SnippetPackage.TITLE', '_Title'), null, 300),
-                                                            $packageGrid=new GridField('Snippets', _t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets'), $this->Snippets(), GridFieldConfig_RelationEditor::create(10))
+                                                            new TextField('Title', _t('SnippetPackage.TITLE', '_Title'), null, 300)
                                                         )
                                         )
                         );
         
         if($this->ID==0) {
-            $fields->replaceField('Snippets', new LabelField('Snippets', _t('SnippetPackage.SNIPPETS_AFTER_FIRST_SAVE', '_Snippets can be added after saving for the first time')));
+            $fields->addFieldToTab('Root.Main', new LabelField('Snippets', _t('SnippetPackage.SNIPPETS_AFTER_FIRST_SAVE', '_Snippets can be added after saving for the first time')));
         }else {
+            $packageGrid=new GridField('Snippets', _t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets'), $this->Snippets(), GridFieldConfig_RelationEditor::create(10));
             $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
                                     ->removeComponentsByType('GridFieldAddNewButton')
                                     ->addComponent(new PackageViewButton());
+            
+            
+            $fields->addFieldToTab('Root.Main', new LiteralField('SnippetAddWarning', '<p class="message warning">'._t('SnippetPackage.ADD_WARNING', '_Warning if you link a snippet that is already in another package it will be moved to this package').'</p>'));
+            $fields->addFieldToTab('Root.Main', $packageGrid);
         }
         
         return $fields;
