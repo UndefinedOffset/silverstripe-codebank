@@ -39,6 +39,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         Requirements::css(CB_DIR.'/css/CodeBank.css');
         
+        Requirements::add_i18n_javascript(CB_DIR.'/javascript/lang');
         Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
         

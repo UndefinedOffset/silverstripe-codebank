@@ -3,7 +3,11 @@
         <form $FormAttributes data-layout-type="border">
             <div class="cms-content-header north">
                 <div class="cms-content-header-info">
-                    <h2><%t CodeBankAddSnippet.TITLE "_Add Snippet" %></h2>
+                    <h2>
+                        <% with $Top %>
+                            <% include CMSBreadcrumbs %>
+                        <% end_with %>
+                    </h2>
                 </div>
             </div>
     

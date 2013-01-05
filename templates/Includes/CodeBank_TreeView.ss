@@ -14,7 +14,7 @@ $ExtraTreeTools
     	</div>
 	<% end_if %>
 
-	<div class="cms-tree codebank-tree" data-url-tree="$Link(getsubtree)" data-url-updatetreenodes="$Link(updatetreenodes)" data-url-addpage="{$LinkPageAdd('AddForm/?action_doAdd=1')}&amp;ParentID=%s&amp;PageType=%s&amp;SecurityID=$SecurityID" data-url-editscreen="$Link('edit')/show/" data-hints="$SiteTreeHints">
+	<div class="cms-tree codebank-tree" data-url-tree="$Link(getsubtree)" data-url-updatetreenodes="$Link(updatetreenodes)" data-url-addscreen="admin/codeBank/add?LanguageID=%s&amp;ClassName=%s&amp;SecurityID=$SecurityID" data-url-addtolanguage="admin/codeBank/addToFolder?ID=%s" data-url-editscreen="$Link('edit')/show/%s" data-hints="$TreeHints">
 		$SiteTreeAsUL
 	</div>
 </div>

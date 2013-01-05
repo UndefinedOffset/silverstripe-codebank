@@ -33,6 +33,14 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         $form->setAttribute('data-pjax-fragment', 'CurrentForm');
         
         
+        if($this->request->getVar('LanguageID')) {
+            $langField=$form->Fields()->dataFieldByName('LanguageID');
+            if($langField && $langField->Value()=='') {
+                $langField->setValue($this->request->getVar('LanguageID'));
+            }
+        }
+        
+        
         $this->extend('updateAddForm', $form);
         
         
@@ -63,5 +71,19 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
     public function getRecord($id) {
         return new Snippet();
     }
+    
+    public function Breadcrumbs($unlinked=false) {
+		$defaultTitle=self::menu_title_for_class(get_class($this));
+		return new ArrayList(array(
+		                            new ArrayData(array(
+                                        				'Title'=>_t('CodeBank.MENUTITLE', '_Code Bank'),
+                                        				'Link'=>$this->LinkMain
+                                        			)),
+                        			new ArrayData(array(
+                                        				'Title'=>_t("{$this->class}.MENUTITLE", $defaultTitle),
+                                        				'Link'=>false
+                                        			))
+                        		));
+	}
 }
 ?>
