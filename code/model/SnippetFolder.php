@@ -19,8 +19,8 @@ class SnippetFolder extends DataObject {
                                 );
     
     public static $allowed_children=array(
-                                        'SnippetFolder',
-                                        'Snippet'
+                                        'Snippet',
+                                        'SnippetFolder'
                                     );
     
     public static $default_child='Snippet';

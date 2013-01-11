@@ -24,8 +24,8 @@ class SnippetLanguage extends DataObject {
     public static $default_sort='Name';
     
     public static $allowed_children=array(
-                                        'SnippetFolder',
-                                        'Snippet'
+                                        'Snippet',
+                                        'SnippetFolder'
                                     );
     
     public static $default_child='Snippet';
