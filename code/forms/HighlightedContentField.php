@@ -97,6 +97,8 @@ class HighlightedContentField extends FormField {
             case 'sass':
             case 'scss':return 'shBrushSass';
             case 'scala':return 'shBrushScala';
+            case 'ss':
+            case 'silverstripe':return 'shBrushSilverStripe';
             case 'sql':return 'shBrushSql';
             case 'vb':
             case 'vbnet':return 'shBrushVb';
@@ -104,8 +106,8 @@ class HighlightedContentField extends FormField {
             case 'xhtml':
             case 'xslt':
             case 'html':return 'shBrushXml';
-            case 'ss':
-            case 'silverstripe':return 'shBrushSilverStripe';
+            case 'yml':
+            case 'yaml':return 'shBrushYaml';
         }
     }
     

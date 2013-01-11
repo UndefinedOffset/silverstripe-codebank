@@ -10,7 +10,8 @@ class Snippet extends DataObject {
                                 'Language'=>'SnippetLanguage',
                                 'Creator'=>'Member',
                                 'LastEditor'=>'Member',
-                                'Package'=>'SnippetPackage'
+                                'Package'=>'SnippetPackage',
+                                'Folder'=>'SnippetFolder'
                              );
     
     public static $has_many=array(
@@ -27,6 +28,9 @@ class Snippet extends DataObject {
     public static $create_table_options=array(
                                     		'MySQLDatabase'=>'ENGINE=MyISAM'
                                     	);
+    
+    public static $allowed_children=array();
+    public static $default_child=null;
     
     /**
      * Gets fields used in the cms
@@ -162,11 +166,6 @@ class Snippet extends DataObject {
 		
 		return $treeTitle;
 	}
-	
-	/**
-	 * Workaround to get snippets to display in tree, does nothing
-	 */
-	public function Snippets() {}
 	
 	/**
 	 * Workaround to get snippets to display

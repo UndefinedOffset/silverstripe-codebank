@@ -19,6 +19,14 @@
     background-position: 0 -16px;
 }
 
+.codebank-tree .class-SnippetLanguage .class-SnippetFolder .jstree-pageicon {
+    background: url(./../images/tree-sheet.png) no-repeat 0 -64px;
+}
+
+.codebank-tree .class-SnippetLanguage .class-SnippetFolder.jstree-open > a > span > .jstree-pageicon {
+    background-position: 0 -80px;
+}
+
 .codebank-tree .class-Snippet .jstree-pageicon {
     background: url(./../../framework/admin/images/sitetree_ss_pageclass_icons_default.png) no-repeat !important;
 }

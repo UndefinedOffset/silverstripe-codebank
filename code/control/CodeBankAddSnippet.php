@@ -33,10 +33,29 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         $form->setAttribute('data-pjax-fragment', 'CurrentForm');
         
         
+        //Handle Language id in url
         if($this->request->getVar('LanguageID')) {
             $langField=$form->Fields()->dataFieldByName('LanguageID');
             if($langField && $langField->Value()=='') {
                 $langField->setValue($this->request->getVar('LanguageID'));
+            }
+        }
+        
+        
+        //Handle folder id in url (or post)
+        if($this->request->getVar('FolderID')) {
+            $folder=SnippetFolder::get()->byID(intval($this->request->getVar('FolderID')));
+            if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+                $langField=$form->Fields()->dataFieldByName('LanguageID')->setValue($folder->ParentID);
+                $form->Fields()->replaceField('LanguageID', $langField->performReadonlyTransformation());
+                $form->Fields()->push(new HiddenField('FolderID', 'FolderID', $folder->ID));
+            }
+        }else if($this->request->postVar('FolderID')) {
+            $folder=SnippetFolder::get()->byID(intval($this->request->postVar('FolderID')));
+            if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+                $langField=$form->Fields()->dataFieldByName('LanguageID')->setValue($folder->ParentID);
+                $form->Fields()->replaceField('LanguageID', $langField->performReadonlyTransformation());
+                $form->Fields()->push(new HiddenField('FolderID', 'FolderID', $folder->ID));
             }
         }
         

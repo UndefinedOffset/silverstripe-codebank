@@ -10,6 +10,8 @@ en:
         ACCESS_CODE_BANK: "Access Code Bank"
         LANGUAGES: "Languages"
         SNIPPIT_NOT_EXIST: "Snippit does not exist"
+        LANGUAGE_NOT_EXIST: "Language does not exist"
+        FOLDER_NOT_EXIST: "Folder does not exist"
         CREATOR: "Creator"
         LANGUAGE: "Language"
         LAST_MODIFIED: "Last Modified"
@@ -48,6 +50,13 @@ en:
         IMPORT_READ_ERROR: "Could not read the file to be imported"
         IMPORT_FILE_FORMAT_INCORRECT: "Import file format is incorrect"
         IMPORT_COMPLETE: "Import Completed"
+        CANNOT_MOVE_TO_LANGUAGE: "You cannot move a snippet to another language"
+        SNIPPET_MOVED: "Snippet moved successfully"
+        UNKNOWN_PARENT: "Unknown Parent"
+        FOLDER_NO_PARENT: "Folder does not have a parent language or folder"
+        FOLDER_ADDED: "Folder added you may now close this dialog"
+        FOLDER_NOT_FOUND: "Folder could not be found"
+        FOLDER_RENAMED: "Folder Renamed"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
@@ -59,6 +68,7 @@ en:
         DISAGREE: "Disagree"
         AGREE: "Agree"
     CodeBankAddSnippet:
+        MENUTITLE: "Add Snippet"
         TITLE: "Add Snippet"
     CodeBankMember:
         USE_HEARTBEAT: "Use Code Bank Heartbeat to keep client session alive?"
@@ -93,6 +103,10 @@ en:
         NAME: "Name"
         FILE_EXTENSION: "File Extension"
         USER_LANGUAGE: "User Language"
+    SnippetFolder:
+        SINGULARNAME: "Folder"
+        PLURALNAME: "Folders"
+        NAME: "Name"
     CodeBankShortCode:
         MISSING_ID_ATTRIBUTE: "Short Code missing the id attribute"
         SNIPPET_NOT_FOUND: "Snippet not found"

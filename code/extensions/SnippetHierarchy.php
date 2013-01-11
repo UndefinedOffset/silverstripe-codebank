@@ -67,7 +67,14 @@ class SnippetHierarchy extends DataExtension {
 		
 		while($p) {
 			$stack[]=$p;
-			$p=$p->LanguageID ? $p->Language() : null;
+			if($p->FolderID && $p->FolderID>0) {
+			    $folder=$p->Folder();
+			    if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+			        $p=$folder;
+			    }
+			}else {
+			    $p=$p->LanguageID ? $p->Language() : null;
+			}
 		}
 		
 		return $stack;
@@ -241,6 +248,8 @@ class SnippetHierarchy extends DataExtension {
 		// Build the cache for this class if it doesn't exist.
 		if(!$cache || !is_numeric($this->_cache_numChildren)) {
 		    if($this->owner instanceof SnippetLanguage) {
+		        $this->_cache_numChildren=(int)$this->owner->Snippets()->Count();
+		    }else if($this->owner instanceof SnippetFolder) {
 		        $this->_cache_numChildren=(int)$this->owner->Snippets()->Count();
 		    }else {
 		        $this->_cache_numChildren=0;
@@ -561,18 +570,22 @@ class SnippetHierarchy extends DataExtension {
 	 * @return SS_List
 	 */
 	public function stageChildren($showAll=false) {
-	    if($this->owner->db('ShowInMenus')) {
-	        $extraFilter=($showAll) ? '' : " AND \"ShowInMenus\"=1";
-	    } else {
-	        $extraFilter='';
-	    }
-	
 	    $baseClass=ClassInfo::baseDataClass($this->owner->class);
 	    
-	    if($baseClass=='Snippet') {
-	        $staged=DataObject::get($baseClass, "\"{$baseClass}\".\"LanguageID\"=".intval($this->owner->ID)." AND \"{$baseClass}\".\"ID\"!=".intval($this->owner->ID).$extraFilter, "");
+	    if($baseClass=='SnippetPackage') {
+	        if($this->owner->ID==0) {
+	            $staged=SnippetPackage::get();
+	        }
+	    }else if($baseClass=='SnippetLanguage') {
+	        if($this->owner->ID==0) {
+	            $staged=SnippetLanguage::get();
+	        }else {
+	            $staged=ArrayList::create(array_merge($this->owner->Folders()->toArray(), $this->owner->Snippets()->where('"FolderID"=0')->toArray()));
+	        }
+	    }else if($baseClass=='SnippetFolder') {
+	        $staged=ArrayList::create(array_merge($this->owner->Folders()->toArray(), $this->owner->Snippets()->toArray()));
 	    }else {
-	        $staged=DataObject::get($baseClass, "\"{$baseClass}\".\"ID\"!=".intval($this->owner->ID).$extraFilter, "");
+	        $staged=new ArrayList();
 	    }
 	    
 	    	

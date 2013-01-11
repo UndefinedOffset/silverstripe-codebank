@@ -15,10 +15,23 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'tree',
                                         'EditForm',
                                         'show',
-                                        'compare'
+                                        'compare',
+                                        'addSnippet',
+                                        'moveSnippet',
+                                        'addFolder',
+                                        'AddFolderForm',
+                                        'doAddFolder',
+                                        'renameFolder',
+                                        'RenameFolderForm',
+                                        'doRenameFolder'
                                     );
     
     public static $session_namespace='CodeBank';
+    
+    
+    private $_folderAdded=false;
+    
+    
     
     /**
      * Constructor
@@ -287,8 +300,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * If ID = 0, then get the whole tree.
      */
     public function getsubtree($request) {
-        $languageID=(strpos($request->getVar('ID'), 'language-')!==false ? intval(str_replace('language-', '', $request->getVar('ID'))):null);
-        $html=$this->getSiteTreeFor($this->stat('tree_class'), $languageID, 'Snippets', null, array($this, 'hasSnippets'));
+        if(strpos($request->getVar('ID'), 'folder-')!==false) {
+            $folderID=(strpos($request->getVar('ID'), 'folder-')!==false ? intval(str_replace('folder-', '', $request->getVar('ID'))):null);
+            $html=$this->getSiteTreeFor('SnippetFolder', $folderID, 'Children', null, array($this, 'hasSnippets'));
+        }else {
+            $languageID=(strpos($request->getVar('ID'), 'language-')!==false ? intval(str_replace('language-', '', $request->getVar('ID'))):null);
+            $html=$this->getSiteTreeFor($this->stat('tree_class'), $languageID, 'Children', null, array($this, 'hasSnippets'));
+        }
 
         // Trim off the outer tag
         $html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
@@ -319,19 +337,19 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
             $next=$prev=null;
-            
             $className=$this->stat('tree_class');
-            $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('Title:GreaterThan', $record->Title)->first();
+            $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->where('"FolderID"='.$record->FolderID)->filter('Title:GreaterThan', $record->Title)->first();
             if(!$next) {
-                $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('Title:LessThan', $record->Title)->reverse()->first();
+                $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->where('"FolderID"='.$record->FolderID)->filter('Title:LessThan', $record->Title)->reverse()->first();
             }
             
             $link=Controller::join_links($recordController->Link("show"), $record->ID);
             $html=CodeBank_TreeNode::create($record, $link, $this->isCurrentPage($record))->forTemplate().'</li>';
             
+            $folder=$record->Folder();
             $data[$id]=array(
                             'html'=>$html,
-                            'ParentID'=>'language-'.$record->LanguageID,
+                            'ParentID'=>(!empty($folder) && $folder!==false && $folder->ID!=0 ? 'folder-'.$record->FolderID:'language-'.$record->LanguageID),
                             'NextID'=>($next ? $next->ID:null),
                             'PrevID'=>($prev ? $prev->ID:null)
                         );
@@ -354,7 +372,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {string} XHTML forming the tree of languages to snippets
      */
     public function SiteTreeAsUL() {
-        $html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Snippets', null);
+        $html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Children', null);
         
         $this->extend('updateSiteTreeAsUL', $html);
         
@@ -400,7 +418,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         // Get the tree root
-        $record=($rootID ? SnippetLanguage::get()->byID($rootID):null);
+        $record=($rootID ? $className::get()->byID($rootID):null);
         $obj=($record ? $record:singleton($className));
         
         // Mark the nodes of the tree to return
@@ -450,7 +468,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     /**
      * Gets the snippet for editing/viewing
      * @param {int} $id ID of the snippet to fetch
-     * @return {Snippet} Snippet to use
+     * @return {DataObject} DataObject to use
      */
     public function getRecord($id) {
         $className='Snippet';
@@ -690,6 +708,362 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
+	 * Create serialized JSON string with tree hints data to be injected into 'data-hints' attribute of root node of jsTree.
+	 * @return {string} Serialized JSON
+	 */
+	public function getTreeHints() {
+		$json = '';
+
+		$classes = array('Snippet', 'SnippetLanguage', 'SnippetFolder');
+
+	 	$cacheCanCreate = array();
+	 	foreach($classes as $class) $cacheCanCreate[$class] = singleton($class)->canCreate();
+
+	 	// Generate basic cache key. Too complex to encompass all variations
+	 	$cache=SS_Cache::factory('CodeBank_TreeHints');
+	 	$cacheKey = md5(implode('_', array(Member::currentUserID(), implode(',', $cacheCanCreate), implode(',', $classes))));
+	 	if($this->request->getVar('flush')) $cache->clean(Zend_Cache::CLEANING_MODE_ALL);
+	 	$json = $cache->load($cacheKey);
+	 	if(!$json) {
+			$def['Root'] = array();
+			$def['Root']['disallowedParents'] = array();
+
+			foreach($classes as $class) {
+				$allowedChildren = $class::$allowed_children;
+				
+				// SiteTree::allowedChildren() returns null rather than an empty array if SiteTree::allowed_chldren == 'none'
+				if($allowedChildren == null) $allowedChildren = array();
+				
+				// Find i18n - names and build allowed children array
+				foreach($allowedChildren as $child) {
+					$instance = singleton($child);
+					
+					if($instance instanceof HiddenClass) continue;
+
+					if(!array_key_exists($child, $cacheCanCreate) || !$cacheCanCreate[$child]) continue;
+
+					// skip this type if it is restricted
+					if($instance->stat('need_permission') && !$this->can(singleton($class)->stat('need_permission'))) continue;
+
+					$title = $instance->i18n_singular_name();
+
+					$def[$class]['allowedChildren'][] = array("ssclass" => $child, "ssname" => $title);
+				}
+
+				$allowedChildren = array_keys(array_diff($classes, $allowedChildren));
+				if($allowedChildren) $def[$class]['disallowedChildren'] = $allowedChildren;
+				$defaultChild = $class::$default_child;
+				if($defaultChild != null) $def[$class]['defaultChild'] = $defaultChild;
+				if(isset($def[$class]['disallowedChildren'])) {
+					foreach($def[$class]['disallowedChildren'] as $disallowedChild) {
+						$def[$disallowedChild]['disallowedParents'][] = $class;
+					}
+				}
+				
+				// Are any classes allowed to be parents of root?
+				$def['Root']['disallowedParents'][] = $class;
+			}
+
+			$json = Convert::raw2xml(Convert::raw2json($def));
+			$cache->save($json, $cacheKey);
+		}
+		return $json;
+    }
+    
+    /**
+     * Handles requests to add a snippet or folder to a language
+     * @param {SS_HTTPRequest} $request HTTP Request
+     */
+    public function addSnippet(SS_HTTPRequest $request)  {
+        if($request->getVar('Type')=='SnippetFolder') {
+            return $this->redirect(Controller::join_links($this->Link('addFolder'), '?FolderID='.str_replace('folder-', '', $request->getVar('ID'))));
+        }else {
+            return $this->redirect(Controller::join_links($this->Link('add'), '?LanguageID='.str_replace('language-', '', $request->getVar('ID'))));
+        }
+    }
+    
+    /**
+     * Handles moving of a snippet when the tree is reordered
+     * @param {SS_HTTPRequest} $request HTTP Request
+     */
+    public function moveSnippet(SS_HTTPRequest $request) {
+        $snippet=Snippet::get()->byID(intval($request->getVar('ID')));
+        
+        if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+            $this->response->setStatusCode(403, _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'));
+            return;
+        }
+        
+        $parentID=$request->getVar('ParentID');
+        if(strpos($parentID, 'language-')!==false) {
+            $lang=SnippetLanguage::get()->byID(intval(str_replace('language-', '', $parentID)));
+            if(empty($lang) || $lang===false || $lang->ID==0) {
+                $this->response->setStatusCode(403, _t('CodeBank.LANGUAGE_NOT_EXIST', '_Language does not exist'));
+                return;
+            }
+            
+            
+            if($lang->ID!=$snippet->LanguageID) {
+                $this->response->setStatusCode(403, _t('CodeBank.CANNOT_MOVE_TO_LANGUAGE', '_You cannot move a snippet to another language'));
+                return;
+            }
+            
+            //Move out of folder
+            DB::query('UPDATE "Snippet" SET "FolderID"=0 WHERE "ID"='.$snippet->ID);
+            
+            
+            $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.SNIPPET_MOVED', '_Snippet moved successfully')));
+            return;
+        }else if(strpos($parentID, 'folder-')!==false) {
+            $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $parentID)));
+            if(empty($folder) || $folder===false || $folder->ID==0) {
+                $this->response->setStatusCode(403, _t('CodeBank.FOLDER_NOT_EXIST', '_Folder does not exist'));
+                return;
+            }
+            
+            
+            if($folder->LanguageID!=$snippet->LanguageID) {
+                $this->response->setStatusCode(403, _t('CodeBank.CANNOT_MOVE_TO_FOLDER', '_You cannot move a snippet to a folder in another language'));
+                return;
+            }
+            
+            //Move to folder
+            DB::query('UPDATE "Snippet" SET "FolderID"='.$folder->ID.' WHERE "ID"='.$snippet->ID);
+            
+            
+            $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.SNIPPET_MOVED', '_Snippet moved successfully')));
+            return;
+        }
+        
+        $this->response->setStatusCode(403, _t('CodeBank.UNKNOWN_PARENT', '_Unknown Parent'));
+    }
+    
+    /**
+     * Handles requests to add a folder
+     * @return {string} HTML to be sent to the browser
+     */
+    public function addFolder() {
+        $form=$this->AddFolderForm();
+        return $this->customise(array(
+                                    'Content'=>' ',
+                                    'Form'=>$form
+                                ))->renderWith('CMSDialog');
+    }
+    
+    /**
+     * Form used for adding a folder
+     * @return {Form} Form to be used for adding a folder
+     */
+    public function AddFolderForm() {
+        $fields=new FieldList(
+                            new TabSet('Root',
+                                            new Tab('Main', 'Main',
+                                                                    new TextField('Name', _t('SnippetFolder.NAME', '_Name'), null, 150)
+                                                                )
+                                        )
+                        );
+        
+        
+        $noParent=true;
+        if(strpos($this->request->getVar('ParentID'), 'language-')!==false) {
+            $fields->push(new HiddenField('LanguageID', 'LanguageID', intval(str_replace('language-', '', $this->request->getVar('ParentID')))));
+            
+            $noParent=false;
+        }else if(strpos($this->request->getVar('LanguageID'), 'folder-')!==false) {
+            $folder=Folder::get()->byID(intval(str_replace('language-', '', $this->request->getVar('ParentID'))));
+            
+            if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+                $fields->push(new HiddenField('ParentID', 'ParentID', $folder->ID));
+                $fields->push(new HiddenField('LanguageID', 'LanguageID', $folder->LanguageID));
+                
+                $noParent=false;
+            }
+        }else {
+            if($this->request->postVar('LanguageID')) {
+                $fields->push(new HiddenField('LanguageID', 'LanguageID', intval($this->request->postVar('LanguageID'))));
+                
+                if($this->request->postVar('ParentID')) {
+                    $fields->push(new HiddenField('ParentID', 'ParentID', intval($this->request->postVar('ParentID'))));
+                }
+                
+                $noParent=false;
+            }
+        }
+        
+        
+        $actions=new FieldList(
+                                new FormAction('doAddFolder', _t('CodeBank.SAVE', '_Save'))
+                            );
+        
+        $validator=new RequiredFields('Name');
+        
+        $form=new Form($this, 'AddFolderForm', $fields, $actions, $validator);
+        $form->addExtraClass('member-profile-form');
+        
+        
+        //If no parent disable folder
+        if($noParent) {
+            $form->setMessage(_t('CodeBank.FOLDER_NO_PARENT', '_Folder does not have a parent language or folder'), 'bad');
+            $form->setFields(new FieldList());
+            $form->setActions(new FieldList());
+        }
+        
+        return $form;
+    }
+    
+    /**
+     * Handles actually adding a folder to the databsae
+     * @param {array} $data Submitted data
+     * @param {Form} $form Submitting form
+     * @return {string} HTML to be rendered
+     */
+    public function doAddFolder($data, Form $form) {
+        $folder=new SnippetFolder();
+        $folder->Name=$data['Name'];
+        $folder->LanguageID=$data['LanguageID'];
+        
+        if(array_key_exists('FolderID', $data)) {
+            $folder->ParentID=$data['FolderID'];
+        }
+        
+        //Write the folder to the database
+        $folder->write();
+        
+        
+        //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
+        $next=$prev=null;
+        $next=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:GreaterThan', $folder->Title)->first();
+        if(!$next) {
+            $prev=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:LessThan', $folder->Title)->reverse()->first();
+        }
+        
+        
+        //Setup js that will add the node to the tree
+        $html=CodeBank_TreeNode::create($folder, '', false)->forTemplate().'</li>';
+        $parentFolder=$folder->Parent();
+        $outputData=array('folder-'.$folder->ID=>array(
+                                            'html'=>$html,
+                                            'ParentID'=>(!empty($parentFolder) && $parentFolder!==false && $parentFolder->ID!=0 ? 'folder-'.$folder->ParentID:'language-'.$folder->LanguageID),
+                                            'NextID'=>($next ? 'folder-'.$next->ID:null),
+                                            'PrevID'=>($prev ? 'folder-'.$prev->ID:null)
+                                        ));
+        
+        Requirements::customScript('window.parent.updateCodeBankTreeNodes('.json_encode($outputData).');');
+        
+        
+        //Re-render the form
+        $form->setFields(new FieldList());
+        $form->setActions(new FieldList());
+        $form->setMessage(_t('CodeBank.FOLDER_ADDED', '_Folder added you may now close this dialog'), 'good');
+        
+        return $this->customise(array(
+                                    'Content'=>' ',
+                                    'Form'=>$form
+                                ))->renderWith('CMSDialog');
+    }
+    
+    /**
+     * Handles requests to rename a folder
+     * @return {string} HTML to be sent to the browser
+     */
+    public function renameFolder() {
+        $form=$this->RenameFolderForm();
+        return $this->customise(array(
+                                    'Content'=>' ',
+                                    'Form'=>$form
+                                ))->renderWith('CMSDialog');
+    }
+    
+    /**
+     * Form used for renaming a folder
+     * @return {Form} Form to be used for renaming a folder
+     */
+    public function RenameFolderForm() {
+        $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ID'))));
+        
+        if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+            $fields=new FieldList(
+                                new TabSet('Root',
+                                                new Tab('Main', 'Main',
+                                                                        new TextField('Name', _t('SnippetFolder.NAME', '_Name'), null, 150)
+                                                                    )
+                                            ),
+                                new HiddenField('ID', 'ID')
+                            );
+            
+            $actions=new FieldList(
+                                    new FormAction('doRenameFolder', _t('CodeBank.SAVE', '_Save'))
+                                );
+        }else {
+            $fields=new FieldList();
+            $actions=new FieldList();
+        }
+        
+        $validator=new RequiredFields('Name');
+        
+        $form=new Form($this, 'RenameFolderForm', $fields, $actions, $validator);
+        $form->addExtraClass('member-profile-form');
+        
+        
+        //If no parent disable folder
+        if(empty($folder) || $folder===false || $folder->ID==0) {
+            $form->setMessage(_t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'), 'bad');
+        }else {
+            $form->loadDataFrom($folder);
+            $form->setFormAction(Controller::join_links($form->FormAction(), '?ID='.$folder->ID));
+        }
+        
+        return $form;
+    }
+    
+    /**
+     * Performs the rename of the folder
+     * @param {array} $data Submitted data
+     * @param {Form} $form Submitting form
+     * @return {string} HTML to be rendered
+     */
+    public function doRenameFolder($data, Form $form) {
+        $folder=SnippetFolder::get()->byID(intval($data['ID']));
+        if(empty($folder) || $folder===false || $folder->ID==0) {
+            $form->sessionMessage(_t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'), 'bad');
+            return $this->redirectBack();
+        }
+        
+        
+        //Update Folder
+        $form->saveInto($folder);
+        $folder->write();
+        
+        
+        //Add script to rename the folder in the tree
+        Requirements::customScript('window.parent.renameCodeBankTreeNode("folder-'.$folder->ID.'", "'.addslashes($folder->TreeTitle).'");');
+        
+        
+        //Re-render the form
+        $form->setMessage(_t('CodeBank.FOLDER_RENAMED', '_Folder Renamed'), 'good');
+        return $this->customise(array(
+                                    'Content'=>' ',
+                                    'Form'=>$form
+                                ))->renderWith('CMSDialog');
+    }
+    
+    /**
+     * Deletes a folder node
+     */
+    public function deleteFolder() {
+        $folder=SnippetFolder::get()->byID(intval($data['ID']));
+        if(empty($folder) || $folder===false || $folder->ID==0) {
+            $this->response->setStatusCode(404, _t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'));
+            return;
+        }
+        
+        
+        $folder->delete();
+        
+        //@TODO Need to figure out how to re-insert the child nodes back into the tree, maybe do this js side?
+    }
+    
+    /**
      * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
      * @return {array} Map of codes to label
      */
@@ -707,9 +1081,17 @@ class CodeBank_TreeNode extends LeftAndMain_TreeNode {
      */
     public function forTemplate() {
         $obj=$this->obj;
-        return "<li ".($this->obj instanceof SnippetLanguage ? "id=\"language-$obj->ID\" data-id=\"language-$obj->ID\"":"id=\"record-$obj->ID\" data-id=\"$obj->ID\"")." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
+        if($this->obj instanceof SnippetLanguage) {
+            $liAttrib='id="language-'.$obj->ID.'" data-id="language-'.$obj->ID.'"';
+        }else if($this->obj instanceof SnippetFolder) {
+            $liAttrib='id="folder-'.$obj->ID.'" data-id="folder-'.$obj->ID.'" data-languageID="'.$obj->LanguageID.'"';
+        }else {
+            $liAttrib='id="record-'.$obj->ID.'" data-id="'.$obj->ID.'" data-languageID="'.$obj->LanguageID.'"';
+        }
+        
+        return "<li ".$liAttrib." data-pagetype=\"$obj->ClassName\" class=\"".$this->getClasses()."\">" .
                 "<ins class=\"jstree-icon\">&nbsp;</ins>".
-                "<a href=\"".($this->obj instanceof SnippetLanguage ? '':$this->getLink())."\" title=\"$obj->class: ".strip_tags($obj->TreeTitle)."\">".
+                "<a href=\"".($this->obj instanceof SnippetLanguage || $this->obj instanceof SnippetFolder ? '':$this->getLink())."\" title=\"$obj->class: ".strip_tags($obj->TreeTitle)."\">".
                 "<ins class=\"jstree-icon\">&nbsp;</ins><span class=\"text\">".($obj->TreeTitle)."</span></a>";
     }
 }

@@ -7,6 +7,11 @@ class SnippetLanguage extends DataObject {
                             'UserLanguage'=>'Boolean'
                          );
     
+    public static $has_many=array(
+                                'Snippets'=>'Snippet.Language',
+                                'Folders'=>'SnippetFolder'
+                            );
+    
     public static $defaults=array(
                                 'HighlightCode'=>'Plain',
                                 'UserLanguage'=>true
@@ -17,6 +22,13 @@ class SnippetLanguage extends DataObject {
                                 );
     
     public static $default_sort='Name';
+    
+    public static $allowed_children=array(
+                                        'SnippetFolder',
+                                        'Snippet'
+                                    );
+    
+    public static $default_child='Snippet';
     
     private $defaultLanguages=array(
                                     'Flex 3'=>array('Extension'=>'mxml', 'HighlightCode'=>'Flex'),
@@ -145,6 +157,10 @@ class SnippetLanguage extends DataObject {
                         );
     }
     
+    public function Folders() {
+        return $this->getComponents('Folders', 'ParentID=0');
+    }
+    
     /**
      * Determins if the language has snippets
      * return {bool} Counts how many children snippets there are if there are more than 0 returns true, false otherwise
@@ -165,18 +181,6 @@ class SnippetLanguage extends DataObject {
 		
 		return $treeTitle;
 	}
-	
-	/**
-	 * Gets the snippets that are bound to this language
-	 * @return {DataList} Data List of Snippets bound to this language
-	 */
-    public function Snippets() {
-        if($this->ID==0 && Controller::curr() instanceof LeftAndMain) {
-            return SnippetLanguage::get();
-        }
-        
-        return Snippet::get()->filter('LanguageID', $this->ID);
-    }
     
 	/**
 	 * Return the CSS classes to apply to this node in the CMS tree
