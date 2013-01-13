@@ -221,8 +221,8 @@ class CodeBankSettings extends CodeBank {
         
         //Import Folders
         foreach($fileData->data->folders as $folder) {
-            DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name") '.
-                    "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."')");
+            DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name", "ParentID", "LanguageID") '.
+                    "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."', ".intval($folder->fkParentId).", ".intval($folder->fkLanguageId).")");
         }
         
         

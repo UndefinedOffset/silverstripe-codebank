@@ -151,7 +151,7 @@ class CodeBank_ClientAPI extends Controller {
         $snippets=$this->queryToArray(DB::query('SELECT "ID", "Title", "Description", "Tags", "LanguageID", "PackageID", "FolderID" FROM "Snippet"'));
         $versions=$this->queryToArray(DB::query('SELECT "ID", "Created", "Text", "ParentID" FROM "SnippetVersion"'));
         $packages=$this->queryToArray(DB::query('SELECT "ID", "Title" FROM "SnippetPackage"'));
-        $folders=$this->queryToArray(DB::query('SELECT "ID", "Name" FROM "SnippetFolder"'));
+        $folders=$this->queryToArray(DB::query('SELECT "ID", "Name", "ParentID", "LanguageID" FROM "SnippetFolder"'));
         
         
         //Build final response array
