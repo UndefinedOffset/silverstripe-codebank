@@ -23,7 +23,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'doAddFolder',
                                         'renameFolder',
                                         'RenameFolderForm',
-                                        'doRenameFolder'
+                                        'doRenameFolder',
+                                        'deleteFolder'
                                     );
     
     public static $session_namespace='CodeBank';
@@ -1051,7 +1052,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Deletes a folder node
      */
     public function deleteFolder() {
-        $folder=SnippetFolder::get()->byID(intval($data['ID']));
+        $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ID'))));
         if(empty($folder) || $folder===false || $folder->ID==0) {
             $this->response->setStatusCode(404, _t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'));
             return;
@@ -1060,7 +1061,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         $folder->delete();
         
-        //@TODO Need to figure out how to re-insert the child nodes back into the tree, maybe do this js side?
+        return 'HELO';
     }
     
     /**

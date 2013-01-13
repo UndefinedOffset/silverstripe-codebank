@@ -130,8 +130,21 @@
                                                                                 $.ajax({
                                                                                     url: ss.i18n.sprintf(self.data('urlDeletefolder'), node.data('id')),
                                                                                     success: function(data) {
-                                                                                        //TODO This needs to be built out
-                                                                                        alert('TODO!');
+                                                                                        var parentNode=node.parent();
+                                                                                        var removeHandler=function (e, data) {
+                                                                                            data.rslt.obj.find('> ul > li').each(function() {
+                                                                                                if($(this).data('pagetype')=='SnippetFolder') {
+                                                                                                    data.inst.move_node(this, parentNode, 'first', false, false, true);
+                                                                                                }else {
+                                                                                                    data.inst.move_node(this, parentNode, 'last', false, false, true);
+                                                                                                }
+                                                                                            });
+                                                                                        };
+                                                                                        
+                                                                                        //Bind to remove event, remove then unbind
+                                                                                        self.bind('remove.jstree', removeHandler);
+                                                                                        self.jstree('remove', node);
+                                                                                        self.unbind('remove.jstree', removeHandler);
                                                                                     },
                                                                                     error: function() {
                                                                                         statusMessage(ss.i18n._t('CodeBankTree.ERROR_DELETING_FOLDER', '_Error Deleting Folder'), 'bad');
