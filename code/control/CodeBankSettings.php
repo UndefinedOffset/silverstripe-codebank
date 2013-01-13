@@ -188,6 +188,7 @@ class CodeBankSettings extends CodeBank {
         DB::query('DELETE FROM SnippetVersion');
         DB::query('DELETE FROM SnippetLanguage');
         DB::query('DELETE FROM SnippetPackage');
+        DB::query('DELETE FROM SnippetFolder');
         
         
         //Import Languages
@@ -206,8 +207,8 @@ class CodeBankSettings extends CodeBank {
         
         //Import Snippets
         foreach($fileData->data->snippets as $snip) {
-            DB::query('INSERT INTO "Snippet" ("ID", "ClassName", "Created", "LastEdited", "Title", "Description", "Tags", "LanguageID", "CreatorID", "LastEditorID", "PackageID") '.
-                    "VALUES(".intval($snip->id).",'Snippet', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($snip->title)."', '".Convert::raw2sql($snip->description)."', '".Convert::raw2sql($snip->tags)."', ".intval($snip->fkLanguage).", ".Member::currentUserID().", ".Member::currentUserID().", ".intval($snip->fkPackageID).")");
+            DB::query('INSERT INTO "Snippet" ("ID", "ClassName", "Created", "LastEdited", "Title", "Description", "Tags", "LanguageID", "CreatorID", "LastEditorID", "PackageID", "FolderID") '.
+                    "VALUES(".intval($snip->id).",'Snippet', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($snip->title)."', '".Convert::raw2sql($snip->description)."', '".Convert::raw2sql($snip->tags)."', ".intval($snip->fkLanguage).", ".Member::currentUserID().", ".Member::currentUserID().", ".intval($snip->fkPackageID).", ".intval($snip->fkFolderID).")");
         }
         
         
@@ -215,6 +216,13 @@ class CodeBankSettings extends CodeBank {
         foreach($fileData->data->versions as $ver) {
             DB::query('INSERT INTO "SnippetVersion" ("ID", "ClassName", "Created", "LastEdited", "Text", "ParentID") '.
                     "VALUES(".intval($ver->id).",'SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($ver->fkSnippit).")");
+        }
+        
+        
+        //Import Folders
+        foreach($fileData->data->folders as $folder) {
+            DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name") '.
+                    "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."')");
         }
         
         

@@ -148,9 +148,10 @@ class CodeBank_ClientAPI extends Controller {
         
         //Dump Data
         $languages=$this->queryToArray(DB::query('SELECT "ID", "Name", "FileExtension", "HighlightCode", "UserLanguage" FROM "SnippetLanguage"'));
-        $snippets=$this->queryToArray(DB::query('SELECT "ID", "Title", "Description", "Tags", "LanguageID", "PackageID" FROM "Snippet"'));
+        $snippets=$this->queryToArray(DB::query('SELECT "ID", "Title", "Description", "Tags", "LanguageID", "PackageID", "FolderID" FROM "Snippet"'));
         $versions=$this->queryToArray(DB::query('SELECT "ID", "Created", "Text", "ParentID" FROM "SnippetVersion"'));
         $packages=$this->queryToArray(DB::query('SELECT "ID", "Title" FROM "SnippetPackage"'));
+        $folders=$this->queryToArray(DB::query('SELECT "ID", "Name" FROM "SnippetFolder"'));
         
         
         //Build final response array
@@ -160,7 +161,8 @@ class CodeBank_ClientAPI extends Controller {
                                     'languages'=>$languages,
                                     'snippets'=>$snippets,
                                     'versions'=>$versions,
-                                    'packages'=>$packages
+                                    'packages'=>$packages,
+                                    'folders'=>$folders
                                 )
                     );
         
