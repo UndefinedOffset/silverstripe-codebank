@@ -51,8 +51,10 @@ class CodeBankSnippets implements CodeBank_APIClass {
         foreach($languages as $lang) {
             if($lang->Snippets()->Count()>0) {
                 $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
+                
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
+                                        'folders'=>$this->mapFolders($lang->Folders()),
                                         'snippets'=>$snippets
                                     );
             }
@@ -60,6 +62,27 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         return $response;
+    }
+    
+    /**
+     * Maps the folder and its decendents through recurrsion
+     * @param {SS_List} $folders List of folders to be mapped
+     * @return {array} Nested array of folder data
+     */
+    private function mapFolders(SS_List $folders) {
+        $result=array();
+        
+        foreach($folders as $folder) {
+            $snippets=$this->arrayUnmap($folder->Snippets()->map('ID', 'Title')->toArray());
+            
+            $result[]=array(
+                            'name'=>$folder->Name,
+                            'folders'=>$this->mapFolders($folder->Folders()),
+                            'snippets'=>$snippets
+                        );
+        }
+        
+        return $result;
     }
     
     /**
