@@ -870,7 +870,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $fields->push(new HiddenField('LanguageID', 'LanguageID', intval(str_replace('language-', '', $this->request->getVar('ParentID')))));
             
             $noParent=false;
-        }else if(strpos($this->request->getVar('LanguageID'), 'folder-')!==false) {
+        }else if(strpos($this->request->getVar('ParentID'), 'folder-')!==false) {
             $folder=Folder::get()->byID(intval(str_replace('language-', '', $this->request->getVar('ParentID'))));
             
             if(!empty($folder) && $folder!==false && $folder->ID!=0) {
