@@ -107,6 +107,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
             $response['data'][]=array(
                                     'language'=>$lang->Name,
+                                    'folders'=>$this->mapFolders($lang->Folders()),
                                     'snippets'=>$snippets
                                 );
         }
@@ -119,6 +120,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * Searches for snippets that match the information the client in the search field
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
+     * @todo Should add folder support to search
      */
     public function searchSnippets($data) {
         $response=CodeBank_ClientAPI::responseBase();
@@ -134,8 +136,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=$lang->Snippets()->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
-            if($lang->Snippets()->Count()>0) {
+            $snippets=Snippets::get()->filter('LanguageID', $lang->ID)->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            if($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
                                         'language'=>$lang->Name,
