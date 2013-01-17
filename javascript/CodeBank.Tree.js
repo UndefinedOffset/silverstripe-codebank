@@ -106,7 +106,7 @@
                                                                 menuitems['edit']={
                                                                                     'label': ss.i18n._t('CodeBankTree.EDIT', '_Edit'),
                                                                                     'action': function(obj) {
-                                                                                        $('.cms-container').entwine('.ss').loadPanel(ss.i18n.sprintf(self.data('urlEditscreen'), obj.data('id')));
+                                                                                        $('.cms-container').entwine('.ss').loadPanel(self.data('urlEditscreen')+obj.data('id'));
                                                                                     }
                                                                                 };
                                                             }else if(pagetype=='SnippetFolder') {
