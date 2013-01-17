@@ -53,6 +53,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
                 
                 $response['data'][]=array(
+                                        'id'=>$lang->ID,
                                         'language'=>$lang->Name,
                                         'folders'=>$this->mapFolders($lang->Folders()),
                                         'snippets'=>$snippets
@@ -76,7 +77,9 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippets=$this->arrayUnmap($folder->Snippets()->map('ID', 'Title')->toArray());
             
             $result[]=array(
+                            'id'=>$folder->ID,
                             'name'=>$folder->Name,
+                            'languageID'=>$folder->LanguageID,
                             'folders'=>$this->mapFolders($folder->Folders()),
                             'snippets'=>$snippets
                         );
@@ -106,6 +109,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
             $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
             $response['data'][]=array(
+                                    'id'=>$lang->ID,
                                     'language'=>$lang->Name,
                                     'folders'=>$this->mapFolders($lang->Folders()),
                                     'snippets'=>$snippets
@@ -140,6 +144,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             if($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
+                                        'id'=>$lang->ID,
                                         'language'=>$lang->Name,
                                         'snippets'=>$snippets
                                     );
@@ -338,6 +343,22 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippet->LanguageID=$data->language;
             $snippet->CreatorID=Member::currentUserID();
             $snippet->PackageID=$data->packageID;
+            
+            if($data->folderID>0) {
+                $folder=Folder::get()->byID(intval($data->folderID));
+                if(empty($folder) || $folder===false || $folder->ID==0) {
+                    $response['status']="EROR";
+                    $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
+                    return $response;
+                }
+                
+                if($folder->LanguageID!=$snippet->LanguageID) {
+                    $response['status']="EROR";
+                    $response['message']=_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet');
+                    return $response;
+                }
+            }
+            
             $snippet->write();
             
             

@@ -137,3 +137,5 @@ en:
         MEMBER_NOT_FOUND: "Member not found"
         NEW_PASSWORD_NOT_VALID: "New password is not valid"
         PASSWORD_NOT_VALID: "Password is not valid"
+        FOLDER_DOES_NOT_EXIST: "Folder does not exist"
+        FOLDER_NOT_LANGUAGE: "Folder is not in the same language as the snippet"
