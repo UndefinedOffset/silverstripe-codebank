@@ -77,6 +77,11 @@ class Snippet extends DataObject {
             $this->CreatorID=Member::currentUserID();
         }else {
             $this->LastEditorID=Member::currentUserID();
+            
+            //If the language is changing reset the folder id
+            if($this->isChanged('LanguageID')) {
+                $this->FolderID=0;
+            }
         }
     }
     
