@@ -920,7 +920,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      */
     public function doAddFolder($data, Form $form) {
         //Existing Check
-        $existingCheck=Folder::get()->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')->filter('LanguageID', $data['LanguageID']);
+        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')->filter('LanguageID', $data['LanguageID']);
         
         if(array_key_exists('FolderID', $data)) {
             $existingCheck=$existingCheck->filter('ParentID', $data['FolderID']);
@@ -1046,11 +1046,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         }
         
         //Existing Check
-        $existingCheck=Folder::get()
-                                    ->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')
-                                    ->filter('LanguageID', $folder->LanguageID)
-                                    ->filter('ParentID', $folder->ParentID)
-                                    ->where('"ID"<>'.$folder->ID);
+        $existingCheck=SnippetFolder::get()
+                                            ->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')
+                                            ->filter('LanguageID', $folder->LanguageID)
+                                            ->filter('ParentID', $folder->ParentID)
+                                            ->where('"ID"<>'.$folder->ID);
         if($existingCheck->Count()>0) {
             $form->sessionMessage(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), 'bad');
             return $this->redirectBack();
