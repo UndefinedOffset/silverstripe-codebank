@@ -751,6 +751,77 @@ class CodeBankSnippets implements CodeBank_APIClass {
         return $response;
     }
     
+    
+    /**
+     * Saves a new folder
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function newFolder($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
+            
+            return $response;
+        }
+        
+        $language=SnippetLanguage::get()->byID(intval($data->languageID));
+        if(empty($language) || $language===false || $language->ID==0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
+            return $response;
+        }
+        
+        
+        if($data->parentID>0) {
+            $folder=SnippetFolder::get()->byID(intval($data->parentID));
+            if(empty($folder) || $folder===false || $folder->ID==0) {
+                $response['status']="EROR";
+                $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
+                return $response;
+            }
+            
+            if($folder->LanguageID!=$language->ID) {
+                $response['status']="EROR";
+                $response['message']=_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet');
+                return $response;
+            }
+        }
+        
+        
+        
+        //Check existing
+        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data->name).'\'')->filter('LanguageID', $language->ID)->filter('ParentID', $data->parentID);
+        
+        
+        if($existingCheck->Count()>0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name');
+            return $response;
+        }
+        
+        
+        try {
+            $snippetFolder=new SnippetFolder();
+            $snippetFolder->Name=$data->name;
+            $snippetFolder->LanguageID=$data->languageID;
+            $snippetFolder->ParentID=$data->parentID;
+            $snippetFolder->write();
+            
+            
+            $response['status']="HELO";
+        }catch(Exception $e) {
+            $response['status']="EROR";
+            $response['message']="Internal Server error occured";
+        }
+        
+        
+        return $response;
+    }
+    
     /**
      * Converts an array where the key and value should be mapped to a nested array
      * @param {array} $array Source Array

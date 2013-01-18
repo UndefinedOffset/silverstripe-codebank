@@ -69,12 +69,12 @@ class SnippetFolder extends DataObject {
 
 		return $classes;
 	}
-    
+	
     /**
      * Removes all snippets from the folder before deleting
      */
     protected function onBeforeDelete() {
-        parent::onAfterDelete();
+        parent::onBeforeDelete();
         
         //Remove all Snippets from this folder
         DB::query('UPDATE "Snippet" SET "FolderID"=0 WHERE "FolderID"='.$this->ID);

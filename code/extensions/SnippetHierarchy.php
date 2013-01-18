@@ -250,7 +250,7 @@ class SnippetHierarchy extends DataExtension {
 		    if($this->owner instanceof SnippetLanguage) {
 		        $this->_cache_numChildren=(int)$this->owner->Snippets()->Count();
 		    }else if($this->owner instanceof SnippetFolder) {
-		        $this->_cache_numChildren=(int)$this->owner->Snippets()->Count();
+		        $this->_cache_numChildren=(int)$this->owner->Snippets()->Count() + (int)$this->owner->Folders()->Count();
 		    }else {
 		        $this->_cache_numChildren=0;
 		    }

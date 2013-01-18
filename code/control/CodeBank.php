@@ -871,7 +871,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             $noParent=false;
         }else if(strpos($this->request->getVar('ParentID'), 'folder-')!==false) {
-            $folder=Folder::get()->byID(intval(str_replace('language-', '', $this->request->getVar('ParentID'))));
+            $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ParentID'))));
             
             if(!empty($folder) && $folder!==false && $folder->ID!=0) {
                 $fields->push(new HiddenField('ParentID', 'ParentID', $folder->ID));
@@ -883,9 +883,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             if($this->request->postVar('LanguageID')) {
                 $fields->push(new HiddenField('LanguageID', 'LanguageID', intval($this->request->postVar('LanguageID'))));
                 
-                if($this->request->postVar('ParentID')) {
-                    $fields->push(new HiddenField('ParentID', 'ParentID', intval($this->request->postVar('ParentID'))));
-                }
+                $noParent=false;
+            }
+               
+            if($this->request->postVar('ParentID')) {
+                $fields->push(new HiddenField('ParentID', 'ParentID', intval($this->request->postVar('ParentID'))));
                 
                 $noParent=false;
             }
@@ -938,8 +940,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $folder->Name=$data['Name'];
         $folder->LanguageID=$data['LanguageID'];
         
-        if(array_key_exists('FolderID', $data)) {
-            $folder->ParentID=$data['FolderID'];
+        if(array_key_exists('ParentID', $data)) {
+            $folder->ParentID=$data['ParentID'];
         }
         
         //Write the folder to the database
