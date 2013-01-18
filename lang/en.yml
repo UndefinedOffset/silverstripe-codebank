@@ -57,6 +57,7 @@ en:
         FOLDER_ADDED: "Folder added you may now close this dialog"
         FOLDER_NOT_FOUND: "Folder could not be found"
         FOLDER_RENAMED: "Folder Renamed"
+        FOLDER_EXISTS: "A folder already exists with that name"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
