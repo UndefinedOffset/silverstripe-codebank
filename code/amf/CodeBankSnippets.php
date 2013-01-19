@@ -751,7 +751,6 @@ class CodeBankSnippets implements CodeBank_APIClass {
         return $response;
     }
     
-    
     /**
      * Saves a new folder
      * @param {stdClass} $data Data passed from ActionScript
@@ -810,6 +809,99 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippetFolder->LanguageID=$data->languageID;
             $snippetFolder->ParentID=$data->parentID;
             $snippetFolder->write();
+            
+            
+            $response['status']="HELO";
+        }catch(Exception $e) {
+            $response['status']="EROR";
+            $response['message']="Internal Server error occured";
+        }
+        
+        
+        return $response;
+    }
+    
+    /**
+     * Renames a folder
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function renameFolder($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
+            
+            return $response;
+        }
+        
+    
+        $snippetFolder=SnippetFolder::get()->byID(intval($data->id));
+        if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
+            return $response;
+        }
+        
+        
+        //Check existing
+        $existingCheck=SnippetFolder::get()
+                                            ->where('"ID"<>'.$snippetFolder->ID)
+                                            ->where('"Name" LIKE \''.Convert::raw2sql($data->name).'\'')
+                                            ->filter('LanguageID', $snippetFolder->LanguageID)
+                                            ->filter('ParentID', $snippetFolder->ParentID);
+        
+        if($existingCheck->Count()>0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name');
+            return $response;
+        }
+        
+        
+        try {
+            $snippetFolder->Name=$data->name;
+            $snippetFolder->write();
+            
+            
+            $response['status']="HELO";
+        }catch(Exception $e) {
+            $response['status']="EROR";
+            $response['message']="Internal Server error occured";
+        }
+        
+        
+        return $response;
+    }
+    
+    /**
+     * Deletes a folder
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function deleteFolder($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
+            
+            return $response;
+        }
+        
+    
+        $snippetFolder=SnippetFolder::get()->byID(intval($data->id));
+        if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
+            return $response;
+        }
+        
+        
+        try {
+            $snippetFolder->delete();
             
             
             $response['status']="HELO";
