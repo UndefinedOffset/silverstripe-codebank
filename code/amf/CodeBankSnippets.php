@@ -50,7 +50,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
             if($lang->Snippets()->Count()>0) {
-                $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
+                $snippets=$this->overviewList($lang->Snippets()->filter('FolderID', 0), 'Title', 'ID', 'LanguageID');
                 
                 $response['data'][]=array(
                                         'id'=>$lang->ID,
@@ -74,7 +74,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $result=array();
         
         foreach($folders as $folder) {
-            $snippets=$this->arrayUnmap($folder->Snippets()->map('ID', 'Title')->toArray());
+            $snippets=$this->overviewList($folder->Snippets(), 'Title', 'ID', 'LanguageID');
             
             $result[]=array(
                             'id'=>$folder->ID,
@@ -107,7 +107,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $lang=SnippetLanguage::get()->byID(intval($data->id));
         if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
-            $snippets=$this->arrayUnmap($lang->Snippets()->map('ID', 'Title')->toArray());
+            $snippets=$this->arrayUnmap($lang->Snippets()->filter('FolderID', 0)->map('ID', 'Title')->toArray());
             $response['data'][]=array(
                                     'id'=>$lang->ID,
                                     'language'=>$lang->Name,
@@ -909,6 +909,62 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
+        
+        
+        return $response;
+    }
+    
+    /**
+     * Deletes a folder
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Standard response base
+     */
+    public function moveSnippet($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        //Ensure logged in
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            $response['status']='EROR';
+            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
+            
+            return $response;
+        }
+        
+        
+        $snippet=Snippet::get()->byID(intval($data->id));
+        if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+            $response['status']="EROR";
+            $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
+            return $response;
+        }
+        
+        
+        if($data->folderID!=0) {
+            $snippetFolder=SnippetFolder::get()->byID(intval($data->folderID));
+            if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+                $response['status']="EROR";
+                $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
+                return $response;
+            }
+            
+            if($snippetFolder->LanguageID!=$snippet->LanguageID) {
+                $response['status']="EROR";
+                $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_SAME', '_Folder is not in the same language as the snippet');
+                return $response;
+            }
+        }
+        
+        
+        //try {
+            $snippet->FolderID=$data->folderID;
+            $snippet->write();
+            
+            
+            $response['status']="HELO";
+        /*}catch(Exception $e) {
+            $response['status']="EROR";
+            $response['message']="Internal Server error occured";
+        }*/
         
         
         return $response;
