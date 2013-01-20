@@ -77,10 +77,10 @@ class SnippetFolder extends DataObject {
         parent::onBeforeDelete();
         
         //Remove all Snippets from this folder
-        DB::query('UPDATE "Snippet" SET "FolderID"=0 WHERE "FolderID"='.$this->ID);
+        DB::query('UPDATE "Snippet" SET "FolderID"='.$this->ParentID.' WHERE "FolderID"='.$this->ID);
         
         //Remove all Snippet Folders from this folder
-        DB::query('UPDATE "SnippetFolder" SET "ParentID"=0 WHERE "ParentID"='.$this->ID);
+        DB::query('UPDATE "SnippetFolder" SET "ParentID"='.$this->ParentID.' WHERE "ParentID"='.$this->ID);
     }
 }
 ?>
