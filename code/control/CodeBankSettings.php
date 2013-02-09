@@ -55,17 +55,26 @@ class CodeBankSettings extends CodeBank {
 		$form->addExtraClass('root-form');
 		$form->addExtraClass('cms-edit-form cms-panel-padded center');
 		// don't add data-pjax-fragment=CurrentForm, its added in the content template instead
-
+		
 		$form->setHTMLID('Form_EditForm');
 		$form->loadDataFrom($config);
 		$form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
-
+		
 		// Use <button> to allow full jQuery UI styling
 		$actions = $actions->dataFields();
 		if($actions) foreach($actions as $action) $action->setUseButtonTag(true);
-
+		
 		$this->extend('updateEditForm', $form);
-
+		
+		
+		//Display message telling user to run dev/build because the version numbers are out of sync
+		if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+		    $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+		}else if($this->hasOldTables()) {
+		    $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+		}
+		
+		
 		return $form;
 	}
 	

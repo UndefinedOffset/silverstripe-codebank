@@ -92,6 +92,14 @@ class CodeBankEditSnippet extends CodeBank {
             $this->extend('updateEditForm', $form);
             
             
+            //Display message telling user to run dev/build because the version numbers are out of sync
+            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+                $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+            }else if($this->hasOldTables()) {
+                $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+            }
+            
+            
             Requirements::javascript(CB_DIR.'/javascript/CodeBank.EditForm.js');
             
             return $form;
@@ -100,6 +108,14 @@ class CodeBankEditSnippet extends CodeBank {
         $form=$this->EmptyForm();
         if(Session::get('CodeBank.deletedSnippetID')) {
             $form->Fields()->push(new HiddenField('ID', 'ID', Session::get('CodeBank.deletedSnippetID')));
+        }
+        
+        
+        //Display message telling user to run dev/build because the version numbers are out of sync
+        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+        }else if($this->hasOldTables()) {
+            $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
         }
         
         

@@ -242,8 +242,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             //Display message telling user to run dev/build because the version numbers are out of sync
             if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
                 $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+            }else if($this->hasOldTables()) {
+                $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
             }
-            
             
             return $form;
         }else if($id) {
@@ -269,6 +270,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         //Display message telling user to run dev/build because the version numbers are out of sync
         if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
             $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+        }else if($this->hasOldTables()) {
+            $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
         }
         
         
@@ -1099,6 +1102,23 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         return array(
                     'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
                 );
+    }
+    
+    /**
+     * Tests to see if the old tables exist
+     * @return {bool} Returns boolean true if the old tables are detected and the migration file is not detected
+     */
+    protected function hasOldTables() {
+        if(!file_exists(ASSETS_PATH.'/.codeBankMigrated')) {
+            $tables=DB::tableList();
+            if(array_key_exists('snippits', $tables) && array_key_exists('snippit_search', $tables)) {
+                return true;
+            }else {
+                touch(ASSETS_PATH.'/.codeBankMigrated');
+            }
+        }
+        
+        return false;
     }
 }
 
