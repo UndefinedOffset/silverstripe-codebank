@@ -144,7 +144,7 @@ en:
         FOLDER_NOT_LANGUAGE: "Folder is not in the same language as the snippet"
     CodeBankLegacyMigrate:
         TITLE: "Legacy Code Bank Migration"
-        DESCIPTION: "Migrates a Code Bank 2.2 Database to the new system, please run this only once when migrating from a 2.2 install of Code Bank"
+        DESCRIPTION: "Migrates a Code Bank 2.2 Database to the new system, please run this only once when migrating from a 2.2 install of Code Bank"
         TABLES_NOT_FOUND: "Could not find Code Bank 2.2 database tables, cannot migrate"
         SNIPPETS_PRESENT: "Already appears to be snippets present in the database, please start with a clean database, cannot migrate."
         OTHER_NOT_FOUND: "Could not find the Other Language, cannot migrate, please run dev/build first"
