@@ -45,6 +45,7 @@ class CodeBankIPAgreement extends CodeBank {
         $fields=new FieldList(
                             new TabSet('Root',
                                             new Tab('Main',
+                                                        new HeaderField('IPMessageTitle', _t('CodeBank.IP_MESSAGE_TITLE', '_You must agree to the following terms before using Code Bank'), 2),
                                                         new LiteralField('IPMessage', '<div class="ipMessage"><div class="middleColumn">'.CodeBankConfig::CurrentConfig()->IPMessage.'</div></div>'),
                                                         new HiddenField('RedirectLink', 'RedirectLink', $sng->Link())
                                                     )
