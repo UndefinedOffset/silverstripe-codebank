@@ -30,11 +30,10 @@
         <get src="http://www.silverstripe.org/${resultStable}" dest="cache/silverstripe-3.0.tar.gz" verbose="true"/>
         
         <untar src="cache/silverstripe-3.0.tar.gz" dest="./../../" compression="gzip">
-            <patternset>
-                <exclude name="mysite"/>
-                <exclude name="mysite/*"/>
-                <exclude name="themes"/>
-                <exclude name="themes/*"/>
+            <patternset><!-- @TODO Fix so that it only includes framework -->
+                <include name="**/framework"/>
+                <include name="**/framework/*"/>
+                <include name="**/framework/**"/>
             </patternset>
             <cutdirsmapper dirs="1"/>
         </untar>
