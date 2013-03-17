@@ -20,7 +20,8 @@ class SnippetPackage extends DataObject {
                                             new Tab('Main', _t('SnippetPackage.MAIN', '_Main'),
                                                             new TextField('Title', _t('SnippetPackage.TITLE', '_Title'), null, 300)
                                                         )
-                                        )
+                                        ),
+                            new HiddenField('ID', 'ID')
                         );
         
         if($this->ID==0) {

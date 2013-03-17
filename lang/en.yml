@@ -76,13 +76,6 @@ en:
         TITLE: "Add Snippet"
     CodeBankMember:
         USE_HEARTBEAT: "Use Code Bank Heartbeat to keep client session alive?"
-    CodeBankPackages:
-        MENUTITLE: "Snippet Packages"
-        ADD_NEW_PACKAGE: "Add New Package"
-        PACKAGE_DELETED: "Snippet Package has been deleted"
-        PACKAGE_SAVED: "Snippet Package has been saved"
-        PACKAGE_CREATED: "Snippet Package has been created"
-        EXPORT: "Export"
     Snippet:
         SINGULARNAME: "Snippet"
         PLURALNAME: "Snippets"
@@ -164,3 +157,5 @@ en:
         CREATE: "Create"
         ADD_NEW: "Add New"
         TITLE: "Title"
+    ExportPackageButton:
+        EXPORT_PACKAGE: "Export Package"

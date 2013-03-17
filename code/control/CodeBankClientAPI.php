@@ -2,6 +2,7 @@
 class CodeBank_ClientAPI extends Controller {
     public static $allowed_actions=array(
                                         'index',
+                                        'export_package',
                                         'export_snippet',
                                         'export_to_client'
                                     );
@@ -169,6 +170,101 @@ class CodeBank_ClientAPI extends Controller {
         
         //Send File
         SS_HTTPRequest::send_file(json_encode($response), date('Y-m-d_hi').'.cbexport', 'application/json')->output();
+        
+        
+        //Save session and exit
+        Session::save();
+        exit;
+    }
+    
+    /**
+     * Handles exporting of snippets
+     * @param {SS_HTTPRequest} $request HTTP Request Data
+     */
+    public function export_package(SS_HTTPRequest $request) {
+        if($request->getVar('s')) {
+            //Use the session id in the request
+            Session::start($request->getVar('s'));
+        }
+        
+        
+        if(!Permission::check('CODE_BANK_ACCESS')) {
+            header("HTTP/1.1 401 Unauthorized");
+            
+            
+            //Save session and exit
+            Session::save();
+            exit;
+        }
+        
+        
+        try {
+            $package=SnippetPackage::get()->byID(intval($request->getVar('id')));
+            if(empty($package) || $package===false || $package->ID==0) {
+                header("HTTP/1.1 404 Not Found");
+                
+                
+                //Save session and exit
+                Session::save();
+                exit;
+            }
+            
+            
+            $urlFilter=URLSegmentFilter::create();
+            $fileID=$urlFilter->filter($package->Title);
+            
+            
+            //If the temp dir doesn't exist create it
+            if(!file_exists(ASSETS_PATH.'/.codeBankTemp')) {
+                mkdir(ASSETS_PATH.'/.codeBankTemp', 0644);
+            }
+            
+            
+            $zip=new ZipArchive();
+            $res=$zip->open(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip', ZIPARCHIVE::CREATE);
+            
+            if($res) {
+                $snippets=$package->Snippets();
+                
+                foreach($snippets as $snippet) {
+                    $snipFileID=$urlFilter->filter($snippet->Title);
+                    
+                    if($snippet->Language()->Name=='ActionScript 3') {
+                        $path='';
+                        $text=preg_split("/[\n\r]/", $snippet->getSnippetText());
+                        $folder=str_replace('.', '/', trim(preg_replace('/^package (.*?)((\s*)\{)?$/i', '\\1', $text[0])));
+                        
+                        $className=array_values(preg_grep('/(\s*|\t*)public(\s+)class(\s+)(.*?)(\s*)((extends|implements)(.*?)(\s*))*\{/i', $text));
+                        
+                        if(count($className)==0) {
+                            throw new Exception('Class definition could not be found');
+                        }
+                        
+                        $className=trim(preg_replace('/(\s*|\t*)public(\s+)class(\s+)(.*?)(\s*)((extends|implements)(.*?)(\s*))*\{/i','\\4', $className[0]));
+                        
+                        if($className=="") {
+                            throw new Exception('Class definition could not be found');
+                        }
+                        
+                        $zip->addFromString($folder.'/'.$className.'.'.$snippet->Language()->FileExtension, $snippet->getSnippetText());
+                    }else {
+                        $zip->addFromString($snipFileID.'.'.$snippet->Language()->FileExtension, $snippet->getSnippetText());
+                    }
+                }
+                
+                $zip->Close();
+                chmod(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip',0600);
+                
+                
+                //Send File
+                SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
+                unlink(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip');
+            }else {
+                header("HTTP/1.1 500 Internal Server Error");
+            }
+        }catch (Exception $e) {
+            header("HTTP/1.1 500 Internal Server Error");
+        }
         
         
         //Save session and exit

@@ -134,6 +134,14 @@ class CodeBankConfig extends DataObject {
                                                                                             'UserLanguage'=>'Boolean->Nice'
                                                                                         ));
         
+        $packageGridConfig=GridFieldConfig_RecordEditor::create(30);
+        $packageGridConfig->addComponent(new ExportPackageButton());
+        $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemEditFormCallback(function(Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
+                                                                                                    Requirements::javascript(CB_DIR.'/javascript/SnippetPackages.ItemEditForm.js');
+                                                                                                    
+                                                                                                    $form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
+                                                                                                    $form->addExtraClass('CodeBankPackages');
+                                                                                                });
         
         return new FieldList(
                             new TabSet('Root',
@@ -144,7 +152,7 @@ class CodeBankConfig extends DataObject {
                                                     new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), $langGridConfig)
                                                 ),
                                             new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
-                                                    new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), GridFieldConfig_RecordEditor::create(30))
+                                                    new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), $packageGridConfig)
                                                 )
                                         )
                         );

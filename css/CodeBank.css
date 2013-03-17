@@ -141,3 +141,7 @@
     
     text-align: center;
 }
+
+.cms table.ss-gridfield-table tbody td a.cb-export-link {
+    background-image: url(./../images/box-arrow.png);
+}

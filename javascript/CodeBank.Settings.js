@@ -33,5 +33,13 @@
                 return false;
             }
         });
+        
+        //Export Package Button
+        $('.CodeBankSettings table.ss-gridfield-table tbody td .cb-export-link').entwine({
+            onclick: function(e) {
+                //Kill the event but allow the default action
+                e.stopPropagation();
+            }
+        });
     });
 })(jQuery);
