@@ -14,11 +14,6 @@
 						<%t CodeBank.SNIPPETS "_Snippets" %>
 					</a>
 				</li>
-                <li<% if $class == 'CodeBankPackages' %> class="ui-tabs-active"<% end_if %>>
-                    <a href="$LinkPackages" class="cms-panel-link" data-href="$LinkPackages">
-                        <%t CodeBank.PACKAGES "_Packages" %>
-                    </a>
-                </li>
 				<li<% if $class=='CodeBankSettings' %> class="ui-tabs-active"<% end_if %>>
 					<a href="$LinkSettings" class="cms-panel-link" data-href="$LinkSettings">
 						<%t CodeBank.SETTINGS "_Settings" %>

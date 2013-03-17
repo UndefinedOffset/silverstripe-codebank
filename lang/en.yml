@@ -64,6 +64,7 @@ en:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
         LANGUAGES: "Languages"
+        MANAGE_PACKAGES: "Manage Packages"
     CodeBankSettings:
         MENUTITLE: "Code Bank Settings"
     CodeBankIPAgreement:
@@ -159,3 +160,7 @@ en:
         MIGRATE_SNIPPETS: "Migrating Snippets"
         NO_SNIPPETS_FOUND: "No snippets found"
         MIGRATION_COMPLETE: "Migration Completed"
+    PackageSelectionField:
+        CREATE: "Create"
+        ADD_NEW: "Add New"
+        TITLE: "Title"

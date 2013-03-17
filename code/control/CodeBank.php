@@ -500,25 +500,6 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
-     * Returns the link to packages
-     * @return {string} Link to packages
-     */
-    public function getLinkPackages() {
-        if($this->urlParams['Action']=='add' && $this->class=='CodeBankPackages') {
-            return $this->LinkWithSearch($this->Link('add'));
-        }else if($this->currentPageID()!=0 && $this->class=='CodeBankPackages') {
-            $otherID=null;
-            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
-                $otherID=intval($this->urlParams['OtherID']);
-            }
-            
-            return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID(), $otherID));
-        }
-        
-        return $this->LinkWithSearch('admin/codeBank/packages');
-    }
-    
-    /**
      * Returns the link to settings
      * @return {string} Link to settings
      */

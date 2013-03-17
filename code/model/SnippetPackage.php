@@ -8,10 +8,6 @@ class SnippetPackage extends DataObject {
                                     'Snippets'=>'Snippet'
                                  );
     
-    public static $extensions=array(
-                                    'SnippetPackageHierachy'
-                                );
-    
     public static $default_sort='Title';
     
     /**
@@ -84,6 +80,13 @@ class SnippetPackage extends DataObject {
 	 */
 	public function hasSnippets() {
 	    return true;
+	}
+	
+	public function summaryFields() {
+	    return array(
+                    'Title'=>_t('SnippetPackage.TITLE', '_Title'),
+	                'Snippets.Count'=>_t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets')
+	            );
 	}
 }
 ?>

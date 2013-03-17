@@ -43,7 +43,7 @@ class Snippet extends DataObject {
                                     new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
-                                    new DropdownField('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'), null, null, _t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
+                                    new PackageSelectionField('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'), null, null, _t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
                                     TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
                                 )

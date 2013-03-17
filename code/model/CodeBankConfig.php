@@ -142,6 +142,9 @@ class CodeBankConfig extends DataObject {
                                                 ),
                                             new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),
                                                     new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), $langGridConfig)
+                                                ),
+                                            new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
+                                                    new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), GridFieldConfig_RecordEditor::create(30))
                                                 )
                                         )
                         );

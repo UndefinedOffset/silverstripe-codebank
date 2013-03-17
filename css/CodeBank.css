@@ -132,14 +132,6 @@
     background: url(./../images/database-import.png) no-repeat;
 }
 
-#cms-content-tools-CodeBankPackages .cms-actions-row {
-    height: 40px;
-}
-
-.CodeBankPackages .codebank-tree #record-0 ins, .CodeBankPackages .codebank-tree #record-0 strong {
-    display: none !important;
-}
-
 #Form_EditForm_IPMessageTitle {
     border-bottom: 1px solid rgba(201, 205, 206, 0.8);
     box-shadow: 0 1px 0 rgba(244, 245, 245, 0.8);
