@@ -156,6 +156,7 @@ en:
     PackageSelectionField:
         CREATE: "Create"
         ADD_NEW: "Add New"
+        MAIN: "Main"
         TITLE: "Title"
     ExportPackageButton:
         EXPORT_PACKAGE: "Export Package"

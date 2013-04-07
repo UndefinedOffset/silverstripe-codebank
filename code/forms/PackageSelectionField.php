@@ -42,7 +42,11 @@ class PackageSelectionField extends DropdownField {
         $sng=singleton('SnippetPackage');
         
         $fields=new FieldList(
-                            new TextField('Title', _t('PackageSelectionField.TITLE', '_Title'), null, 300)
+                            new TabSet('Root',
+                                    new Tab('Main', _t('PackageSelectionField.MAIN', '_Main'),
+                                            new TextField('Title', _t('PackageSelectionField.TITLE', '_Title'), null, 300)
+                                        )
+                                )
                         );
         
         $actions=new FieldList(
