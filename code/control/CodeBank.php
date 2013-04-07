@@ -97,6 +97,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $params=array(
                     'q'=>(array)$this->request->getVar('q'),
                     'tag'=>$this->request->getVar('tag'),
+                    'creator'=>$this->request->getVar('creator'),
                     'ParentID'=>$this->request->getVar('ParentID')
                 );
         
@@ -197,7 +198,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), $package, $record->ID));
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
             $fields->replaceField('Tags', new TagsViewField('Tags', _t('Snippet.TAGS_COLUMN', '_Tags')));
-            $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', $creator=ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? '<a href="'.$this->Link().'?creator='.$record->CreatorID.'">'.$record->Creator()->Name.'</a>':null))->setForm($form));
+            $creator->dontEscape=true;
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
             $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditorName', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
@@ -370,7 +372,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {bool}
      */
     public function TreeIsFiltered() {
-        return ($this->request->getVar('q') || $this->request->getVar('tag'));
+        return ($this->request->getVar('q') || $this->request->getVar('tag') || $this->request->getVar('creator'));
     }
     
     /**
@@ -395,6 +397,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     public function getSiteTreeFor($className, $rootID=null, $childrenMethod=null, $numChildrenMethod=null, $filterFunction=null, $minNodeCount=30) {
         // Filter criteria
         $params=$this->request->getVar('q');
+        $tag=$this->request->getVar('tag');
+        $creator=$this->request->getVar('creator');
         if($params) {
             $filterClass=CodeBank::$filter_class;
             if($filterClass!='SnippetTreeFilter' && !is_subclass_of($filterClass, 'SnippetTreeFilter')) {
@@ -402,14 +406,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
             
             $filter=new $filterClass($params);
+        }else if($tag && !empty($tag)) {
+            $filter=new SnippetTreeTagFilter($tag);
+        }else if($creator && intval($creator)>0) {
+            $filter=new SnippetTreeCreatorFilter($creator);
         }else {
             $filter=null;
-        }
-        
-        
-        $tag=$this->request->getVar('tag');
-        if($tag && !empty($tag)) {
-            $filter=new SnippetTreeTagFilter($tag);
         }
         
         

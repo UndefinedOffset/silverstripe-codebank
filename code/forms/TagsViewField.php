@@ -8,7 +8,7 @@ class TagsViewField extends ReadonlyField {
 		        $val[$key]='<a href="'.$this->form->Controller()->Link().'?tag='.rawurlencode($value).'">'.$value.'</a>';
 		    }
 		    
-		    return implode(',', $val);
+		    return implode(', ', $val);
 		}else {
 		    return '<i>('._t('FormField.NONE', 'none').')</i>';
 		}
