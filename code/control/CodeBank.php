@@ -96,6 +96,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         // Whitelist to avoid side effects
         $params=array(
                     'q'=>(array)$this->request->getVar('q'),
+                    'tag'=>$this->request->getVar('tag'),
                     'ParentID'=>$this->request->getVar('ParentID')
                 );
         
@@ -195,6 +196,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), $package, $record->ID));
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
+            $fields->replaceField('Tags', new TagsViewField('Tags', _t('Snippet.TAGS_COLUMN', '_Tags')));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? $record->Creator()->Name:null))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
             $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
@@ -368,7 +370,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {bool}
      */
     public function TreeIsFiltered() {
-        return $this->request->getVar('q');
+        return ($this->request->getVar('q') || $this->request->getVar('tag'));
     }
     
     /**
@@ -402,6 +404,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $filter=new $filterClass($params);
         }else {
             $filter=null;
+        }
+        
+        
+        $tag=$this->request->getVar('tag');
+        if($tag && !empty($tag)) {
+            $filter=new SnippetTreeTagFilter($tag);
         }
         
         
