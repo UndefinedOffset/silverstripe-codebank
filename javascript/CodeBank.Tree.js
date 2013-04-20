@@ -126,7 +126,7 @@
                                                                 menuitems['delete']={
                                                                         'label': ss.i18n._t('CodeBankTree.DELETE', '_Delete'),
                                                                         'action': function(node) {
-                                                                            if(confirm(ss.i18n.sprintf(ss.i18n._t('CodeBankTree.CONFIRM_FOLDER_DELETE', '_Are you sure you want to delete the folder "%s"?'), jQuery.trim(node.text())))) {
+                                                                            if(confirm(ss.i18n.sprintf(ss.i18n._t('CodeBankTree.CONFIRM_FOLDER_DELETE', '_Are you sure you want to delete the folder "%s"?'), jQuery.trim(node.find('span.item:first').text())))) {
                                                                                 $.ajax({
                                                                                     url: ss.i18n.sprintf(self.data('urlDeletefolder'), node.data('id')),
                                                                                     success: function(data) {
