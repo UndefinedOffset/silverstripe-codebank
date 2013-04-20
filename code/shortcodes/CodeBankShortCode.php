@@ -41,16 +41,17 @@ class CodeBankShortCode {
         Requirements::javascript(THIRDPARTY_DIR.'/jquery/jquery.js');
         Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/shCore.js');
         Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.self::getBrushName($snippet->Language()->HighlightCode).'.js');
-        Requirements::javascriptTemplate(CB_DIR.'/javascript/CodeBankShortCode.template.js', array('ID'=>$snippet->ID), 'snippet-highlightinit-'.$snippet-ID);
+        Requirements::javascriptTemplate(CB_DIR.'/javascript/CodeBankShortCode.template.js', array('ID'=>$snippet->ID), 'snippet-highlightinit-'.$snippet->ID);
         
         
         //Render the snippet
-        return $this->renderWith('CodeBankShortCode', array(
+        $obj=new ViewableData();
+        return $obj->renderWith('CodeBankShortCode', array(
                                                             'ID'=>$snippet->ID,
                                                             'Title'=>$snippet->getField('Title'),
                                                             'Description'=>$snippet->getField('Description'),
                                                             'SnippetText'=>DBField::create_field('Text', $snippetText),
-                                                            'HighlightCode'=>$snippet->Language()->HighlightCode
+                                                            'HighlightCode'=>strtolower($snippet->Language()->HighlightCode)
                                                         ));
     }
     
