@@ -142,6 +142,10 @@
     text-align: center;
 }
 
+.CodeBank #Form_SearchForm {
+    width: 100%;
+}
+
 .cms table.ss-gridfield-table tbody td a.cb-export-link {
     background-image: url(./../images/box-arrow.png);
 }
