@@ -1,15 +1,15 @@
 <?php
 class CodeBankIPAgreement extends CodeBank {
-    public static $url_segment='codeBank/agreement';
-    public static $url_rule='/$Action/$ID/$OtherID';
-    public static $url_priority=64;
-    public static $session_namespace='CodeBankIPAgreement';
+    private static $url_segment='codeBank/agreement';
+    private static $url_rule='/$Action/$ID/$OtherID';
+    private static $url_priority=64;
+    private static $session_namespace='CodeBankIPAgreement';
     
-    public static $required_permission_codes=array(
+    private static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
                                                 );
     
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'EditForm'
                                     );
     

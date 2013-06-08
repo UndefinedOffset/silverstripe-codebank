@@ -1,10 +1,10 @@
 <?php
 class CodeBankMember extends DataExtension {
-    public static $db=array(
+    private static $db=array(
                             'UseHeartbeat'=>'Boolean'
                          );
     
-    public static $defaults=array(
+    private static $defaults=array(
                                     'UseHeartbeat'=>false
                                 );
     

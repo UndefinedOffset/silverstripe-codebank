@@ -1,14 +1,14 @@
 <?php
 class SnippetPackage extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'Title'=>'Varchar(300)'
                          );
     
-    public static $has_many=array(
+    private static $has_many=array(
                                     'Snippets'=>'Snippet'
                                  );
     
-    public static $default_sort='Title';
+    private static $default_sort='Title';
     
     /**
      * Gets fields used in the cms

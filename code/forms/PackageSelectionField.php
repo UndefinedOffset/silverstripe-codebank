@@ -4,7 +4,7 @@ class PackageSelectionField extends DropdownField {
                                 'dropdown'
                             );
     
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'Field',
                                         'addPackage',
                                         'AddPackageForm',

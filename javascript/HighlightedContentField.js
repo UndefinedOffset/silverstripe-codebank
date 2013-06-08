@@ -34,7 +34,7 @@
             },
             
             fromWindow: {
-                onresize: function(){
+                onresize: function() {
                     this._super();
                     
                     this.redraw();

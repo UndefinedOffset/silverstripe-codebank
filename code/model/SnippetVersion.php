@@ -1,14 +1,14 @@
 <?php
 class SnippetVersion extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'Text'=>'Text'
                          );
     
-    public static $has_one=array(
+    private static $has_one=array(
                                 'Parent'=>'Snippet'
                              );
     
-    public static $default_sort='Created DESC';
+    private static $default_sort='Created DESC';
     
     /**
      * Checks to see if the given member can create this object or not

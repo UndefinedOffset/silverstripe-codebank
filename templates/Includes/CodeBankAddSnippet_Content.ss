@@ -3,11 +3,9 @@
         <form $FormAttributes data-layout-type="border">
             <div class="cms-content-header north">
                 <div class="cms-content-header-info">
-                    <h2>
-                        <% with $Top %>
-                            <% include CMSBreadcrumbs %>
-                        <% end_with %>
-                    </h2>
+                    <% with $Top %>
+                        <% include CMSBreadcrumbs %>
+                    <% end_with %>
                 </div>
             </div>
     

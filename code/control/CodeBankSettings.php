@@ -1,15 +1,15 @@
 <?php
 class CodeBankSettings extends CodeBank {
-    public static $url_segment='codeBank/settings';
-    public static $url_rule='/$Action/$ID/$OtherID';
-    public static $url_priority=63;
-    public static $session_namespace='CodeBankSettings';
+    private static $url_segment='codeBank/settings';
+    private static $url_rule='/$Action/$ID/$OtherID';
+    private static $url_priority=63;
+    private static $session_namespace='CodeBankSettings';
     
-    public static $required_permission_codes=array(
+    private static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
                                                 );
     
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'EditForm',
                                         'import_from_client',
                                         'ImportFromClientForm',

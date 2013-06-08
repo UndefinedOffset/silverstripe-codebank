@@ -1,6 +1,6 @@
 <?php
 class CodeBankConfig extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'IPMessage'=>'HTMLText',
                             'Version'=>'Varchar(30)'
                          );

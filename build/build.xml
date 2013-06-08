@@ -10,26 +10,28 @@
     
     <target name="updateSilverStripe">
         <delete file="cache/stable-download.html"/>
-        <delete file="silverstripe-3.0.tar.gz"/>
+        <delete file="silverstripe-3.1.tar.gz"/>
         
-        <!-- Fetch 3.0 -->
-        <get src="http://www.silverstripe.org/stable-download/" dest="cache/stable-download.html" verbose="true"/>
+        <!-- Fetch 3.1 -->
+        <!-- <get src="http://www.silverstripe.org/stable-download/" dest="cache/stable-download.html" verbose="true"/> -->
+        <get src="http://www.silverstripe.org/pre-releases/" dest="cache/stable-download.html" verbose="true"/>
         
         <loadfile srcFile="cache/stable-download.html" property="resultStable">
             <filterchain>
                 <linecontains>
-                    <contains value="assets/releases/SilverStripe-framework-v3.0"/>
+                    <contains value="assets/releases/SilverStripe-framework-v3.1"/>
                     <contains value=".tar.gz"/>
                 </linecontains>
                 <tokenfilter>
-                    <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/>
+                    <!-- <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/> -->
+                    <replaceregex pattern="(\s*)(.*)&lt;a id=&quot;new-release-framework&quot; class=&quot;tracklink&quot; style=&quot;font-size: 10px;&quot; href=&quot;(.*)&quot;&gt;Download(.*)" replace="\3"/>
                 </tokenfilter>
             </filterchain>
         </loadfile>
         
-        <get src="http://www.silverstripe.org/${resultStable}" dest="cache/silverstripe-3.0.tar.gz" verbose="true"/>
+        <get src="http://www.silverstripe.org/${resultStable}" dest="cache/silverstripe-3.1.tar.gz" verbose="true"/>
         
-        <untar src="cache/silverstripe-3.0.tar.gz" dest="./../../" compression="gzip">
+        <untar src="cache/silverstripe-3.1.tar.gz" dest="./../../" compression="gzip">
             <patternset><!-- @TODO Fix so that it only includes framework -->
                 <include name="**/framework"/>
                 <include name="**/framework/*"/>

@@ -1,34 +1,34 @@
 <?php
 class SnippetLanguage extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'Name'=>'Varchar(100)',
                             'FileExtension'=>'Varchar(45)',
                             'HighlightCode'=>'Varchar(45)',
                             'UserLanguage'=>'Boolean'
                          );
     
-    public static $has_many=array(
+    private static $has_many=array(
                                 'Snippets'=>'Snippet.Language',
                                 'Folders'=>'SnippetFolder'
                             );
     
-    public static $defaults=array(
+    private static $defaults=array(
                                 'HighlightCode'=>'Plain',
                                 'UserLanguage'=>true
                             );
     
-    public static $extensions=array(
+    private static $extensions=array(
                                     'SnippetHierarchy'
                                 );
     
-    public static $default_sort='Name';
+    private static $default_sort='Name';
     
-    public static $allowed_children=array(
+    private static $allowed_children=array(
                                         'Snippet',
                                         'SnippetFolder'
                                     );
     
-    public static $default_child='Snippet';
+    private static $default_child='Snippet';
     
     private $defaultLanguages=array(
                                     'Flex 3'=>array('Extension'=>'mxml', 'HighlightCode'=>'Flex'),
@@ -199,6 +199,39 @@ class SnippetLanguage extends DataObject {
 	                'Name'=>_t('SnippetLanguage.NAME', '_Name'),
 	                'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language')
 	            );
+	}
+	
+	/**
+	 * Returns an array of the class names of classes that are allowed to be children of this class.
+	 * @return {array} Array of children
+	 */
+	public function allowedChildren() {
+		$allowedChildren = array();
+		$candidates = $this->stat('allowed_children');
+		if($candidates && $candidates != "none") {
+			foreach($candidates as $candidate) {
+				// If a classname is prefixed by "*", such as "*Page", then only that
+				// class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
+				if(substr($candidate,0,1) == '*') {
+					$allowedChildren[] = substr($candidate,1);
+				} else {
+					$subclasses = ClassInfo::subclassesFor($candidate);
+					foreach($subclasses as $subclass) {
+						$allowedChildren[] = $subclass;
+					}
+				}
+			}
+		}
+		
+		return $allowedChildren;
+	}
+	
+	/**
+	 * Returns the default child for this class
+	 * @return {string} Class name of the default child
+	 */
+	public function default_child() {
+		return $this->stat('default_child');
 	}
 }
 ?>

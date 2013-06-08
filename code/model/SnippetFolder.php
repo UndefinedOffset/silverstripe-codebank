@@ -1,30 +1,30 @@
 <?php
 class SnippetFolder extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'Name'=>'Varchar(150)'
                          );
     
-    public static $has_one=array(
+    private static $has_one=array(
                                 'Language'=>'SnippetLanguage',
                                 'Parent'=>'SnippetFolder'
                              );
     
-    public static $has_many=array(
+    private static $has_many=array(
                                 'Snippets'=>'Snippet.Folder',
                                 'Folders'=>'SnippetFolder.Parent'
                              );
     
-    public static $extensions=array(
+    private static $extensions=array(
                                     'SnippetHierarchy'
                                 );
     
-    public static $allowed_children=array(
+    private static $allowed_children=array(
                                         'Snippet',
                                         'SnippetFolder'
                                     );
     
-    public static $default_child='Snippet';
-    public static $default_parent='SnippetLanguage';
+    private static $default_child='Snippet';
+    private static $default_parent='SnippetLanguage';
     
     
     /**
@@ -82,5 +82,38 @@ class SnippetFolder extends DataObject {
         //Remove all Snippet Folders from this folder
         DB::query('UPDATE "SnippetFolder" SET "ParentID"='.$this->ParentID.' WHERE "ParentID"='.$this->ID);
     }
+	
+	/**
+	 * Returns an array of the class names of classes that are allowed to be children of this class.
+	 * @return {array} Array of children
+	 */
+	public function allowedChildren() {
+		$allowedChildren = array();
+		$candidates = $this->stat('allowed_children');
+		if($candidates && $candidates != "none") {
+			foreach($candidates as $candidate) {
+				// If a classname is prefixed by "*", such as "*Page", then only that
+				// class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
+				if(substr($candidate,0,1) == '*') {
+					$allowedChildren[] = substr($candidate,1);
+				} else {
+					$subclasses = ClassInfo::subclassesFor($candidate);
+					foreach($subclasses as $subclass) {
+						$allowedChildren[] = $subclass;
+					}
+				}
+			}
+		}
+		
+		return $allowedChildren;
+	}
+	
+	/**
+	 * Returns the default child for this class
+	 * @return {string} Class name of the default child
+	 */
+	public function default_child() {
+		return $this->stat('default_child');
+	}
 }
 ?>

@@ -1,15 +1,15 @@
 <?php
 class CodeBankAddSnippet extends CodeBankEditSnippet {
-    public static $url_segment='codeBank/add';
-    public static $url_rule='/$Action/$ID/$OtherID';
-    public static $url_priority=62;
-    public static $session_namespace='CodeBankAddSnippet';
+    private static $url_segment='codeBank/add';
+    private static $url_rule='/$Action/$ID/$OtherID';
+    private static $url_priority=62;
+    private static $session_namespace='CodeBankAddSnippet';
     
-    public static $required_permission_codes=array(
+    private static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
                                                 );
     
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'AddForm',
                                         'doAdd'
                                     );

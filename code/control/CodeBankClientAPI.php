@@ -1,6 +1,6 @@
 <?php
 class CodeBank_ClientAPI extends Controller {
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'index',
                                         'export_package',
                                         'export_snippet',

@@ -59,10 +59,6 @@
     box-shadow: none;
 }
 
-.cms-container .CodeBank {
-    margin-left: -1px;
-}
-
 .cms-container .CodeBank .cms-edit-form {
     background: #e6eaed;
 }
@@ -140,10 +136,6 @@
     padding: 0 0 7px;
     
     text-align: center;
-}
-
-.CodeBank #Form_SearchForm {
-    width: 100%;
 }
 
 .cms table.ss-gridfield-table tbody td a.cb-export-link {

@@ -1,12 +1,12 @@
 <?php
 class Snippet extends DataObject {
-    public static $db=array(
+    private static $db=array(
                             'Title'=>'Varchar(300)',
                             'Description'=>'Varchar(600)',
                             'Tags'=>'Varchar(400)'
                          );
     
-    public static $has_one=array(
+    private static $has_one=array(
                                 'Language'=>'SnippetLanguage',
                                 'Creator'=>'Member',
                                 'LastEditor'=>'Member',
@@ -14,23 +14,23 @@ class Snippet extends DataObject {
                                 'Folder'=>'SnippetFolder'
                              );
     
-    public static $has_many=array(
+    private static $has_many=array(
                                 'Versions'=>'SnippetVersion'
                              );
     
-    public static $extensions=array(
+    private static $extensions=array(
                                     'SnippetHierarchy',
                                     "FulltextSearchable('Title,Description,Tags')"
                                 );
     
-    public static $default_sort='Title, ID';
+    private static $default_sort='Title, ID';
     
-    public static $create_table_options=array(
+    private static $create_table_options=array(
                                     		'MySQLDatabase'=>'ENGINE=MyISAM'
                                     	);
     
-    public static $allowed_children=array();
-    public static $default_child=null;
+    private static $allowed_children=array();
+    private static $default_child=null;
     
     /**
      * Gets fields used in the cms
@@ -40,10 +40,10 @@ class Snippet extends DataObject {
         $fields=new FieldList(
                             new TabSet('Root',
                                 new Tab('Main', _t('Snippet.MAIN', '_Main'),
-                                    new DropdownField('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'), null, null, '---'),
+                                    DropdownField::create('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'))->setEmptyString('---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
-                                    new PackageSelectionField('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'), null, null, _t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
+                                    PackageSelectionField::create('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'))->setEmptyString(_t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
                                     TextareaField::create('Text', _t('Snippet.CODE', '_Code'), $this->getSnippetText())->setRows(30)->addExtraClass('codeBankFullWidth')->addExtraClass('stacked'),
                                     TextareaField::create('Tags', _t('Snippet.TAGS', '_Tags (comma separate)'))->setRows(2)
                                 )
@@ -190,6 +190,39 @@ class Snippet extends DataObject {
 		$classes.=$this->markingClasses();
 
 		return $classes;
+	}
+	
+	/**
+	 * Returns an array of the class names of classes that are allowed to be children of this class.
+	 * @return {array} Array of children
+	 */
+	public function allowedChildren() {
+		$allowedChildren = array();
+		$candidates = $this->stat('allowed_children');
+		if($candidates && $candidates != "none") {
+			foreach($candidates as $candidate) {
+				// If a classname is prefixed by "*", such as "*Page", then only that
+				// class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
+				if(substr($candidate,0,1) == '*') {
+					$allowedChildren[] = substr($candidate,1);
+				} else {
+					$subclasses = ClassInfo::subclassesFor($candidate);
+					foreach($subclasses as $subclass) {
+						$allowedChildren[] = $subclass;
+					}
+				}
+			}
+		}
+		
+		return $allowedChildren;
+	}
+	
+	/**
+	 * Returns the default child for this class
+	 * @return {string} Class name of the default child
+	 */
+	public function default_child() {
+		return $this->stat('default_child');
 	}
 }
 ?>

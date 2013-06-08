@@ -1,16 +1,16 @@
 <?php
 class CodeBank extends LeftAndMain implements PermissionProvider {
-    public static $url_segment='codeBank';
-    public static $tree_class='SnippetLanguage';
-    public static $url_rule='/$Action/$ID/$OtherID';
-    public static $url_priority=59;
-    public static $filter_class='SnippetTreeFilter';
+    private static $url_segment='codeBank';
+    private static $tree_class='SnippetLanguage';
+    private static $url_rule='/$Action/$ID/$OtherID';
+    private static $url_priority=59;
+    private static $filter_class='SnippetTreeFilter';
     
-    public static $required_permission_codes=array(
+    private static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'
                                                 );
     
-    public static $allowed_actions=array(
+    private static $allowed_actions=array(
                                         'index',
                                         'tree',
                                         'EditForm',
@@ -27,7 +27,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'deleteFolder'
                                     );
     
-    public static $session_namespace='CodeBank';
+    private static $session_namespace='CodeBank';
     
     
     private $_folderAdded=false;
@@ -160,13 +160,17 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         if($record) {
             $fields->push($idField=new HiddenField("ID", false, $id));
+            $versions=$record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created');
             $actions=new FieldList(
                                     new FormAction('doCopy', _t('CodeBank.COPY', '_Copy')),
                                     new FormAction('doEditRedirect', _t('CodeBank.EDIT', '_Edit')),
                                     new FormAction('doExport', _t('CodeBank.EXPORT', '_Export')),
                                     new FormAction('doPrint', _t('CodeBank.PRINT', '_Print')),
                                     new LabelField('Revision', _t('CodeBank.REVISION', '_Revision').': '),
-                                    DropdownField::create('RevisionID', '', $record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created'), $this->urlParams['OtherID'], null, '{'._t('CodeBank.CURRENT_REVISION', '_Current Revision').'}')->setDisabled($record->Versions()->Count()<=1)->addExtraClass('no-change-track'),
+                                    DropdownField::create('RevisionID', '', $versions, $this->urlParams['OtherID'])
+                                                                                                                ->setEmptyString('{'._t('CodeBank.CURRENT_REVISION', '_Current Revision').'}')
+                                                                                                                ->setDisabled($record->Versions()->Count()<=1)
+                                                                                                                ->addExtraClass('no-change-track'),
                                     FormAction::create('compareRevision', _t('CodeBank.COMPARE_WITH_CURRENT', '_Compare with Current'))->setDisabled($record->Versions()->Count()<=1 || empty($this->urlParams['OtherID']) || !is_numeric($this->urlParams['OtherID']))
                                 );
             
@@ -724,7 +728,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 			$def['Root']['disallowedParents'] = array();
 
 			foreach($classes as $class) {
-				$allowedChildren = $class::$allowed_children;
+			    $sng=singleton($class);
+				$allowedChildren = $sng->allowedChildren();
 				
 				// SiteTree::allowedChildren() returns null rather than an empty array if SiteTree::allowed_chldren == 'none'
 				if($allowedChildren == null) $allowedChildren = array();
@@ -747,7 +752,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
 
 				$allowedChildren = array_keys(array_diff($classes, $allowedChildren));
 				if($allowedChildren) $def[$class]['disallowedChildren'] = $allowedChildren;
-				$defaultChild = $class::$default_child;
+				$defaultChild = $sng->default_child();
 				if($defaultChild != null) $def[$class]['defaultChild'] = $defaultChild;
 				if(isset($def[$class]['disallowedChildren'])) {
 					foreach($def[$class]['disallowedChildren'] as $disallowedChild) {
