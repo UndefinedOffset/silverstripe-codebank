@@ -33,7 +33,7 @@
                 
                 var extraClass='packageselection-addnewdialog';
                 
-                dialog.ssdialog({iframeUrl: this.data('url'), autoOpen: true, dialogExtraClass: extraClass, width: 600, height: 200});
+                dialog.ssdialog({iframeUrl: this.data('url'), autoOpen: true, dialogExtraClass: extraClass, width: 600, height: 200, maxWidth: 600, maxHeight: 200});
                 return false;
             }
         });

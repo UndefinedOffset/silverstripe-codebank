@@ -117,7 +117,8 @@ class CodeBankSettings extends CodeBank {
 	public function ImportFromClientForm() {
 	    $uploadField=new FileField('ImportFile', _t('CodeBank.EXPORT_FILE', '_Client Export File'));
 	    $uploadField->getValidator()->setAllowedExtensions(array('cbexport'));
-	    File::$allowed_extensions[]='cbexport';
+	    File::config()->allowed_extensions=array('cbexport');
+	    
 	    
 	    $fields=new FieldList(
 	                        new LiteralField('ImportWarning', '<p class="message warning">'._t('CodeBank.IMPORT_DATA_WARNING', '_Warning clicking import will erase all snippets in the database, it is recommended you backup your database before proceeding').'</p>'),

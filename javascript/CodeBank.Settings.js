@@ -26,7 +26,7 @@
                     $('body').append(dialog);
                 }
                 
-                dialog.ssdialog({iframeUrl: this.data('importurl'), autoOpen: true, dialogExtraClass: 'import-dialog', close: function(e, ui) {dialog.trigger('importDialogClosed');}});
+                dialog.ssdialog({iframeUrl: this.data('importurl'), autoOpen: true, dialogExtraClass: 'import-dialog', close: function(e, ui) {dialog.trigger('importDialogClosed');}, width: 400, height: 300, maxWidth: 670, maxHeight: 300});
                 
                 $(this).blur().focusout().removeClass('ui-state-hover ui-state-active');
                 e.stopPropagation();

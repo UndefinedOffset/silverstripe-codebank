@@ -80,7 +80,7 @@
                                                                                                                             $('body').append(dialog);
                                                                                                                         }
                                                                                                                         
-                                                                                                                        dialog.ssdialog({iframeUrl: ss.i18n.sprintf(self.data('urlAddfolder'), id, val.ssclass), autoOpen: true, width: 300, height: 200});
+                                                                                                                        dialog.ssdialog({iframeUrl: ss.i18n.sprintf(self.data('urlAddfolder'), id, val.ssclass), autoOpen: true, width: 300, height: 200, maxWidth: 670, maxHeight: 200});
                                                                                                                     }else {
                                                                                                                         $('.cms-container').entwine('.ss').loadPanel(ss.i18n.sprintf(self.data('urlAddsnippet'), id, val.ssclass));
                                                                                                                     }
@@ -119,7 +119,7 @@
                                                                                             $('body').append(dialog);
                                                                                         }
                                                                                         
-                                                                                        dialog.ssdialog({iframeUrl: ss.i18n.sprintf(self.data('urlRenamefolder'), node.data('id')), autoOpen: true, width: 300, height: 200});
+                                                                                        dialog.ssdialog({iframeUrl: ss.i18n.sprintf(self.data('urlRenamefolder'), node.data('id')), autoOpen: true, width: 300, height: 200, maxWidth: 670, maxHeight: 200});
                                                                                     }
                                                                                 };
                                                                 
