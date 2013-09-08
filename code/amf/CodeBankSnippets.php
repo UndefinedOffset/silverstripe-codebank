@@ -140,7 +140,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=Snippets::get()->filter('LanguageID', $lang->ID)->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            $snippets=Snippet::get()->filter('LanguageID', $lang->ID)->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
             if($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
