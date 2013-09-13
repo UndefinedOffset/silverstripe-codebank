@@ -24,7 +24,7 @@
                 </linecontains>
                 <tokenfilter>
                     <!-- <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/> -->
-                    <replaceregex pattern="(\s*)(.*)&lt;a id=&quot;new-release-framework&quot; class=&quot;tracklink&quot; style=&quot;font-size: 10px;&quot; href=&quot;(.*)&quot;&gt;Download(.*)" replace="\3"/>
+                    <replaceregex pattern="(\s*)(.*)&lt;a class=&quot;tracklink noicon&quot; href=&quot;(.*)&quot; onClick=&quot;(.*)&quot;(\s*)&gt;" replace="\3"/>
                 </tokenfilter>
             </filterchain>
         </loadfile>
