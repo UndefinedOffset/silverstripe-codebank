@@ -13,8 +13,7 @@
         <delete file="silverstripe-3.1.tar.gz"/>
         
         <!-- Fetch 3.1 -->
-        <!-- <get src="http://www.silverstripe.org/stable-download/" dest="cache/stable-download.html" verbose="true"/> -->
-        <get src="http://www.silverstripe.org/pre-releases/" dest="cache/stable-download.html" verbose="true"/>
+        <get src="http://www.silverstripe.org/stable-download/" dest="cache/stable-download.html" verbose="true"/>
         
         <loadfile srcFile="cache/stable-download.html" property="resultStable">
             <filterchain>
@@ -23,7 +22,6 @@
                     <contains value=".tar.gz"/>
                 </linecontains>
                 <tokenfilter>
-                    <!-- <replaceregex pattern="(\s*)&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/(.*)&quot; onClick=&quot;(\s*)_gaq.push\(\['_trackEvent', 'Downloads', 'Link', 'Framework'\]\);&quot;(\s*)&gt;" replace="\2"/> -->
                     <replaceregex pattern="(\s*)(.*)&lt;a class=&quot;tracklink noicon&quot; href=&quot;(.*)&quot; onClick=&quot;(.*)&quot;(\s*)&gt;" replace="\3"/>
                 </tokenfilter>
             </filterchain>
