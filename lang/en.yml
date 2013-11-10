@@ -60,6 +60,8 @@ en:
         FOLDER_EXISTS: "A folder already exists with that name"
         MIGRATION_AVAILABLE: "It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first."
         IP_MESSAGE_TITLE: "You must agree to the following terms before using Code Bank"
+        UNKNOWN_USER: "Unknown User"
+        CREATE: "Create"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"
@@ -149,6 +151,7 @@ en:
         NOT_FOUND: "None Found"
         MIGRATE_USERS: "Migrating Users"
         MEMBER_EXISTS: "WARNING: Member {username} already exists in the database, no changes have been made to this member. If you are unsure of the password please ask an administrator to have it reset or use the forgot password link"
+        DELETED_MEMBER_SKIP: "WARNING: Skipping deleted member {username}, deleted members in Code Bank 3 are not supported"
         NO_USERS_FOUND: "No users found, Code Bank 2.2 appears to have not been properly setup cannot continue with migration"
         MIGRATE_SNIPPETS: "Migrating Snippets"
         NO_SNIPPETS_FOUND: "No snippets found"

@@ -1,3 +1,20 @@
+.field.highlightedcontent .middleColumn {
+    width: 100%;
+}
+
 .field.highlightedcontent .middleColumn pre {
     display: none;
+}
+
+.field.highlightedcontent .middleColumn .syntaxhighlighter {
+    max-height: 600px;
+    
+    margin: 0 !important;
+    padding-bottom: 5px;
+}
+
+.field.highlightedcontent .syntaxhighlighter .gutter .line {
+    background-color: #F0F4F7 !important;
+    
+    border-right-color: #338CBF !important;
 }

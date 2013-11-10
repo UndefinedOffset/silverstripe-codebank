@@ -24,7 +24,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'renameFolder',
                                         'RenameFolderForm',
                                         'doRenameFolder',
-                                        'deleteFolder'
+                                        'deleteFolder',
+                                		'savetreenode',
+                                		'getsubtree',
+                                		'moveSnippet',
+                                        'updatetreenodes'
                                     );
     
     private static $session_namespace='CodeBank';
@@ -199,14 +203,15 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 $package=null;
             }
             
+            $fields->insertBefore($fields->dataFieldByName('Title'), 'LanguageID');
             $fields->replaceField('PackageID', new PackageViewField('PackageID', _t('Snippet.PACKAGE', '_Package'), $package, $record->ID));
             $fields->replaceField('Text', HighlightedContentField::create('SnippetText', _t('Snippet.CODE', '_Code'), $record->Language()->HighlightCode)->setForm($form));
             $fields->replaceField('Tags', new TagsViewField('Tags', _t('Snippet.TAGS_COLUMN', '_Tags')));
-            $fields->addFieldToTab('Root.Main', $creator=ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() ? '<a href="'.$this->Link().'?creator='.$record->CreatorID.'">'.$record->Creator()->Name.'</a>':null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', $creator=ReadonlyField::create('CreatorName', _t('CodeBank.CREATOR', '_Creator'), ($record->Creator() && $record->Creator()->ID>0 ? '<a href="'.$this->Link().'?creator='.$record->CreatorID.'">'.$record->Creator()->Name.'</a>':_t('CodeBank.UNKNOWN_USER', '_Unknown User')))->setForm($form));
             $creator->dontEscape=true;
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('LanguageName', _t('CodeBank.LANGUAGE', '_Language'), $record->Language()->Name)->setForm($form));
             $fields->addFieldToTab('Root.Main', DatetimeField_Readonly::create('LastModified', _t('CodeBank.LAST_MODIFIED', '_Last Modified'), $record->CurrentVersion->LastEdited)->setForm($form));
-            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditorName', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() ? $record->LastEditor()->Name:null))->setForm($form));
+            $fields->addFieldToTab('Root.Main', ReadonlyField::create('LastEditorName', _t('CodeBank.LAST_EDITED_BY', '_Last Edited By'), ($record->LastEditor() && $record->LastEditor()->ID>0 ? $record->LastEditor()->Name:_t('CodeBank.UNKNOWN_USER', '_Unknown User')))->setForm($form));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('SnippetID', _t('CodeBank.ID', '_ID'), $record->ID));
             $fields->addFieldToTab('Root.Main', ReadonlyField::create('CurrentVersionID', _t('CodeBank.VERSION', '_Version')));
             $fields->push(new HiddenField('ID', 'ID'));
@@ -229,7 +234,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                     $fields->dataFieldByName('CurrentVersionID')->setValue($version->ID);
                 }
                 
-                $form->setMessage(_t('CodeBank.NOT_CURRENT_VERSION', '_You are viewing a past version of this snippet\'s content, {linkopen}click here{linkclose} to view the current version', array('linkopen'=>'<a href="admin/codeBank/show/'.$record->ID.'">', 'linkclose'=>'</a>')), 'warning');
+                $form->Fields()->insertBefore(new LiteralField('NotCurrentVersion', '<p class="message warning">'._t('CodeBank.NOT_CURRENT_VERSION', '_You are viewing a past version of this snippet\'s content, {linkopen}click here{linkclose} to view the current version', array('linkopen'=>'<a href="admin/codeBank/show/'.$record->ID.'">', 'linkclose'=>'</a>')).'</p>'), 'Title');
             }
             
             
@@ -249,9 +254,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             //Display message telling user to run dev/build because the version numbers are out of sync
             if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
-                $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+                $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'Title');
             }else if($this->hasOldTables()) {
-                $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+                $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'Title');
             }
             
             return $form;
@@ -267,19 +272,27 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
             $form->addExtraClass('center '.$this->BaseCSSClasses());
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
+            
+            
+            //Display message telling user to run dev/build because the version numbers are out of sync
+            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+                $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'DoesntExist');
+            }else if($this->hasOldTables()) {
+                $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'DoesntExistLabel');
+            }
         }else {
             $form=$this->EmptyForm();
             if(Session::get('CodeBank.deletedSnippetID')) {
                 $form->Fields()->push(new HiddenField('ID', 'ID', Session::get('CodeBank.deletedSnippetID')));
             }
-        }
-        
-        
-        //Display message telling user to run dev/build because the version numbers are out of sync
-        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
-            $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
-        }else if($this->hasOldTables()) {
-            $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+            
+            
+            //Display message telling user to run dev/build because the version numbers are out of sync
+            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+                $form->Fields()->push(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'));
+            }else if($this->hasOldTables()) {
+                $form->Fields()->push(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'));
+            }
         }
         
         

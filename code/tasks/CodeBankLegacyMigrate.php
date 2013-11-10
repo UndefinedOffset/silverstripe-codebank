@@ -83,6 +83,11 @@ class CodeBankLegacyMigrate extends BuildTask {
         $results=DB::query('SELECT * FROM "users"');
         if($results->numRecords()>0) {
             foreach($results as $row) {
+                if($row['deleted']==true) {
+                    echo '<br/><i>'._t('CodeBankLegacyMigrate.DELETED_MEMBER_SKIP', '_WARNING: Skipping deleted member {username}, deleted members in Code Bank 3 are not supported', array('username'=>$row['username'])).'</i><br/>';
+                    continue;
+                }
+                
                 //Get user heartbeat preference
                 $useHeartbeat=DB::query('SELECT "value" FROM "preferences" WHERE "code"=\'heartbeat\' AND "fkUser"='.$row['id'])->value();
                 
@@ -98,7 +103,6 @@ class CodeBankLegacyMigrate extends BuildTask {
                     $member->Locale='en_US';
                     $member->DateFormat='MMM d, yyyy';
                     $member->TimeFormat='h:mm:ss a';
-                    $member->LockedOutUntil=($row['deleted']==true ? '2037-12-31 11:59:59':null);
                     $member->UseHeartbeat=intval($useHeartbeat);
                     $member->write();
                     
@@ -116,6 +120,9 @@ class CodeBankLegacyMigrate extends BuildTask {
                     if($row['username']!='admin') {
                         $member->addToGroupByCode('code-bank-api');
                     }
+                    
+                    $member->UseHeartbeat=intval($useHeartbeat);
+                    $member->write();
                     
                     echo '<br/><i>'._t('CodeBankLegacyMigrate.MEMBER_EXISTS', '_WARNING: Member {username} already exists in the database, no changes have been made to this member. If you are unsure of the password please ask an administrator to have it reset or use the forgot password link', array('username'=>$row['username'])).'</i><br/>';
                 }

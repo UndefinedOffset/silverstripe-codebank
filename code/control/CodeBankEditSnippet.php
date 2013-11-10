@@ -14,8 +14,10 @@ class CodeBankEditSnippet extends CodeBank {
                                         'tree',
                                         'show',
                                         'EditForm',
-                                        'doSave',
-                                        'doDelete'
+                                        'moveSnippet',
+                                		'savetreenode',
+                                		'getsubtree',
+                                		'moveSnippet'
                                     );
     
     /**
@@ -30,33 +32,23 @@ class CodeBankEditSnippet extends CodeBank {
         }
         
         
-        $form=LeftAndMain::getEditForm($id);
-        
-        
         $record=$this->getRecord($id);
         if($record && !$record->canView()) {
             return Security::permissionFailure($this);
         }
         
         
-        if(!$fields) {
-            $fields=$form->Fields();
-        }
-        
-        
-        $actions=$form->Actions();
-        
         
         if($record) {
-            $fields->push($idField=new HiddenField("ID", false, $id));
+            $fields=$record->getCMSFields();
             $actions=new FieldList(
-                                    FormAction::create('doCancel', _t('CodeBank.CANCEL', '_Cancel')),
-                                    FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')
+                                    FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'),
+                                    FormAction::create('doCancel', _t('CodeBank.CANCEL', '_Cancel'))
                                 );
             
             
             if($record->canDelete()) {
-                $actions->insertBefore(FormAction::create('doDelete', _t('CodeBank.DELETE', '_Delete'))->addExtraClass('ss-ui-action-destructive'), 'action_doCancel');
+                $actions->push(FormAction::create('doDelete', _t('CodeBank.DELETE', '_Delete'))->addExtraClass('ss-ui-action-destructive'));
             }
             
             
@@ -80,12 +72,13 @@ class CodeBankEditSnippet extends CodeBank {
             
             $fields->push(new HiddenField('ID', 'ID'));
             
-            $form=new Form($this, 'EditForm', $fields, $actions, $validator);
+            $form=CMSForm::create($this, 'EditForm', $fields, $actions, $validator)->setHTMLID('Form_EditForm');
             $form->loadDataFrom($record);
             $form->disableDefaultAction();
             $form->addExtraClass('cms-edit-form');
             $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
             $form->addExtraClass('center '.$this->BaseCSSClasses());
+            $form->setResponseNegotiator($this->getResponseNegotiator());
             $form->setAttribute('data-pjax-fragment', 'CurrentForm');
             
             
@@ -94,9 +87,9 @@ class CodeBankEditSnippet extends CodeBank {
             
             //Display message telling user to run dev/build because the version numbers are out of sync
             if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
-                $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+                $form->insertBefore(new LiteralField('<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'LanguageID');
             }else if($this->hasOldTables()) {
-                $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+                $form->insertBefore(new LiteralField('<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'LanguageID');
             }
             
             
@@ -113,9 +106,9 @@ class CodeBankEditSnippet extends CodeBank {
         
         //Display message telling user to run dev/build because the version numbers are out of sync
         if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
-            $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+            $form->push(new LiteralField('<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'));
         }else if($this->hasOldTables()) {
-            $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+            $form->push(new LiteralField('<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'));
         }
         
         

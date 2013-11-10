@@ -1,5 +1,5 @@
 <?php
-class CodeBankAddSnippet extends CodeBankEditSnippet {
+class CodeBankAddSnippet extends CodeBank {
     private static $url_segment='codeBank/add';
     private static $url_rule='/$Action/$ID/$OtherID';
     private static $url_priority=62;
@@ -15,19 +15,30 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
                                     );
     
     /**
+     * Ensures the AddForm is used
+     */
+    public function getEditForm($id=null, $fields=null) {
+        return $this->AddForm();
+    }
+    
+    /**
      * Generates the form used for adding snippets
      * @return {Form} Form used to add snippets
      */
     public function AddForm() {
-        $form=LeftAndMain::getEditForm();
+        $sng=singleton('Snippet');
+        $fields=$sng->getCMSFields();
+        $validator=$sng->getCMSValidator();
         
-        $form->setName('AddForm');
-        $form->setActions(new FieldList(
-                                        FormAction::create('doAdd', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')->setUseButtonTag(true)
-                                    ));
+        $actions=new FieldList(
+                                FormAction::create('doAdd', _t('CodeBank.CREATE', '_Create'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept')->setUseButtonTag(true)
+                            );
         
+        $form=CMSForm::create($this, 'AddForm', $fields, $actions)->setHTMLID('Form_AddForm');
+        $form->setValidator($validator);
         $form->disableDefaultAction();
         $form->addExtraClass('cms-add-form cms-edit-form');
+        $form->setResponseNegotiator($this->getResponseNegotiator());
         $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
         $form->addExtraClass('center '.$this->BaseCSSClasses());
         $form->setAttribute('data-pjax-fragment', 'CurrentForm');
@@ -37,7 +48,7 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         if($this->request->getVar('LanguageID')) {
             $langField=$form->Fields()->dataFieldByName('LanguageID');
             if($langField && $langField->Value()=='') {
-                $langField->setValue($this->request->getVar('LanguageID'));
+                $langField->setValue(intval(str_replace('language-', '', $this->request->getVar('LanguageID'))));
             }
         }
         
@@ -65,9 +76,9 @@ class CodeBankAddSnippet extends CodeBankEditSnippet {
         
         //Display message telling user to run dev/build because the version numbers are out of sync
         if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
-            $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
+            $form->insertBefore(new LiteralField('<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'LanguageID');
         }else if($this->hasOldTables()) {
-            $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
+            $form->insertBefore(new LiteralField('<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'LanguageID');
         }
         
         

@@ -140,8 +140,26 @@
 
 .cms table.ss-gridfield-table tbody td a.cb-export-link {
     background-image: url(./../images/box-arrow.png);
+    
+    margin-left: 10px;
 }
 
 .cms table.ss-gridfield-table tbody td a.cb-export-link:focus {
     outline: 0;
+}
+
+.CodeBank #Title.readonly label {
+    display: none;
+}
+
+.CodeBank #Title.readonly .middleColumn {
+    margin-left: 0;
+}
+
+.CodeBank #Title.readonly .middleColumn span {
+    font-size: 24px;
+    
+    line-height: 34px;
+    
+    text-shadow: 1px 1px 0 #FFFFFF;
 }
