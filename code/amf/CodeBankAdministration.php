@@ -131,6 +131,8 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             //Create and write member
             $member=new Member();
+            $member->FirstName=(!empty($data->firstname) ? $data->firstname:$data->username);
+            $member->Surname=(!empty($data->surname) ? $data->surname:null);
             $member->Email=$data->username;
             $member->Password=$data->Password;
             $member->UseHeartbeat=0;
