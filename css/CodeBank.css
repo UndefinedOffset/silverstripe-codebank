@@ -163,3 +163,27 @@
     
     text-shadow: 1px 1px 0 #FFFFFF;
 }
+
+.cms.CodeBankPrinterFriendly {
+    overflow: visible;
+}
+
+.cms.CodeBankPrinterFriendly #PrintHighlight .syntaxhighlighter {
+    overflow: visible !important;
+    
+    margin-bottom: 0 !important;
+}
+
+.cms.CodeBankPrinterFriendly .header .logo {
+    float: right;
+}
+
+.cms.CodeBankPrinterFriendly .header .clear {
+    clear: both;
+}
+
+.cms.CodeBankPrinterFriendly p.copyright {
+    margin-top: 2em;
+    
+    text-align: center;
+}

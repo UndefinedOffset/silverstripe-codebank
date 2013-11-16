@@ -48,7 +48,7 @@
         //Print Button
         $('.CodeBank #Form_EditForm_action_doPrint').entwine({
             onclick: function(e) {
-                window.print();
+                window.open('admin/codeBank/printSnippet/'+$('#Form_EditForm_ID').val()+'/'+$('.CodeBank #Form_EditForm_RevisionID').val());
                 
                 return false;
             }

@@ -62,6 +62,8 @@ en:
         IP_MESSAGE_TITLE: "You must agree to the following terms before using Code Bank"
         UNKNOWN_USER: "Unknown User"
         CREATE: "Create"
+        NO_DIFFERENCES: "There are no differences between the revisions"
+        PRINT_COPYRIGHT: "Printed from Code Bank which is copyright {year} Ed Chipman"
     CodeBankConfig:
         MAIN: "Main"
         IP_MESSAGE: "Intellectual Property Message"

@@ -11,7 +11,11 @@
                 <h4><%t CodeBank.COMPARED_REVISION "_Compared Revision" %></h4>
                 
                 <div id="compareDialogContent">
-                    $CompareContent
+                    <% if $CompareContent %>
+                        $CompareContent.RAW
+                    <% else %>
+                        <p class="message warning"><%t CodeBank.NO_DIFFERENCES "_There are no differences between the revisions" %></p>
+                    <% end_if %>
                 </div>
             </div>
         </div>

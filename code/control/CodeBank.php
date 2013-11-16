@@ -18,6 +18,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'compare',
                                         'addSnippet',
                                         'moveSnippet',
+                                        'printSnippet',
                                         'addFolder',
                                         'AddFolderForm',
                                         'doAddFolder',
@@ -704,8 +705,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                     $lTable.='</tbody></table>';
                     $rTable.='</tbody></table>';
                     
-                    $compareContent='<div class="compare leftSide">'.$rTable.'</div>'.
-                                    '<div class="compare rightSide">'.$lTable.'</div>';
+                    $compareContent='<div class="compare leftSide">'.$lTable.'</div>'.
+                                    '<div class="compare rightSide">'.$rTable.'</div>';
                 }
             }
         }
@@ -713,6 +714,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         Requirements::css(CB_DIR.'/css/CompareView.css');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.CompareView.js');
+        
         
         return $this->renderWith('CodeBank_CompareView', array(
                                                                 'CompareContent'=>$compareContent
@@ -1101,6 +1103,33 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $folder->delete();
         
         return 'HELO';
+    }
+    
+    /**
+     * Handles requests to print the current snippet
+     * @return {string} Rendered template
+     */
+    public function printSnippet() {
+        $record=$this->getRecord($this->currentPageID());
+        if(!empty($record) && $record!==false && $record->ID>0) {
+            $version=false;
+            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+                $version=$record->Version(intval($this->urlParams['OtherID']));
+            }
+            
+            
+            Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCore.css');
+            Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCoreDefault.css');
+            Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shThemeDefault.css');
+            
+            Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/shCore.js');
+            Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$record->getBrushName().'.js');
+            Requirements::javascript(CB_DIR.'/javascript/CodeBank_PrinterFriendly.js');
+            
+            return $this->renderWith('CodeBank_PrinterFriendly', array('Snippet'=>$record, 'SnippetVersion'=>$version, 'CodeBankDir'=>CB_DIR));
+        }
+        
+        return $this->response->setStatusCode(404);
     }
     
     /**

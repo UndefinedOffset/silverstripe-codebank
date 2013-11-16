@@ -149,6 +149,77 @@ class Snippet extends DataObject {
     }
     
     /**
+     * Gets the brush name
+     * @return {string} Name of the file used for the syntax highlighter brush
+     */
+    public function getBrushName() {
+        switch(strtolower($this->Language()->Name)) {
+            case 'applescript':return 'shBrushAppleScript';
+            case 'actionscript3':
+            case 'as3':return 'shBrushAS3';
+            case 'mxml':
+            case 'flex':return 'shBrushFlex';
+            case 'bash':
+            case 'shell':return 'shBrushBash';
+            case 'coldfusion':
+            case 'cf':return 'shBrushColdFusion';
+            case 'cpp':
+            case 'c':return 'shBrushCpp';
+            case 'c#':
+            case 'c-sharp':
+            case 'csharp':return 'shBrushCSharp';
+            case 'css':return 'shBrushCss';
+            case 'delphi':
+            case 'pascal':return 'shBrushDelphi';
+            case 'diff':
+            case 'patch':
+            case 'pas':return 'shBrushDiff';
+            case 'erl':
+            case 'erlang':return 'shBrushErlang';
+            case 'groovy':return 'shBrushGroovy';
+            case 'java':return 'shBrushJava';
+            case 'jfx':
+            case 'javafx':return 'shBrushJavaFX';
+            case 'js':
+            case 'jscript':
+            case 'javascript':return 'shBrushJScript';
+            case 'perl':
+            case 'pl':return 'shBrushPerl';
+            case 'php':return 'shBrushPhp';
+            case 'text':
+            case 'plain':return 'shBrushPlain';
+            case 'py':
+            case 'python':return 'shBrushPython';
+            case 'ruby':
+            case 'rails':
+            case 'ror':
+            case 'rb':return 'shBrushRuby';
+            case 'sass':
+            case 'scss':return 'shBrushSass';
+            case 'scala':return 'shBrushScala';
+            case 'ss':
+            case 'silverstripe':return 'shBrushSilverStripe';
+            case 'sql':return 'shBrushSql';
+            case 'vb':
+            case 'vbnet':return 'shBrushVb';
+            case 'xml':
+            case 'xhtml':
+            case 'xslt':
+            case 'html':return 'shBrushXml';
+            case 'yml':
+            case 'yaml':return 'shBrushYaml';
+        }
+    }
+    
+    /**
+     * Gets the highlight code used for syntax highlighter
+     * @return {string} Language code
+     */
+    public function getHighlightCode() {
+        return strtolower($this->Language()->HighlightCode);
+    }
+    
+    /**
      * Gets the summary fields used in gridfield
      * @return {array} Array of field's mapped to labels
      */
