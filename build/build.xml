@@ -127,8 +127,6 @@
         <replace file="${releaseFolder}/framework/dev/install/install.php5">
             <replacefilter token="// Set the current theme. More themes can be downloaded from" value=""/>
             <replacefilter token="// http://www.silverstripe.org/themes/" value=""/>
-            <replacefilter token="// Enable nested URLs for this site (e.g. page/sub-page/)" value="LeftAndMain::require_css('CodeBank/css/LeftAndMain.css');"/>
-            <replacefilter token="if (class_exists('SiteTree')) SiteTree::enable_nested_urls();" value="Object::add_extension('Security', 'CodeBankSecurity');"/>
             <replacefilter token="your SilverStripe site" value="your Code Bank server"/>
             <replacefilter token="your site" value="your Code Bank Server"/>
         </replace>

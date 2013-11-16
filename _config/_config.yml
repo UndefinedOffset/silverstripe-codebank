@@ -4,4 +4,8 @@ After: 'framework/*','cms/*'
 ---
 Member:
     extensions:
-        - CodeBankMember
+        - 'CodeBankMember'
+
+Security:
+    extensions:
+        - 'CodeBankSecurity'
