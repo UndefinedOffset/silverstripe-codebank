@@ -145,7 +145,7 @@ class CodeBankConfig extends DataObject {
         
         return new FieldList(
                             new TabSet('Root',
-                                            new Tab('Main', _t('CodeBankConfig.MAIN', '_Main'),
+                                            new Tab('Main', _t('CodeBankConfig.MAIN', '_IP Message'),
                                                     HtmlEditorField::create('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))->addExtraClass('stacked')
                                                 ),
                                             new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),

@@ -65,7 +65,7 @@ en:
         NO_DIFFERENCES: "There are no differences between the revisions"
         PRINT_COPYRIGHT: "Printed from Code Bank which is copyright {year} Ed Chipman"
     CodeBankConfig:
-        MAIN: "Main"
+        MAIN: "IP Message"
         IP_MESSAGE: "Intellectual Property Message"
         LANGUAGES: "Languages"
         MANAGE_PACKAGES: "Manage Packages"
