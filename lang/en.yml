@@ -75,6 +75,9 @@ en:
         MENUTITLE: "Code Bank Intellectual Property Agreement"
         DISAGREE: "Disagree"
         AGREE: "Agree"
+    CodeBankEditSnippet:
+        MENUTITLE: "Edit Snippet"
+        TITLE: "Edit Snippet"
     CodeBankAddSnippet:
         MENUTITLE: "Add Snippet"
         TITLE: "Add Snippet"

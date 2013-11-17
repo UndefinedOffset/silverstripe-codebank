@@ -14,12 +14,6 @@ class CodeBankAddSnippet extends CodeBank {
                                         'doAdd'
                                     );
     
-    /**
-     * Ensures the AddForm is used
-     */
-    public function getEditForm($id=null, $fields=null) {
-        return $this->AddForm();
-    }
     
     /**
      * Generates the form used for adding snippets
@@ -97,9 +91,10 @@ class CodeBankAddSnippet extends CodeBank {
         $form->saveInto($record);
         $record->write();
         
+        $editController=singleton('CodeBank');
+        $editController->setCurrentPageID($record->ID);
         
-        $this->redirect('admin/codeBank/show/'.$record->ID);
-        return $this->getResponseNegotiator()->respond($this->request);
+        return $this->redirect(Controller::join_links(singleton('CodeBank')->Link('show'), $record->ID));
     }
     
     /**
