@@ -51,9 +51,9 @@ class CodeBankSettings extends CodeBank {
                                 FormAction::create('doImportFromClient', _t('CodeBank.IMPORT_FROM_CLIENT', '_Import From Desktop Client'))->setAttribute('data-icon', 'import')->setAttribute('data-importurl', $this->Link('import-from-client'))
                             );
         
-		$form=new Form($this, 'EditForm', $fields, $actions);
+		$form=CMSForm::create($this, 'EditForm', $fields, $actions)->setHTMLID('Form_EditForm');
 		$form->addExtraClass('root-form');
-		$form->addExtraClass('cms-edit-form cms-panel-padded center');
+		$form->addExtraClass('cms-edit-form center');
 		// don't add data-pjax-fragment=CurrentForm, its added in the content template instead
 		
 		$form->setHTMLID('Form_EditForm');
@@ -73,6 +73,9 @@ class CodeBankSettings extends CodeBank {
 		}else if($this->hasOldTables()) {
 		    $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
 		}
+        
+		
+        $form->Actions()->push(new LiteralField('CodeBankVersion', '<p class="codeBankVersion">Code Bank: '.$this->getVersion().'</p>'));
 		
 		
 		return $form;

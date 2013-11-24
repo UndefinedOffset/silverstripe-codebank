@@ -1,10 +1,4 @@
 <form $FormAttributes data-layout-type="border">
-    <div class="cms-content-header north">
-        <div class="cms-content-header-info">
-            <h2><% _t('CodeBankAddSnippet.TITLE','Add Snippet') %></h2>
-        </div>
-    </div>
-
     <div class="cms-content-fields center cms-panel-content cms-panel-padded">
         <% if $Message %>
         <p id="{$FormName}_error" class="message $MessageType">$Message</p>

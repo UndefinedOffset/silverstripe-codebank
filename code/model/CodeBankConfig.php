@@ -130,13 +130,14 @@ class CodeBankConfig extends DataObject {
      */
     public function getCMSFields() {
         $langGridConfig=GridFieldConfig_RecordEditor::create(30);
+        $langGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest');
         $langGridConfig->getComponentByType('GridFieldDataColumns')->setFieldCasting(array(
                                                                                             'UserLanguage'=>'Boolean->Nice'
                                                                                         ));
         
         $packageGridConfig=GridFieldConfig_RecordEditor::create(30);
         $packageGridConfig->addComponent(new ExportPackageButton());
-        $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemEditFormCallback(function(Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
+        $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest')->setItemEditFormCallback(function(Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
                                                                                                     Requirements::javascript(CB_DIR.'/javascript/SnippetPackages.ItemEditForm.js');
                                                                                                     
                                                                                                     $form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));

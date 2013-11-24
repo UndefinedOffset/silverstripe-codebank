@@ -75,6 +75,8 @@ class CodeBankAddSnippet extends CodeBank {
             $form->insertBefore(new LiteralField('<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'LanguageID');
         }
         
+        $form->Actions()->push(new LiteralField('CodeBankVersion', '<p class="codeBankVersion">Code Bank: '.$this->getVersion().'</p>'));
+        
         
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.EditForm.js');
         

@@ -187,3 +187,11 @@
     
     text-align: center;
 }
+
+.codeBankVersion {
+    float: right !important;
+    
+    color: #C0C0C2;
+    
+    margin: 6px 0 0 !important;
+}

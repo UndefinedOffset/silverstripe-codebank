@@ -246,6 +246,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             $this->extend('updateEditForm', $form);
             
+            $form->Actions()->push(new LiteralField('CodeBankVersion', '<p class="codeBankVersion">Code Bank: '.$this->getVersion().'</p>'));
+            
             
             Requirements::add_i18n_javascript(CB_DIR.'/javascript/lang');
             Requirements::add_i18n_javascript('mysite/javascript/lang');
@@ -262,13 +264,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             return $form;
         }else if($id) {
-            $form=new Form($this, 'EditForm', new FieldList(
+            $form=CMSForm::create($this, 'EditForm', new FieldList(
                                                             new TabSet('Root',
                                                                             new Tab('Main', ' ',
                                                                                         new LabelField('DoesntExistLabel', _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'))
                                                                                     )
                                                                     )
-                                                        ), new FieldList());
+                                                        ), new FieldList())->setHTMLID('Form_EditForm');
             $form->addExtraClass('cms-edit-form');
             $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
             $form->addExtraClass('center '.$this->BaseCSSClasses());
@@ -301,6 +303,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $form->addExtraClass('cms-edit-form');
         $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
         $form->addExtraClass('center '.$this->BaseCSSClasses());
+        
+        $form->Actions()->push(new LiteralField('CodeBankVersion', '<p class="codeBankVersion">Code Bank: '.$this->getVersion().'</p>'));
         
         return $form;
     }
@@ -618,25 +622,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the current version of Code Bank
      * @return {string} Version Number Plus Build Date
      */
-    public static function getVersion() {
+    final public function getVersion() {
         if(CB_VERSION=='@@VERSION@@') {
             return _t('CodeBank.DEVELOPMENT_BUILD', '_Development Build');
         }
         
         return CB_VERSION.' '.CB_BUILD_DATE;
-    }
-    
-    /**
-     * Return the version number of this application.
-     * Uses the subversion path information in <mymodule>/silverstripe_version
-     * (automacially replaced by build scripts).
-     *
-     * @return string
-     */
-    public function CMSVersion() {
-        $frameworkVersions=parent::CMSVersion();
-    
-        return sprintf('Code Bank: %s, %s', self::getVersion(), $frameworkVersions);
     }
     
     /**
