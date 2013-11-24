@@ -68,19 +68,29 @@ class CodeBankSnippets implements CodeBank_APIClass {
     /**
      * Maps the folder and its decendents through recurrsion
      * @param {SS_List} $folders List of folders to be mapped
+     * @param {string} $searchQuery Search Query
      * @return {array} Nested array of folder data
      */
-    private function mapFolders(SS_List $folders) {
+    private function mapFolders(SS_List $folders, $searchQuery=null) {
         $result=array();
         
         foreach($folders as $folder) {
-            $snippets=$this->overviewList($folder->Snippets(), 'Title', 'ID', 'LanguageID');
+            $snippets=$folder->Snippets();
+            if(!empty($searchQuery) && $searchQuery!==false) {
+                $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($searchQuery)."' IN BOOLEAN MODE)");
+            }
+            
+            $snippets=$this->overviewList($snippets, 'Title', 'ID', 'LanguageID');
+            
+            if(!empty($searchQuery) && $searchQuery!==false && count($snippets)==0) {
+                continue;
+            }
             
             $result[]=array(
                             'id'=>$folder->ID,
                             'name'=>$folder->Name,
                             'languageID'=>$folder->LanguageID,
-                            'folders'=>$this->mapFolders($folder->Folders()),
+                            'folders'=>$this->mapFolders($folder->Folders(), $searchQuery),
                             'snippets'=>$snippets
                         );
         }
@@ -124,7 +134,6 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * Searches for snippets that match the information the client in the search field
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
-     * @todo Should add folder support to search
      */
     public function searchSnippets($data) {
         $response=CodeBank_ClientAPI::responseBase();
@@ -140,12 +149,13 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=Snippet::get()->filter('LanguageID', $lang->ID)->where("MATCH(Title, Description, Tags) AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            $snippets=Snippet::get()->filter('LanguageID', $lang->ID)->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
             if($snippets->Count()>0) {
-                $snippets=$this->arrayUnmap($snippets->map('ID', 'Title')->toArray());
+                $snippets=$this->arrayUnmap($snippets->filter('FolderID', 0)->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
                                         'id'=>$lang->ID,
                                         'language'=>$lang->Name,
+                                        'folders'=>$this->mapFolders($lang->Folders(), $data->query),
                                         'snippets'=>$snippets
                                     );
             }

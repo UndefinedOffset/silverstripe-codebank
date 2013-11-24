@@ -88,11 +88,7 @@ class SnippetTreeFilter extends Object {
 		
 		if(isset($this->params['Term']) && !empty($this->params['Term'])) {
 		    $SQL_val=Convert::raw2sql($this->params['Term']);
-		    $q->setWhereAny(array(
-        		            "\"Title\" LIKE '%$SQL_val%'",
-        		            "\"Description\" LIKE '%$SQL_val%'",
-        		            "\"Tags\" LIKE '%$SQL_val%'"
-        		        ));
+		    $q->addWhere("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
 		}
 		
 		
