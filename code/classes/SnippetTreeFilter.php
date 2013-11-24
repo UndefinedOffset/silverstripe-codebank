@@ -4,22 +4,27 @@ class SnippetTreeFilter extends Object {
      * @var Array Search parameters, mostly properties on {@link SiteTree}.
      * Caution: Unescaped data.
      */
-    protected $params = array();
+    protected $params=array();
     
     /**
      * @var Array
      */
-    protected $_cache_language_ids = null;
+    protected $_cache_language_ids=null;
     
     /**
      * @var Array
      */
-    protected $_cache_snippet_ids = null;
+    protected $_cache_snippet_ids=null;
+    
+    /**
+     * @var Array
+     */
+    protected $_cache_folder_ids=null;
     
     /**
      * @var String
      */
-    protected $childrenMethod = null;
+    protected $childrenMethod=null;
     
     public function __construct($params=null) {
         if($params) {
@@ -99,6 +104,40 @@ class SnippetTreeFilter extends Object {
     }
     
     /**
+     * @return Array Map of Snippet Folder IDs
+     */
+    public function snippetFoldersIncluded() {
+        if($this->_cache_snippet_ids===null) {
+            $this->populateSnippetIDs();
+        }
+        
+        if(empty($this->_cache_snippet_ids)) {
+            return array();
+        }
+        
+        $ids=array();
+        
+        $q=new SQLQuery();
+		$q->setSelect(array('"SnippetFolder"."ID"'))
+		    ->setFrom('"SnippetFolder"')
+		    ->addInnerJoin('SnippetLanguage', '"SnippetLanguage"."ID"="SnippetFolder"."LanguageID"')
+		    ->addInnerJoin('Snippet', '"Snippet"."FolderID"="SnippetFolder"."ID"')
+		    ->setGroupBy('"SnippetFolder"."ID"');
+		
+		if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
+		    $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
+		}
+		
+		$q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
+		
+		foreach($q->execute() as $row) {
+			$ids[]=array('ID'=>$row['ID']);
+		}
+		
+		return $ids;
+    }
+    
+    /**
      * Populate the IDs of the snippet languages returned by snippetLanguagesIncluded()
      */
     protected function populateLanguageIDs() {
@@ -127,9 +166,23 @@ class SnippetTreeFilter extends Object {
     }
     
     /**
+     * Populate the IDs of the snippet languages returned by snippetLanguagesIncluded()
+     */
+    protected function populateFolderIDs() {
+        $this->_cache_language_ids=array();
+        if($snippetFolders=$this->snippetFoldersIncluded()) {
+            // And keep a record of parents we don't need to get
+            // parents of themselves, as well as IDs to mark
+            foreach($snippetFolders as $folderArr) {
+                $this->_cache_folder_ids[$folderArr['ID']]=true;
+            }
+        }
+    }
+    
+    /**
      * Returns TRUE if the given snippet or language should be included in the tree.
-     * @param {SnippetLanguage|Snippet} $obj Snippetor Language to be checked
-     * @return {bool} Returns boolean true if the snippet or language should be included in the tree false otherwise
+     * @param {SnippetLanguage|Snippet|SnippetFolder} $obj Object to be checked
+     * @return {bool} Returns boolean true if the snippet or language or folder should be included in the tree false otherwise
      */
     public function isSnippetLanguageIncluded($obj) {
         if($obj instanceof SnippetLanguage) {
@@ -144,6 +197,12 @@ class SnippetTreeFilter extends Object {
             }
             
             return (isset($this->_cache_snippet_ids[$obj->ID]) && $this->_cache_snippet_ids[$obj->ID]);
+        }else if($obj instanceof SnippetFolder) {
+            if($this->_cache_folder_ids===null) {
+                $this->populateFolderIDs();
+            }
+            
+            return (isset($this->_cache_folder_ids[$obj->ID]) && $this->_cache_folder_ids[$obj->ID]);
         }
         
         return false;

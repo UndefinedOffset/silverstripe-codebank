@@ -28,9 +28,21 @@ See http://www.silverstripe.org/system-requirements/ as Code Bank is built on th
 5. If you are installing the standalone file make sure before you upload the new files you remove mysite, .htaccess, webconfig.conf, install.php, and install-frameworkmissing.html. As well you should just overwrite the existing files.
 
 
+##Custom Languages with Brushes
+Code Bank uses SyntaxHighlighter (https://github.com/alexgorbatchev/SyntaxHighlighter) to highlight code snippets, to provide a language with syntax highlighting you must add to your [http://doc.silverstripe.org/framework/en/topics/configuration] yml configs the following then run dev/build (see the installation section for this url).
+```yml
+CodeBank:
+    extra_languages:
+        - Name: "Example Language" #Name of the language
+          HighlightCode: "example" #Highlighter code
+          FileName: "ex" #File extension
+          Brush: "mysite/javascript/shBrushEx.js" #Relative Path to the snippet highlighter brush
+``` 
+
 #Attribution:
 * Some Icons are from the Fudge Icon Set http://p.yusukekamiyamane.com/
 * Code Bank Logo is derived from the Tango Desktop Project http://tango.freedesktop.org
 * Other icons are from the noun project http://thenounproject.com/
 * Code Bank is powered by the SilverStripe framework http://www.silverstripe.org
 * Code Bank uses portions of the Zend Framework http://framework.zend.com/
+* Syntax highlighting provided by SyntaxHighlighter https://github.com/alexgorbatchev/SyntaxHighlighter

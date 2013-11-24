@@ -4,6 +4,7 @@ class SnippetLanguage extends DataObject {
                             'Name'=>'Varchar(100)',
                             'FileExtension'=>'Varchar(45)',
                             'HighlightCode'=>'Varchar(45)',
+                            'BrushFile'=>'Text',
                             'UserLanguage'=>'Boolean'
                          );
     
@@ -111,6 +112,50 @@ class SnippetLanguage extends DataObject {
                     $lang->write();
                     
                     DB::alteration_message('Created snippet language "'.$name.'"', 'created');
+                }
+            }
+        }
+        
+        
+        //Look for config languages
+        $configLanguages=CodeBank::config()->extra_languages;
+        if(!empty($configLanguages)) {
+            foreach($configLanguages as $language) {
+                //Validate languages
+                if(empty($language['Name']) || empty($language['FileName']) || empty($language['HighlightCode']) || empty($language['Brush'])) {
+                    user_error('Invalid snippet user language found in config, user languages defined in config must contain a Name, FileName, HighlightCode and Brush file path', E_USER_WARNING);
+                    continue;
+                }
+                
+                
+                $lang=SnippetLanguage::get()
+                                            ->filter('Name', $language['Name'])
+                                            ->filter('HighlightCode', $language['HighlightCode'])
+                                            ->filter('UserLanguage', true)
+                                            ->first();
+                
+                if(empty($lang) || $lang===false || $lang->ID<=0) {
+                    if(Director::is_absolute($language['Brush']) || Director::is_absolute_url($language['Brush'])) {
+                        user_error('Invalid snippet user language found in config, user languages defined in config must contain a path to the brush relative to the SilverStripe base ('.Director::baseFolder().')', E_USER_WARNING);
+                        continue;
+                    }
+                    
+                    if(preg_match('/\.js$/', $language['Brush'])==0) {
+                        user_error('Invalid snippet user language found in config, user languages defined in config must be javascript files', E_USER_WARNING);
+                        continue;
+                    }
+                    
+                    
+                    //Add language
+                    $lang=new SnippetLanguage();
+                    $lang->Name=$language['Name'];
+                    $lang->FileExtension=$language['FileName'];
+                    $lang->HighlightCode=$language['HighlightCode'];
+                    $lang->BrushFile=$language['Brush'];
+                    $lang->UserLanguage=true;
+                    $lang->write();
+                    
+                    DB::alteration_message('Created snippet user language "'.$language['Name'].'"', 'created');
                 }
             }
         }

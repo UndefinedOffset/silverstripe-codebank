@@ -9,3 +9,6 @@ Member:
 Security:
     extensions:
         - 'CodeBankSecurity'
+
+HighlightedContentField:
+    theme: 'Default'

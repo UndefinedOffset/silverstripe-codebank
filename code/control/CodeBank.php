@@ -598,8 +598,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         $actions=new FieldList(
-                            FormAction::create('doSearch', _t('CodeBank.APPLY_FILTER', '_Apply Filter'))->addExtraClass('ss-ui-action-constructive')->setUseButtonTag(true),
-                            Object::create('ResetFormAction', 'clear', _t('CodeBank.RESET', '_Reset'))->setUseButtonTag(true)
+                            FormAction::create('doSearch', _t('CodeBank.APPLY_FILTER', '_Apply Filter'))->setUseButtonTag(true)
                         );
         
         

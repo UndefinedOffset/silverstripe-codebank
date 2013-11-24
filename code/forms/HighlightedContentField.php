@@ -36,12 +36,22 @@ class HighlightedContentField extends FormField {
         
         
         Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCore.css');
-        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCoreDefault.css');
-        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shThemeDefault.css');
+        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shCore'.$this->theme_file().'.css');
+        Requirements::css(CB_DIR.'/javascript/external/syntaxhighlighter/themes/shTheme'.$this->theme_file().'.css');
         Requirements::css(CB_DIR.'/css/HighlightedContentField.css');
         
         Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/shCore.js');
-        Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
+        
+        $brushName=$this->getBrushName();
+        if(!empty($brushName)) {
+            Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
+        }else {
+            $lang=SnippetLanguage::get()->filter('HighlightCode', $this->language)->filter('UserLanguage', true)->first();
+            if(!empty($lang) && $lang!==false && $lang->ID>0 && !empty($lang->BrushFile)) {
+                Requirements::javascript($lang->BrushFile);
+            }
+        }
+        
         Requirements::javascript(CB_DIR.'/javascript/HighlightedContentField.js');
         
         
@@ -133,6 +143,24 @@ class HighlightedContentField extends FormField {
      */
     public function getHighlightCode() {
         return strtolower($this->language);
+    }
+    
+    /**
+     * Detects the theme based on the current config
+     * @return {string} Theme based on looking at the value in config, if its not valid or not present use 'Default'
+     */
+    protected function theme_file() {
+        switch(HighlightedContentField::config()->theme) {
+            case 'Django':
+            case 'Eclipse':
+            case 'Emacs':
+            case 'FadeToGrey':
+            case 'MDUltra':
+            case 'FlashDevelop':
+            case 'FlexBuilder':
+            case 'RDark':return HighlightedContentField::config()->theme;
+            default:return 'Default';
+        }
     }
     
     /**

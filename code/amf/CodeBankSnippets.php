@@ -201,6 +201,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                     'package'=>$packageDetails
                                 );
             
+            $snippetScript='<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$response['data'][0]['shjs_code'].'.js"></script>';
+            if($snippet->Language()->UserLanguage==true && !empty($snippet->Language()->BrushFile)) {
+                $snippetScript="<script type=\"text/javascript\">\n".@file_get_contents(Director::baseFolder().'/'.$snippet->Language()->BrushFile)."\n</script>";
+            }
+            
+            
             $response['data'][0]['text']=preg_replace('/\r\n|\n|\r/', "\n", $response['data'][0]['text']);
             $response['data'][0]['formatedText']='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'.
                                                  '<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">'.
@@ -211,7 +217,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                                         '<link type="text/css" rel="stylesheet" href="app:/tools/external/syntaxhighlighter/themes/shTheme'.$data->style.'.css"/>'.
                                                         '<link type="text/css" rel="stylesheet" href="app:/tools/syntaxhighlighter.css"/>'.
                                                         '<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shCore.js"></script>'.
-                                                        '<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$response['data'][0]['shjs_code'].'.js"></script>'.
+                                                        $snippetScript.
                                                         '<script type="text/javascript" src="app:/tools/external/jquery-packed.js"></script>'.
                                                         '<script type="text/javascript" src="app:/tools/highlight_helper.js"></script>'.
                                                     '</head>'.
@@ -290,6 +296,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
         if(!empty($revision) && $revision!==false && $revision->ID!=0) {
             $lang=$revision->Parent()->Language();
             
+            $snippetScript='<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$lang->HighlightCode.'.js"></script>';
+            if($lang->UserLanguage==true && !empty($lang->BrushFile)) {
+                $snippetScript="<script type=\"text/javascript\">\n".@file_get_contents(Director::baseFolder().'/'.$lang->BrushFile)."\n</script>";
+            }
+            
             $response['data']='<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'.
                                  '<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">'.
                                     '<head>'.
@@ -299,7 +310,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                         '<link type="text/css" rel="stylesheet" href="app:/tools/external/syntaxhighlighter/themes/shTheme'.$data->style.'.css"/>'.
                                         '<link type="text/css" rel="stylesheet" href="app:/tools/syntaxhighlighter.css"/>'.
                                         '<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shCore.js"></script>'.
-                                        '<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$lang->HighlightCode.'.js"></script>'.
+                                        $snippetScript.
                                         '<script type="text/javascript" src="app:/tools/external/jquery-packed.js"></script>'.
                                         '<script type="text/javascript" src="app:/tools/highlight_helper.js"></script>'.
                                     '</head>'.
