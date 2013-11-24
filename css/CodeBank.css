@@ -54,13 +54,17 @@
     padding: 5px;
 }
 
+.CodeBank .Actions select:disabled {
+    color: #AEB0B1;
+}
+
 .CodeBank .cms-content-toolbar {
     border-bottom: 0;
     box-shadow: none;
 }
 
 .cms-container .CodeBank .cms-edit-form {
-    background: #e6eaed;
+    background: #E6EAED;
 }
 
 .cms-container .CodeBank .cms-edit-form .ui-tabs-nav {
@@ -81,13 +85,13 @@
 }
 
 .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-default {
-    border: 1px solid #c0c0c2;
+    border: 1px solid #C0C0C2;
 }
 
 .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-active {
     padding-bottom: 1px;
-    background: #e6eaed;
-    border: 1px solid #c0c0c2;
+    background: #E6EAED;
+    border: 1px solid #C0C0C2;
 }
 
 .cms-container .CodeBank .ss-tabset .ss-tabset {
@@ -95,8 +99,8 @@
 }
 
 .cms-container .CodeBank .ss-tabset .ui-tabs-panel {
-    background: #e6eaed;
-    border-top: 1px solid #c0c0c2;
+    background: #E6EAED;
+    border-top: 1px solid #C0C0C2;
     clear: both;
     
     padding: 1em 1.4em;

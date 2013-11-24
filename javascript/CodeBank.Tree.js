@@ -193,6 +193,11 @@
                 
                 
                 return config;
+            },
+            updateFromEditForm: function() {
+                $(this).find('li.current').removeClass('current');
+                
+                this._super();
             }
         });
     });
