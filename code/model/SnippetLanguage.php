@@ -129,8 +129,8 @@ class SnippetLanguage extends DataObject {
                 
                 
                 $lang=SnippetLanguage::get()
-                                            ->filter('Name', $language['Name'])
-                                            ->filter('HighlightCode', $language['HighlightCode'])
+                                            ->filter('Name', Convert::raw2sql($language['Name']))
+                                            ->filter('HighlightCode', Convert::raw2sql($language['HighlightCode']))
                                             ->filter('UserLanguage', true)
                                             ->first();
                 

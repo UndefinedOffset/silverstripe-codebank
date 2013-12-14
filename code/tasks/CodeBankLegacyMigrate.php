@@ -93,7 +93,7 @@ class CodeBankLegacyMigrate extends BuildTask {
                 
                 
                 //Insert User
-                $member=Member::get()->filter('Email', $row['username'])->first();
+                $member=Member::get()->filter('Email', Convert::raw2sql($row['username']))->first();
                 if(empty($member) || $member===false || $member->ID==0) {
                     $member=new Member();
                     $member->FirstName=$row['username'];
@@ -159,7 +159,7 @@ class CodeBankLegacyMigrate extends BuildTask {
         if($results->numRecords()>0) {
             foreach($results as $row) {
                 //Get Creator ID
-                $creator=Member::get()->filter('Email', $row['creatorUsername'])->first();
+                $creator=Member::get()->filter('Email', Convert::raw2sql($row['creatorUsername']))->first();
                 if(!empty($creator) && $creator!==false && $creator->ID!=0) {
                     $creatorID=$creator->ID;
                 }else {
@@ -168,7 +168,7 @@ class CodeBankLegacyMigrate extends BuildTask {
                 
                 
                 //Get Last Editor ID
-                $lastEditor=Member::get()->filter('Email', $row['lastEditorUsername'])->first();
+                $lastEditor=Member::get()->filter('Email', Convert::raw2sql($row['lastEditorUsername']))->first();
                 if(!empty($lastEditor) && $lastEditor!==false && $lastEditor->ID!=0) {
                     $lastEditorID=$lastEditor->ID;
                 }else {
@@ -177,7 +177,7 @@ class CodeBankLegacyMigrate extends BuildTask {
                 
                 
                 //Get Language ID
-                $language=SnippetLanguage::get()->filter('Name', $row['language'])->first();
+                $language=SnippetLanguage::get()->filter('Name', Convert::raw2sql($row['language']))->first();
                 if(!empty($language) && $language!==false && $language->ID!=0) {
                     $languageID=$language->ID;
                 }else {

@@ -46,7 +46,7 @@ class HighlightedContentField extends FormField {
         if(!empty($brushName)) {
             Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
         }else {
-            $lang=SnippetLanguage::get()->filter('HighlightCode', $this->language)->filter('UserLanguage', true)->first();
+            $lang=SnippetLanguage::get()->filter('HighlightCode', Convert::raw2sql($this->language))->filter('UserLanguage', true)->first();
             if(!empty($lang) && $lang!==false && $lang->ID>0 && !empty($lang->BrushFile)) {
                 Requirements::javascript($lang->BrushFile);
             }

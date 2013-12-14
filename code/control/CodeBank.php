@@ -926,10 +926,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      */
     public function doAddFolder($data, Form $form) {
         //Existing Check
-        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')->filter('LanguageID', $data['LanguageID']);
+        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')->filter('LanguageID', intval($data['LanguageID']));
         
         if(array_key_exists('FolderID', $data)) {
-            $existingCheck=$existingCheck->filter('ParentID', $data['FolderID']);
+            $existingCheck=$existingCheck->filter('ParentID', intval($data['FolderID']));
         }else {
             $existingCheck->filter('ParentID', 0);
         }
@@ -954,9 +954,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
         $next=$prev=null;
-        $next=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:GreaterThan', $folder->Title)->first();
+        $next=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:GreaterThan', Convert::raw2sql($folder->Title))->first();
         if(!$next) {
-            $prev=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:LessThan', $folder->Title)->reverse()->first();
+            $prev=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:LessThan', Convert::raw2sql($folder->Title))->reverse()->first();
         }
         
         
