@@ -1,9 +1,9 @@
 <?php
 class CodeBankGridField_ItemRequest extends GridFieldDetailForm_ItemRequest {
-	private static $allowed_actions=array(
-										'ItemEditForm'
-									);
-	
+    private static $allowed_actions=array(
+                                        'ItemEditForm'
+                                    );
+    
     public function ItemEditForm() {
         $form=parent::ItemEditForm();
         

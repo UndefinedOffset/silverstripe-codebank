@@ -51,44 +51,44 @@ class SnippetPackage extends DataObject {
                             );
     }
     
-	/**
-	 * Return the CSS classes to apply to this node in the CMS tree
-	 * @return {string} Classes used in the cms tree
-	 */
-	public function CMSTreeClasses() {
-		$classes=sprintf('class-%s', $this->class);
-		
-		$classes.=$this->markingClasses();
+    /**
+     * Return the CSS classes to apply to this node in the CMS tree
+     * @return {string} Classes used in the cms tree
+     */
+    public function CMSTreeClasses() {
+        $classes=sprintf('class-%s', $this->class);
+        
+        $classes.=$this->markingClasses();
 
-		return $classes;
-	}
-	
-	/**
-	 * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
-	 * @return string a html string ready to be directly used in a template
-	 */
-	public function getTreeTitle() {
-		$treeTitle = sprintf(
-			"<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-			Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
-		);
-		
-		return $treeTitle;
-	}
-	
-	/**
-	 * Always return true
-	 * @return {bool} Return true
-	 */
-	public function hasSnippets() {
-	    return true;
-	}
-	
-	public function summaryFields() {
-	    return array(
+        return $classes;
+    }
+    
+    /**
+     * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
+     * @return string a html string ready to be directly used in a template
+     */
+    public function getTreeTitle() {
+        $treeTitle = sprintf(
+            "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
+            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+        );
+        
+        return $treeTitle;
+    }
+    
+    /**
+     * Always return true
+     * @return {bool} Return true
+     */
+    public function hasSnippets() {
+        return true;
+    }
+    
+    public function summaryFields() {
+        return array(
                     'Title'=>_t('SnippetPackage.TITLE', '_Title'),
-	                'Snippets.Count'=>_t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets')
-	            );
-	}
+                    'Snippets.Count'=>_t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets')
+                );
+    }
 }
 ?>

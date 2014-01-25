@@ -26,9 +26,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                         'RenameFolderForm',
                                         'doRenameFolder',
                                         'deleteFolder',
-                                		'savetreenode',
-                                		'getsubtree',
-                                		'moveSnippet',
+                                        'savetreenode',
+                                        'getsubtree',
+                                        'moveSnippet',
                                         'updatetreenodes'
                                     );
     
@@ -712,67 +712,67 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
     
     /**
-	 * Create serialized JSON string with tree hints data to be injected into 'data-hints' attribute of root node of jsTree.
-	 * @return {string} Serialized JSON
-	 */
-	public function getTreeHints() {
-		$json = '';
+     * Create serialized JSON string with tree hints data to be injected into 'data-hints' attribute of root node of jsTree.
+     * @return {string} Serialized JSON
+     */
+    public function getTreeHints() {
+        $json = '';
 
-		$classes = array('Snippet', 'SnippetLanguage', 'SnippetFolder');
+        $classes = array('Snippet', 'SnippetLanguage', 'SnippetFolder');
 
-	 	$cacheCanCreate = array();
-	 	foreach($classes as $class) $cacheCanCreate[$class] = singleton($class)->canCreate();
+         $cacheCanCreate = array();
+         foreach($classes as $class) $cacheCanCreate[$class] = singleton($class)->canCreate();
 
-	 	// Generate basic cache key. Too complex to encompass all variations
-	 	$cache=SS_Cache::factory('CodeBank_TreeHints');
-	 	$cacheKey = md5(implode('_', array(Member::currentUserID(), implode(',', $cacheCanCreate), implode(',', $classes))));
-	 	if($this->request->getVar('flush')) $cache->clean(Zend_Cache::CLEANING_MODE_ALL);
-	 	$json = $cache->load($cacheKey);
-	 	if(!$json) {
-			$def['Root'] = array();
-			$def['Root']['disallowedParents'] = array();
+         // Generate basic cache key. Too complex to encompass all variations
+         $cache=SS_Cache::factory('CodeBank_TreeHints');
+         $cacheKey = md5(implode('_', array(Member::currentUserID(), implode(',', $cacheCanCreate), implode(',', $classes))));
+         if($this->request->getVar('flush')) $cache->clean(Zend_Cache::CLEANING_MODE_ALL);
+         $json = $cache->load($cacheKey);
+         if(!$json) {
+            $def['Root'] = array();
+            $def['Root']['disallowedParents'] = array();
 
-			foreach($classes as $class) {
-			    $sng=singleton($class);
-				$allowedChildren = $sng->allowedChildren();
-				
-				// SiteTree::allowedChildren() returns null rather than an empty array if SiteTree::allowed_chldren == 'none'
-				if($allowedChildren == null) $allowedChildren = array();
-				
-				// Find i18n - names and build allowed children array
-				foreach($allowedChildren as $child) {
-					$instance = singleton($child);
-					
-					if($instance instanceof HiddenClass) continue;
+            foreach($classes as $class) {
+                $sng=singleton($class);
+                $allowedChildren = $sng->allowedChildren();
+                
+                // SiteTree::allowedChildren() returns null rather than an empty array if SiteTree::allowed_chldren == 'none'
+                if($allowedChildren == null) $allowedChildren = array();
+                
+                // Find i18n - names and build allowed children array
+                foreach($allowedChildren as $child) {
+                    $instance = singleton($child);
+                    
+                    if($instance instanceof HiddenClass) continue;
 
-					if(!array_key_exists($child, $cacheCanCreate) || !$cacheCanCreate[$child]) continue;
+                    if(!array_key_exists($child, $cacheCanCreate) || !$cacheCanCreate[$child]) continue;
 
-					// skip this type if it is restricted
-					if($instance->stat('need_permission') && !$this->can(singleton($class)->stat('need_permission'))) continue;
+                    // skip this type if it is restricted
+                    if($instance->stat('need_permission') && !$this->can(singleton($class)->stat('need_permission'))) continue;
 
-					$title = $instance->i18n_singular_name();
+                    $title = $instance->i18n_singular_name();
 
-					$def[$class]['allowedChildren'][] = array("ssclass" => $child, "ssname" => $title);
-				}
+                    $def[$class]['allowedChildren'][] = array("ssclass" => $child, "ssname" => $title);
+                }
 
-				$allowedChildren = array_keys(array_diff($classes, $allowedChildren));
-				if($allowedChildren) $def[$class]['disallowedChildren'] = $allowedChildren;
-				$defaultChild = $sng->default_child();
-				if($defaultChild != null) $def[$class]['defaultChild'] = $defaultChild;
-				if(isset($def[$class]['disallowedChildren'])) {
-					foreach($def[$class]['disallowedChildren'] as $disallowedChild) {
-						$def[$disallowedChild]['disallowedParents'][] = $class;
-					}
-				}
-				
-				// Are any classes allowed to be parents of root?
-				$def['Root']['disallowedParents'][] = $class;
-			}
+                $allowedChildren = array_keys(array_diff($classes, $allowedChildren));
+                if($allowedChildren) $def[$class]['disallowedChildren'] = $allowedChildren;
+                $defaultChild = $sng->default_child();
+                if($defaultChild != null) $def[$class]['defaultChild'] = $defaultChild;
+                if(isset($def[$class]['disallowedChildren'])) {
+                    foreach($def[$class]['disallowedChildren'] as $disallowedChild) {
+                        $def[$disallowedChild]['disallowedParents'][] = $class;
+                    }
+                }
+                
+                // Are any classes allowed to be parents of root?
+                $def['Root']['disallowedParents'][] = $class;
+            }
 
-			$json = Convert::raw2xml(Convert::raw2json($def));
-			$cache->save($json, $cacheKey);
-		}
-		return $json;
+            $json = Convert::raw2xml(Convert::raw2json($def));
+            $cache->save($json, $cacheKey);
+        }
+        return $json;
     }
     
     /**

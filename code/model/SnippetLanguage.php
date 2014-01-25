@@ -6,7 +6,7 @@ class SnippetLanguage extends DataObject {
                             'HighlightCode'=>'Varchar(45)',
                             'BrushFile'=>'Text',
                             'UserLanguage'=>'Boolean',
-    						'Hidden'=>'Boolean'
+                            'Hidden'=>'Boolean'
                          );
     
     private static $has_many=array(
@@ -17,7 +17,7 @@ class SnippetLanguage extends DataObject {
     private static $defaults=array(
                                 'HighlightCode'=>'Plain',
                                 'UserLanguage'=>true,
-    							'Hidden'=>false
+                                'Hidden'=>false
                             );
     
     private static $extensions=array(
@@ -201,7 +201,7 @@ class SnippetLanguage extends DataObject {
         return new FieldList(
                             new TextField('Name', _t('SnippetLanguage.NAME', '_Name'), null, 100),
                             new TextField('FileExtension', _t('SnippetLanguage.FILE_EXTENSION', '_File Extension'), null, 45),
-        					new TextField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
+                            new TextField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
                         );
     }
     
@@ -216,71 +216,71 @@ class SnippetLanguage extends DataObject {
     public function hasSnippets() {
         return ($this->Snippets()->Count()>0);
     }
-	
-	/**
-	 * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
-	 * @return {string} a html string ready to be directly used in a template
-	 */
-	public function getTreeTitle() {
-		$treeTitle = sprintf(
-			"<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-			Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
-		);
-		
-		return $treeTitle;
-	}
     
-	/**
-	 * Return the CSS classes to apply to this node in the CMS tree
-	 * @return {string} Classes used in the cms tree
-	 */
-	public function CMSTreeClasses() {
-		$classes=sprintf('class-%s', $this->class);
-		
-		$classes.=$this->markingClasses();
+    /**
+     * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
+     * @return {string} a html string ready to be directly used in a template
+     */
+    public function getTreeTitle() {
+        $treeTitle = sprintf(
+            "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
+            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+        );
+        
+        return $treeTitle;
+    }
+    
+    /**
+     * Return the CSS classes to apply to this node in the CMS tree
+     * @return {string} Classes used in the cms tree
+     */
+    public function CMSTreeClasses() {
+        $classes=sprintf('class-%s', $this->class);
+        
+        $classes.=$this->markingClasses();
 
-	    return $classes;
-	}
-	
-	public function summaryFields() {
-	    return array(
-	                'Name'=>_t('SnippetLanguage.NAME', '_Name'),
-	                'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language'),
-	    			'Hidden'=>_t('SnippetLanguage.HIDDEN', '_Hidden')
-	            );
-	}
-	
-	/**
-	 * Returns an array of the class names of classes that are allowed to be children of this class.
-	 * @return {array} Array of children
-	 */
-	public function allowedChildren() {
-		$allowedChildren = array();
-		$candidates = $this->stat('allowed_children');
-		if($candidates && $candidates != "none") {
-			foreach($candidates as $candidate) {
-				// If a classname is prefixed by "*", such as "*Page", then only that
-				// class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
-				if(substr($candidate,0,1) == '*') {
-					$allowedChildren[] = substr($candidate,1);
-				} else {
-					$subclasses = ClassInfo::subclassesFor($candidate);
-					foreach($subclasses as $subclass) {
-						$allowedChildren[] = $subclass;
-					}
-				}
-			}
-		}
-		
-		return $allowedChildren;
-	}
-	
-	/**
-	 * Returns the default child for this class
-	 * @return {string} Class name of the default child
-	 */
-	public function default_child() {
-		return $this->stat('default_child');
-	}
+        return $classes;
+    }
+    
+    public function summaryFields() {
+        return array(
+                    'Name'=>_t('SnippetLanguage.NAME', '_Name'),
+                    'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language'),
+                    'Hidden'=>_t('SnippetLanguage.HIDDEN', '_Hidden')
+                );
+    }
+    
+    /**
+     * Returns an array of the class names of classes that are allowed to be children of this class.
+     * @return {array} Array of children
+     */
+    public function allowedChildren() {
+        $allowedChildren = array();
+        $candidates = $this->stat('allowed_children');
+        if($candidates && $candidates != "none") {
+            foreach($candidates as $candidate) {
+                // If a classname is prefixed by "*", such as "*Page", then only that
+                // class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
+                if(substr($candidate,0,1) == '*') {
+                    $allowedChildren[] = substr($candidate,1);
+                } else {
+                    $subclasses = ClassInfo::subclassesFor($candidate);
+                    foreach($subclasses as $subclass) {
+                        $allowedChildren[] = $subclass;
+                    }
+                }
+            }
+        }
+        
+        return $allowedChildren;
+    }
+    
+    /**
+     * Returns the default child for this class
+     * @return {string} Class name of the default child
+     */
+    public function default_child() {
+        return $this->stat('default_child');
+    }
 }
 ?>

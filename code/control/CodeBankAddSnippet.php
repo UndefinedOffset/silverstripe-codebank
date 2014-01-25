@@ -108,17 +108,17 @@ class CodeBankAddSnippet extends CodeBank {
     }
     
     public function Breadcrumbs($unlinked=false) {
-		$defaultTitle=self::menu_title_for_class(get_class($this));
-		return new ArrayList(array(
-		                            new ArrayData(array(
-                                        				'Title'=>_t('CodeBank.MENUTITLE', '_Code Bank'),
-                                        				'Link'=>$this->LinkMain
-                                        			)),
-                        			new ArrayData(array(
-                                        				'Title'=>_t("{$this->class}.MENUTITLE", $defaultTitle),
-                                        				'Link'=>false
-                                        			))
-                        		));
-	}
+        $defaultTitle=self::menu_title_for_class(get_class($this));
+        return new ArrayList(array(
+                                    new ArrayData(array(
+                                                        'Title'=>_t('CodeBank.MENUTITLE', '_Code Bank'),
+                                                        'Link'=>$this->LinkMain
+                                                    )),
+                                    new ArrayData(array(
+                                                        'Title'=>_t("{$this->class}.MENUTITLE", $defaultTitle),
+                                                        'Link'=>false
+                                                    ))
+                                ));
+    }
 }
 ?>

@@ -13,12 +13,12 @@ class SnippetTreeCreatorFilter extends SnippetTreeFilter {
                                 "\"CreatorID\"=".intval($this->creator)
                             ));
         }
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['LanguageID']);
-		}
-		
-		return $ids;
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['LanguageID']);
+        }
+        
+        return $ids;
     }
     
     /**
@@ -27,20 +27,20 @@ class SnippetTreeCreatorFilter extends SnippetTreeFilter {
     public function snippetsIncluded() {
         $ids=array();
         $q=new SQLQuery();
-		$q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
-		
-		if(!empty($this->creator)) {
-		    $q->setWhereAny(array(
-        		            "\"CreatorID\"=".intval($this->creator)
-        		        ));
-		}
-		
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['ID']);
-		}
-		
-		return $ids;
+        $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
+        
+        if(!empty($this->creator)) {
+            $q->setWhereAny(array(
+                            "\"CreatorID\"=".intval($this->creator)
+                        ));
+        }
+        
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['ID']);
+        }
+        
+        return $ids;
     }
     /**
      * @return Array Map of Snippet Folder IDs
@@ -55,12 +55,12 @@ class SnippetTreeCreatorFilter extends SnippetTreeFilter {
                                 "\"CreatorID\"=".intval($this->creator)
                             ));
         }
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['FolderID']);
-		}
-		
-		return $ids;
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['FolderID']);
+        }
+        
+        return $ids;
     }
 }
 ?>

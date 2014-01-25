@@ -15,9 +15,9 @@ class CodeBankEditSnippet extends CodeBank {
                                         'show',
                                         'EditForm',
                                         'moveSnippet',
-                                		'savetreenode',
-                                		'getsubtree',
-                                		'moveSnippet'
+                                        'savetreenode',
+                                        'getsubtree',
+                                        'moveSnippet'
                                     );
     
     /**

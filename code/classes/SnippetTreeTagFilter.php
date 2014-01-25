@@ -22,12 +22,12 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
                                 "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
                             ));
         }
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['LanguageID']);
-		}
-		
-		return $ids;
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['LanguageID']);
+        }
+        
+        return $ids;
     }
     
     /**
@@ -36,21 +36,21 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
     public function snippetsIncluded() {
         $ids=array();
         $q=new SQLQuery();
-		$q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
-		
-		if(!empty($this->tag)) {
-		    $SQL_val=Convert::raw2sql($this->tag);
-		    $q->setWhereAny(array(
-        		            "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
-        		        ));
-		}
-		
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['ID']);
-		}
-		
-		return $ids;
+        $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
+        
+        if(!empty($this->tag)) {
+            $SQL_val=Convert::raw2sql($this->tag);
+            $q->setWhereAny(array(
+                            "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
+                        ));
+        }
+        
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['ID']);
+        }
+        
+        return $ids;
     }
     
     /**
@@ -67,12 +67,12 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
                                 "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
                             ));
         }
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['FolderID']);
-		}
-		
-		return $ids;
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['FolderID']);
+        }
+        
+        return $ids;
     }
 }
 ?>

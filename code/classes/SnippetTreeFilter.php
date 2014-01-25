@@ -56,22 +56,22 @@ class SnippetTreeFilter extends Object {
         $ids=array();
         
         $q=new SQLQuery();
-		$q->setSelect(array('"SnippetLanguage"."ID"'))
-		    ->setFrom('"SnippetLanguage"')
-		    ->addInnerJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"')
-		    ->setGroupBy('"SnippetLanguage"."ID"');
-		
-		if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-		    $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
-		}
-		
-		$q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['ID']);
-		}
-		
-		return $ids;
+        $q->setSelect(array('"SnippetLanguage"."ID"'))
+            ->setFrom('"SnippetLanguage"')
+            ->addInnerJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"')
+            ->setGroupBy('"SnippetLanguage"."ID"');
+        
+        if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
+            $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
+        }
+        
+        $q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['ID']);
+        }
+        
+        return $ids;
     }
     
     /**
@@ -80,23 +80,23 @@ class SnippetTreeFilter extends Object {
     public function snippetsIncluded() {
         $ids=array();
         $q=new SQLQuery();
-		$q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
-		
-		if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-		    $q->addWhere('"Snippet"."LanguageID"='.intval($this->params['LanguageID']));
-		}
-		
-		if(isset($this->params['Term']) && !empty($this->params['Term'])) {
-		    $SQL_val=Convert::raw2sql($this->params['Term']);
-		    $q->addWhere("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
-		}
-		
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['ID']);
-		}
-		
-		return $ids;
+        $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
+        
+        if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
+            $q->addWhere('"Snippet"."LanguageID"='.intval($this->params['LanguageID']));
+        }
+        
+        if(isset($this->params['Term']) && !empty($this->params['Term'])) {
+            $SQL_val=Convert::raw2sql($this->params['Term']);
+            $q->addWhere("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
+        }
+        
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['ID']);
+        }
+        
+        return $ids;
     }
     
     /**
@@ -114,23 +114,23 @@ class SnippetTreeFilter extends Object {
         $ids=array();
         
         $q=new SQLQuery();
-		$q->setSelect(array('"SnippetFolder"."ID"'))
-		    ->setFrom('"SnippetFolder"')
-		    ->addInnerJoin('SnippetLanguage', '"SnippetLanguage"."ID"="SnippetFolder"."LanguageID"')
-		    ->addInnerJoin('Snippet', '"Snippet"."FolderID"="SnippetFolder"."ID"')
-		    ->setGroupBy('"SnippetFolder"."ID"');
-		
-		if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-		    $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
-		}
-		
-		$q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
-		
-		foreach($q->execute() as $row) {
-			$ids[]=array('ID'=>$row['ID']);
-		}
-		
-		return $ids;
+        $q->setSelect(array('"SnippetFolder"."ID"'))
+            ->setFrom('"SnippetFolder"')
+            ->addInnerJoin('SnippetLanguage', '"SnippetLanguage"."ID"="SnippetFolder"."LanguageID"')
+            ->addInnerJoin('Snippet', '"Snippet"."FolderID"="SnippetFolder"."ID"')
+            ->setGroupBy('"SnippetFolder"."ID"');
+        
+        if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
+            $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
+        }
+        
+        $q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
+        
+        foreach($q->execute() as $row) {
+            $ids[]=array('ID'=>$row['ID']);
+        }
+        
+        return $ids;
     }
     
     /**

@@ -70,31 +70,31 @@ class PackageViewField extends FormField {
         
         return $obj->renderWith($this->getFieldHolderTemplates());
     }
-	
-	/**
-	 * Sets the current snippet id
-	 * @param {int} ID of the current snippet
-	 * @return {PackageViewField} Returns this
-	 */
-	public function setCurrentSnippetID() {
-	    $this->currentSnippetID=$id;
-	    
-	    return $this;
-	}
-	
-	/**
-	 * Gets the current snippet id
-	 * @return {int} ID of the current snippet
-	 */
-	public function getCurrentSnippetID() {
-	    return $this->currentSnippetID;
-	}
-	
-	/**
-	 * Returns a readonly version of this field
-	 */
-	public function performReadonlyTransformation() {
-		return $this;
-	}
+    
+    /**
+     * Sets the current snippet id
+     * @param {int} ID of the current snippet
+     * @return {PackageViewField} Returns this
+     */
+    public function setCurrentSnippetID() {
+        $this->currentSnippetID=$id;
+        
+        return $this;
+    }
+    
+    /**
+     * Gets the current snippet id
+     * @return {int} ID of the current snippet
+     */
+    public function getCurrentSnippetID() {
+        return $this->currentSnippetID;
+    }
+    
+    /**
+     * Returns a readonly version of this field
+     */
+    public function performReadonlyTransformation() {
+        return $this;
+    }
 }
 ?>
