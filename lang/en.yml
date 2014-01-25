@@ -108,6 +108,7 @@ en:
         NAME: "Name"
         FILE_EXTENSION: "File Extension"
         USER_LANGUAGE: "User Language"
+        HIDDEN: "Hidden"
     SnippetFolder:
         SINGULARNAME: "Folder"
         PLURALNAME: "Folders"

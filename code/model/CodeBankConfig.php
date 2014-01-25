@@ -132,7 +132,8 @@ class CodeBankConfig extends DataObject {
         $langGridConfig=GridFieldConfig_RecordEditor::create(30);
         $langGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest');
         $langGridConfig->getComponentByType('GridFieldDataColumns')->setFieldCasting(array(
-                                                                                            'UserLanguage'=>'Boolean->Nice'
+                                                                                            'UserLanguage'=>'Boolean->Nice',
+                                                                                            'Hidden'=>'Boolean->Nice'
                                                                                         ));
         
         $packageGridConfig=GridFieldConfig_RecordEditor::create(30);

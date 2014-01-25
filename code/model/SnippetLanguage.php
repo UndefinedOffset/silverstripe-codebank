@@ -5,7 +5,8 @@ class SnippetLanguage extends DataObject {
                             'FileExtension'=>'Varchar(45)',
                             'HighlightCode'=>'Varchar(45)',
                             'BrushFile'=>'Text',
-                            'UserLanguage'=>'Boolean'
+                            'UserLanguage'=>'Boolean',
+    						'Hidden'=>'Boolean'
                          );
     
     private static $has_many=array(
@@ -15,7 +16,8 @@ class SnippetLanguage extends DataObject {
     
     private static $defaults=array(
                                 'HighlightCode'=>'Plain',
-                                'UserLanguage'=>true
+                                'UserLanguage'=>true,
+    							'Hidden'=>false
                             );
     
     private static $extensions=array(
@@ -198,7 +200,8 @@ class SnippetLanguage extends DataObject {
     public function getCMSFields() {
         return new FieldList(
                             new TextField('Name', _t('SnippetLanguage.NAME', '_Name'), null, 100),
-                            new TextField('FileExtension', _t('SnippetLanguage.FILE_EXTENSION', '_File Extension'), null, 45)
+                            new TextField('FileExtension', _t('SnippetLanguage.FILE_EXTENSION', '_File Extension'), null, 45),
+        					new TextField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
                         );
     }
     
@@ -236,13 +239,14 @@ class SnippetLanguage extends DataObject {
 		
 		$classes.=$this->markingClasses();
 
-		return $classes;
+	    return $classes;
 	}
 	
 	public function summaryFields() {
 	    return array(
 	                'Name'=>_t('SnippetLanguage.NAME', '_Name'),
-	                'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language')
+	                'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language'),
+	    			'Hidden'=>_t('SnippetLanguage.HIDDEN', '_Hidden')
 	            );
 	}
 	

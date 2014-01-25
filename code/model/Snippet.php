@@ -40,7 +40,7 @@ class Snippet extends DataObject {
         $fields=new FieldList(
                             new TabSet('Root',
                                 new Tab('Main', _t('Snippet.MAIN', '_Main'),
-                                    DropdownField::create('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->map('ID', 'Title'))->setEmptyString('---'),
+                                    DropdownField::create('LanguageID', _t('Snippet.LANGUAGE', '_Language'), SnippetLanguage::get()->filter('Hidden', false)->map('ID', 'Title'))->setEmptyString('---'),
                                     new TextField('Title', _t('Snippet.TITLE', '_Title'), null, 300),
                                     TextareaField::create('Description', _t('Snippet.DESCRIPTION', '_Description'))->setRows(5),
                                     PackageSelectionField::create('PackageID', _t('Snippet.PACKAGE', '_Package'), SnippetPackage::get()->map('ID', 'Title'))->setEmptyString(_t('Snippet.NOT_IN_PACKAGE', '_Not Part of a Package')),
