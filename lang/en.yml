@@ -101,6 +101,7 @@ en:
         PACKAGE_SNIPPETS: "Package Snippets"
         SNIPPETS_AFTER_FIRST_SAVE: "Snippets can be added after saving for the first time"
         ADD_WARNING: "Warning if you link a snippet that is already in another package it will be moved to this package"
+        FIND_SNIPPETS_BY_TITLE: "Find Snippets by Title"
     SnippetLanguage:
         SINGULARNAME: "Language"
         PLURALNAME: "Languages"

@@ -30,7 +30,8 @@ class SnippetPackage extends DataObject {
             $packageGrid=new GridField('Snippets', _t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets'), $this->Snippets(), GridFieldConfig_RelationEditor::create(10));
             $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
                                     ->removeComponentsByType('GridFieldAddNewButton')
-                                    ->addComponent(new PackageViewButton());
+                                    ->addComponent(new PackageViewButton())
+                                    ->getComponentByType('GridFieldAddExistingAutocompleter')->setSearchFields(array('Snippet.Title'))->setplaceholderText(_t('SnippetPackage.FIND_SNIPPETS_BY_TITLE', '_Find Snippets by Title'));
             
             
             $fields->addFieldToTab('Root.Main', new LiteralField('SnippetAddWarning', '<p class="message warning">'._t('SnippetPackage.ADD_WARNING', '_Warning if you link a snippet that is already in another package it will be moved to this package').'</p>'));

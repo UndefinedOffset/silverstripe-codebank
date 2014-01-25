@@ -1,7 +1,7 @@
 <% if $SourceList.Count %>
     <ul>
         <% loop $SourceList %>
-            <li><a href="admin/codeBank/packages/show/$ID">$Title.XML</a> <a href="code-bank-api/export-package?id=$ID" target="_blank" class="exportPackageButton"><%t PackageViewField.EXPORT_PACKAGE "_Export Package" %></a>
+            <li><a href="admin/codeBank/settings/EditForm/field/Packages/item/$ID/edit">$Title.XML</a> <a href="code-bank-api/export-package?id=$ID" target="_blank" class="exportPackageButton"><%t PackageViewField.EXPORT_PACKAGE "_Export Package" %></a>
                 <% if $Top.ShowNested && $Snippets.Count %>
                     <ul>
                         <% loop $Snippets %>
