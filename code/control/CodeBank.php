@@ -588,12 +588,17 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @return {Form} Form used for searching
      */
     public function SearchForm() {
+        $languages=SnippetLanguage::get()
+                                        ->leftJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"')
+                                        ->where('"SnippetLanguage"."Hidden"=0 OR "Snippet"."ID" IS NOT NULL')
+                                        ->sort('Name');
+        
         $fields=new FieldList(
                             new TextField('q[Term]', _t('CodeBank.KEYWORD', '_Keyword')),
                             $classDropdown=new DropdownField(
                                                             'q[LanguageID]',
                                                             _t('CodeBank.LANGUAGE', '_Language'),
-                                                            SnippetLanguage::get()->sort('Name')->map('ID', 'Name')
+                                                            $languages->map('ID', 'Name')
                                                         )
                         );
         

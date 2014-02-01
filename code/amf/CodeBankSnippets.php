@@ -20,10 +20,15 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $response['data']=array();
         
         foreach($languages as $lang) {
+            if($lang->Hidden && $lang->Snippets()->Count()==0) {
+                continue;
+            }
+            
             $response['data'][]=array(
                         'language'=>$lang->Name,
                         'file_extension'=>$lang->FileExtension,
                         'shjs_code'=>$lang->HighlightCode,
+                        'hidden'=>$lang->Hidden,
                         'id'=>$lang->ID
                     );
         }
@@ -417,6 +422,22 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 $snippet->Description=$data->description;
                 $snippet->Text=$data->code;
                 $snippet->Tags=$data->tags;
+                
+                //Ensure we're not assigning to another hidden language
+                if($snippet->LanguageID!=$data->language) {
+                    $lang=SnippetLanguage::get()->byID(intval($data->language));
+                    if(!empty($lang) && $lang!==false && $lang->ID>0) {
+                        if($lang->Hidden) {
+                            $response['status']='EROR';
+                            $response['message']=_t('CodeBankAPI.LANGUAGE_HIDDEN', '_You cannot assign this snippet to a hidden language');
+                            
+                            return $response;
+                        }
+                    }else {
+                        throw new Exception('Language not found');
+                    }
+                }
+                
                 $snippet->LanguageID=$data->language;
                 $snippet->LastEditorID=Member::currentUserID();
                 $snippet->PackageID=$data->packageID;

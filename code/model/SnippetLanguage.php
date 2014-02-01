@@ -164,21 +164,6 @@ class SnippetLanguage extends DataObject {
     }
     
     /**
-     * Checks to see if the given member can edit this object or not
-     * @param {Member} $member Member instance or member id to check
-     * @return {bool} Returns boolean true or false depending if the user can edit this object
-     */
-    public function canEdit($member=null) {
-        $parentResult=parent::canEdit($member);
-        
-        if($parentResult==false || $this->UserLanguage==false) {
-            return false;
-        }
-        
-        return true;
-    }
-    
-    /**
      * Checks to see if the given member can delete this object or not
      * @param {Member} $member Member instance or member id to check
      * @return {bool} Returns boolean true or false depending if the user can delete this object
@@ -198,11 +183,18 @@ class SnippetLanguage extends DataObject {
      * @return {FieldSet} Fields to be used
      */
     public function getCMSFields() {
-        return new FieldList(
+        $fields=new FieldList(
                             new TextField('Name', _t('SnippetLanguage.NAME', '_Name'), null, 100),
                             new TextField('FileExtension', _t('SnippetLanguage.FILE_EXTENSION', '_File Extension'), null, 45),
-                            new TextField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
+                            new CheckboxField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
                         );
+        
+        if($this->UserLanguage==false) {
+            $fields->replaceField('Name', $fields->dataFieldByName('Name')->performReadonlyTransformation());
+            $fields->replaceField('FileExtension', $fields->dataFieldByName('FileExtension')->performReadonlyTransformation());
+        }
+        
+        return $fields;
     }
     
     public function Folders() {

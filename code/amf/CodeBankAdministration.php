@@ -179,7 +179,8 @@ class CodeBankAdministration implements CodeBank_APIClass {
                                     'file_extension'=>$lang->FileExtension,
                                     'shjh_code'=>$lang->HighlightCode,
                                     'user_language'=>$lang->UserLanguage,
-                                    'snippetCount'=>$lang->Snippets()->Count()
+                                    'snippetCount'=>$lang->Snippets()->Count(),
+                                    'hidden'=>$lang->Hidden
                                 );
         }
         
@@ -291,7 +292,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         try {
             $lang=SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."' AND ID<>=".intval($data->id));
-            if(empty($lang) || $lang===false || $lang->ID==0) {
+            if(!empty($lang) && $lang!==false && $lang->ID>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
             
@@ -300,14 +301,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             
             $lang=SnippetLanguage::get()->byID(intval($data->id));
-            if(!empty($lang) && $lang!==false && $lang->ID!=0) {
-                if($lang->UserLanguage==false) {
-                    $response['status']='EROR';
-                    $response['message']=_t('CodeBankAPI.NOT_USER_LANGUAGE', '_Language cannot be edited, it is not a user language');
-                    
-                    return $response;
-                }
-            }else {
+            if(empty($lang) || $lang===false || $lang->ID==0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
                 
@@ -316,8 +310,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             
             //Update language and write
-            $lang->Name=$data->language;
-            $lang->FileExtension=$data->fileExtension;
+            if($lang->UserLanguage==true) {
+                $lang->Name=$data->language;
+                $lang->FileExtension=$data->fileExtension;
+            }
+            
+            $lang->Hidden=$data->hidden;
             $lang->write();
             
             

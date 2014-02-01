@@ -134,7 +134,6 @@ en:
         PREFERENCES_SAVED: "Preferences saved successfully"
         LANGUAGE_NOT_FOUND: "Language not found"
         LANGUAGE_EXISTS: "Language already exists"
-        NOT_USER_LANGUAGE: "Language cannot be edited, it is not a user language"
         LANGUAGE_DELETE_ERROR: "Language cannot be deleted, it is either not a user language or has snippets attached to it"
         EMAIL_EXISTS: "An account with that email already exists"
         CURRENT_PASSWORD_MATCH: "Current password does not match"
@@ -146,6 +145,7 @@ en:
         PASSWORD_NOT_VALID: "Password is not valid"
         FOLDER_DOES_NOT_EXIST: "Folder does not exist"
         FOLDER_NOT_LANGUAGE: "Folder is not in the same language as the snippet"
+        LANGUAGE_HIDDEN: "You cannot assign this snippet to a hidden language"
     CodeBankLegacyMigrate:
         TITLE: "Legacy Code Bank Migration"
         DESCRIPTION: "Migrates a Code Bank 2.2 Database to the new system, please run this only once when migrating from a 2.2 install of Code Bank"
