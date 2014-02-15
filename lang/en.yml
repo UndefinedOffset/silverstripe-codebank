@@ -4,7 +4,7 @@ en:
         DEVELOPMENT_BUILD: "Development Build"
         COPYRIGHT: "Code Bank Copyright {year} Ed Chipman"
         LICENSE: "Code Bank is licensed under a"
-        LICENSE_TYPE: "Creative Commons Attribution-Noncommercial-No Derivative Works 3.0 License"
+        LICENSE_TYPE: "BSD 3.0 Clause"
         LICENSE_WAVER: "Any part of the Code Bank license can be waived with permission from the copyright holder."
         BUILT_ON: "Code Bank is built on the SilverStipe Framework in combination with the Zend Framework, see the respective sites for copyright information on those frameworks"
         ACCESS_CODE_BANK: "Access Code Bank"

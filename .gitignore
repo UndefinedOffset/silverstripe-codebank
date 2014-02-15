@@ -4,3 +4,6 @@
 
 # /build/cache/
 /build/cache/*
+/.settings
+/.buildpath
+/.project
