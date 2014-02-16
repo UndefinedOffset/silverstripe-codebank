@@ -1,8 +1,9 @@
 {
-    "name": "undefinedoffset/codebank",
+    "name": "undefinedoffset/silverstripe-codebank",
     "description": "Code Bank is a code snippet manager with syntax highlighting for multiple languages including C++, ActionScript, Flex, HTML and SQL to name a few. Code Bank also has a simple revision history with a compare viewer so you can see the changes side-by-side between two revisions.",
     "type": "silverstripe-module",
     "keywords": ["silverstripe", "snippet", "snippet manager", "development"],
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Ed Chipman",
@@ -12,13 +13,12 @@
     ],
     "require":
     {
-        "silverstripe/framework": "3.*",
+        "silverstripe/framework": "3.1.*",
         "composer/installers": "*"
     },
     "support": {
-        "issues": "https://github.com/undefinedoffset/codebank/issues"
+        "issues": "https://github.com/undefinedoffset/silverstripe-codebank/issues"
     },
-    "license": "CC-BY-ND-3.0",
     "extra": {
         "installer-name": "codebank"
     }

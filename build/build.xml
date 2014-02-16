@@ -30,7 +30,7 @@
         <get src="http://www.silverstripe.org/${resultStable}" dest="cache/silverstripe-3.1.tar.gz" verbose="true"/>
         
         <untar src="cache/silverstripe-3.1.tar.gz" dest="./../../" compression="gzip">
-            <patternset><!-- @TODO Fix so that it only includes framework -->
+            <patternset>
                 <include name="**/framework"/>
                 <include name="**/framework/*"/>
                 <include name="**/framework/**"/>
@@ -61,12 +61,13 @@
             <fileset dir="./../">
                 <exclude name="**/.svn"/>
                 <exclude name="build"/>
+                <exclude name="**/build/**"/>
                 <exclude name=".project"/>
                 <exclude name=".settings"/>
-                <exclude name=".settings/*"/>
+                <exclude name=".settings/**"/>
                 <exclude name=".buildpath"/>
                 <exclude name="release"/>
-            	<exclude name="release/*"/>
+            	<exclude name="release/**"/>
             </fileset>
         </copy>
         
@@ -75,11 +76,7 @@
         <zip destfile="${releaseDir}/${moduleReleaseArchive}" basedir="${releaseFolder}/CodeBank" update="true" level="9" excludes="code/CodeBankRedirecter.php"/>
         
         
-        
         <echo message="Starting Standalone Build"/>
-        
-        
-        <!-- @TODO Remove files for module -->
         
         
         <!-- Copy _config -->
@@ -93,21 +90,31 @@
             <fileset dir="../../themes">
                 <exclude name="**/.svn"/>
                 <exclude name="**/build"/>
+                <exclude name="**/build/**"/>
                 <exclude name="**/.project"/>
                 <exclude name="**/.settings"/>
+                <exclude name="**/.settings/**"/>
                 <exclude name="**/.buildpath"/>
             </fileset>
         </copy>
         
+        <!-- Copy the composer.json -->
+        <copy file="composer.tpl" tofile="${releaseFolder}/composer.json"/>
+        
+        
         <!-- Untar Framework -->
-        <untar src="cache/silverstripe-3.0.tar.gz" dest="${releaseFolder}" compression="gzip">
+        <untar src="cache/silverstripe-3.1.tar.gz" dest="${releaseFolder}" compression="gzip">
             <patternset>
-                <exclude name="themes"/>
-                <exclude name="themes/*"/>
-                <exclude name="phpunit*"/>
-                <exclude name="Makefile"/>
-                <exclude name="favicon.ico"/>
-                <exclude name="build.properties.default"/>
+                <exclude name="**/themes"/>
+                <exclude name="**/themes/**"/>
+                <exclude name="**/phpunit*"/>
+                <exclude name="**/Makefile"/>
+                <exclude name="**/favicon.ico"/>
+                <exclude name="**/build.properties.default"/>
+                <exclude name="**/vendor"/>
+                <exclude name="**/vendor/**"/>
+                <exclude name="**/CONTRIBUTING.md"/>
+                <exclude name="**/README.md"/>
             </patternset>
             
             <cutdirsmapper dirs="1"/>
@@ -146,7 +153,7 @@
         <replace file="${releaseFolder}/framework/dev/install/php5-required.html">
             <replacefilter token="To run SilverStripe" value="To run Code Bank"/>
             <replacefilter token="order to run SilverStripe" value="order to run Code Bank"/>
-            <replacefilter token="| Copyright &amp;copy; 2012 SilverStripe Limited" value="| Copyright &amp;copy; 2012 SilverStripe Limited&lt;br/&gt;&lt;a href=&quot;http://programs.edchipman.ca/applications/code-bank&quot; target=&quot;_blank&quot;&gt;Code Bank&lt;/a&gt; | Copyright &amp;copy; 2012 Ed Chipman"/>
+            <replacefilter token="| Copyright &amp;copy; 2014 SilverStripe Limited" value="| Copyright &amp;copy; 2014 SilverStripe Limited&lt;br/&gt;&lt;a href=&quot;http://programs.edchipman.ca/applications/code-bank&quot; target=&quot;_blank&quot;&gt;Code Bank&lt;/a&gt; | Copyright &amp;copy; 2014 Ed Chipman"/>
         </replace>
         
         
