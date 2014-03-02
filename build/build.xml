@@ -71,6 +71,13 @@
             </fileset>
         </copy>
         
+        
+        <!-- Update Build Date -->
+        <echo message="Updating Build Date"/>
+        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@BUILD_DATE@@" value="${releaseDir.buildDate}"/>
+        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@VERSION@@" value="${version}"/>
+        
+        
         <!-- Zip Module Release -->
         <echo message="Building Module Archive"/>
         <zip destfile="${releaseDir}/${moduleReleaseArchive}" basedir="${releaseFolder}/CodeBank" update="true" level="9" excludes="code/CodeBankRedirecter.php"/>
@@ -105,29 +112,28 @@
         <!-- Untar Framework -->
         <untar src="cache/silverstripe-3.1.tar.gz" dest="${releaseFolder}" compression="gzip">
             <patternset>
-                <exclude name="**/themes"/>
-                <exclude name="**/themes/**"/>
-                <exclude name="**/phpunit*"/>
-                <exclude name="**/Makefile"/>
-                <exclude name="**/favicon.ico"/>
-                <exclude name="**/build.properties.default"/>
-                <exclude name="**/vendor"/>
-                <exclude name="**/vendor/**"/>
-                <exclude name="**/CONTRIBUTING.md"/>
-                <exclude name="**/README.md"/>
+                <exclude name="SilverStripe-framework-v3.1.*/themes"/>
+                <exclude name="SilverStripe-framework-v3.1.*/themes/**"/>
+                <exclude name="SilverStripe-framework-v3.1.*/phpunit*"/>
+                <exclude name="SilverStripe-framework-v3.1.*/Makefile"/>
+                <exclude name="SilverStripe-framework-v3.1.*/favicon.ico"/>
+                <exclude name="SilverStripe-framework-v3.1.*/build.properties.default"/>
+                <exclude name="SilverStripe-framework-v3.1.*/vendor"/>
+                <exclude name="SilverStripe-framework-v3.1.*/vendor/**"/>
+                <exclude name="SilverStripe-framework-v3.1.*/CONTRIBUTING.md"/>
+                <exclude name="SilverStripe-framework-v3.1.*/README.md"/>
             </patternset>
             
             <cutdirsmapper dirs="1"/>
         </untar>
         
+        
+        <!-- Replace mysite config -->
+        <copy file="config.yml" todir="${releaseFolder}/mysite/_config"/>
+        
+        
         <!-- Replace Fav Icon -->
         <copy file="favicon.ico" todir="${releaseFolder}"/>
-        
-        
-        <!-- Update Build Date -->
-        <echo message="Updating Build Date"/>
-        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@BUILD_DATE@@" value="${releaseDir.buildDate}"/>
-        <replace file="${releaseFolder}/CodeBank/_config.php" token="@@VERSION@@" value="${version}"/>
         
         
         <!-- Patch install.php5 -->

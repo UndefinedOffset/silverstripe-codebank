@@ -1,0 +1,12 @@
+---
+Name: mysite
+After: "framework/*","cms/*"
+---
+#Director:
+    #environment_type: "dev"
+
+SSViewer:
+    theme: "codeBank"
+
+MySQLDatabase:
+    connection_charset: "utf8"

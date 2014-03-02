@@ -92,6 +92,20 @@ class SnippetLanguage extends DataObject {
                                     'AutoIt'=>array('Extension'=>'au3', 'HighlightCode'=>'AutoIt')
                                 );
     
+    
+    /**
+     * Checks to see if the member can view or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can view false otherwise
+     */
+    public function canView($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
     /**
      * Adds the default languages if they are missing
      */

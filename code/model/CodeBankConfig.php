@@ -7,6 +7,51 @@ class CodeBankConfig extends DataObject {
     
     protected static $_currentConfig;
     
+    
+    /**
+     * Checks to see if the member can view or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can view false otherwise
+     */
+    public function canView($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can edit or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can edit false otherwise
+     */
+    public function canEdit($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can delete or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can delete false otherwise
+     */
+    public function canDelete($member=null) {
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can create or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can create false otherwise
+     */
+    public function canCreate($member=null) {
+        return false;
+    }
+    
     /**
      * Creates the default code bank config
      */
@@ -145,19 +190,31 @@ class CodeBankConfig extends DataObject {
                                                                                                     $form->addExtraClass('CodeBankPackages');
                                                                                                 });
         
-        return new FieldList(
-                            new TabSet('Root',
-                                            new Tab('Main', _t('CodeBankConfig.MAIN', '_IP Message'),
-                                                    HtmlEditorField::create('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))->addExtraClass('stacked')
-                                                ),
-                                            new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),
-                                                    new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), $langGridConfig)
-                                                ),
-                                            new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
-                                                    new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), $packageGridConfig)
-                                                )
-                                        )
-                        );
+        if(Permission::check('ADMIN')) {
+            $fields=new FieldList(
+                                new TabSet('Root',
+                                        new Tab('Main', _t('CodeBankConfig.MAIN', '_IP Message'),
+                                                HtmlEditorField::create('IPMessage', _t('CodeBankConfig.IP_MESSAGE', '_Intellectual Property Message'))->addExtraClass('stacked')
+                                            ),
+                                        new Tab('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'),
+                                                new GridField('Languages', _t('CodeBankConfig.LANGUAGES', '_Languages'), SnippetLanguage::get(), $langGridConfig)
+                                            ),
+                                        new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
+                                                new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), $packageGridConfig)
+                                            )
+                                    )
+                            );
+        }else {
+            $fields=new FieldList(
+                                new TabSet('Root',
+                                                new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
+                                                        new GridField('Packages', _t('CodeBankConfig.MANAGE_PACKAGES', '_Manage Packages'), SnippetPackage::get(), $packageGridConfig)
+                                                    )
+                                            )
+                            );
+        }
+        
+        return $fields;
     }
 }
 ?>

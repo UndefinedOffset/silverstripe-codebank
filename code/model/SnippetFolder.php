@@ -28,6 +28,59 @@ class SnippetFolder extends DataObject {
     
     
     /**
+     * Checks to see if the member can view or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can view false otherwise
+     */
+    public function canView($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can edit or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can edit false otherwise
+     */
+    public function canEdit($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can delete or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can delete false otherwise
+     */
+    public function canDelete($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Checks to see if the member can create or not
+     * @param {int|Member} $member Member ID or instance to check
+     * @return {bool} Returns boolean true if the member can create false otherwise
+     */
+    public function canCreate($member=null) {
+        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    
+    /**
      * Gets fields used in the cms
      * @return {FieldList} Fields to be used
      */

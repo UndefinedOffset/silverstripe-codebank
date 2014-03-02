@@ -47,9 +47,13 @@ class CodeBankSettings extends CodeBank {
         $fields=$config->getCMSFields();
         $actions=new FieldList(
                                 FormAction::create('doSave', _t('CodeBank.SAVE', '_Save'))->addExtraClass('ss-ui-action-constructive')->setAttribute('data-icon', 'accept'),
-                                FormAction::create('doExportToClient', _t('CodeBank.EXPORT_TO_CLIENT', '_Export To Desktop Client'))->setAttribute('data-exporturl', Director::absoluteURL('code-bank-api/export-to-client'))->setAttribute('data-icon', 'export'),
-                                FormAction::create('doImportFromClient', _t('CodeBank.IMPORT_FROM_CLIENT', '_Import From Desktop Client'))->setAttribute('data-icon', 'import')->setAttribute('data-importurl', $this->Link('import-from-client'))
+                                FormAction::create('doExportToClient', _t('CodeBank.EXPORT_TO_CLIENT', '_Export To Desktop Client'))->setAttribute('data-exporturl', Director::absoluteURL('code-bank-api/export-to-client'))->setAttribute('data-icon', 'export')
                             );
+        
+        
+        if(Permission::check('ADMIN')) {
+            $actions->push(FormAction::create('doImportFromClient', _t('CodeBank.IMPORT_FROM_CLIENT', '_Import From Desktop Client'))->setAttribute('data-icon', 'import')->setAttribute('data-importurl', $this->Link('import-from-client')));
+        }
         
         $form=CMSForm::create($this, 'EditForm', $fields, $actions)->setHTMLID('Form_EditForm');
         $form->addExtraClass('root-form');
@@ -101,6 +105,11 @@ class CodeBankSettings extends CodeBank {
      * @return {string} Rendered template
      */
     public function import_from_client() {
+        if(!Permission::check('ADMIN')) {
+            Security::permissionFailure($this);
+            return;
+        }
+        
         $form=$this->ImportFromClientForm();
         if(Session::get('reloadOnImportDialogClose')) {
             Requirements::javascript(CB_DIR.'/javascript/CodeBank.ImportDialog.js');
@@ -118,6 +127,11 @@ class CodeBankSettings extends CodeBank {
      * @return {Form} Form to be used in the popup
      */
     public function ImportFromClientForm() {
+        if(!Permission::check('ADMIN')) {
+            Security::permissionFailure($this);
+            return;
+        }
+        
         $uploadField=new FileField('ImportFile', _t('CodeBank.EXPORT_FILE', '_Client Export File'));
         $uploadField->getValidator()->setAllowedExtensions(array('cbexport'));
         File::config()->allowed_extensions=array('cbexport');
@@ -155,6 +169,11 @@ class CodeBankSettings extends CodeBank {
      * @return {SS_HTTPResponse} Response
      */
     public function doImportData($data, Form $form) {
+        if(!Permission::check('ADMIN')) {
+            Security::permissionFailure($this);
+            return;
+        }
+        
         $fileData=$form->Fields()->dataFieldByName('ImportFile')->Value();
         //Check that the file uploaded
         if(!array_key_exists('tmp_name', $fileData) || !file_exists($fileData['tmp_name'])) {

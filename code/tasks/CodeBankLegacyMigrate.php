@@ -107,6 +107,12 @@ class CodeBankLegacyMigrate extends BuildTask {
                     $member->write();
                     
                     
+                    DB::query('UPDATE "Member" '.
+                            'SET "Password"=\''.substr(base_convert($row['password'], 16, 36), 0, 64).'\', '.
+                            '"Salt"=NULL '.
+                            'WHERE "ID"='.$member->ID);
+                    
+                    
                     //Add to security group
                     if($row['username']=='admin') {
                         //For admin add to administrators group
