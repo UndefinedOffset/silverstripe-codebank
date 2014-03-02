@@ -5,4 +5,4 @@ After:  framework/routes#rootroutes
 Director:
     rules:
         '': 'CodeBankRedirecter'
-        'code-bank-api': 'CodeBankClientAPI'
+        'code-bank-api': 'CodeBank_ClientAPI'
