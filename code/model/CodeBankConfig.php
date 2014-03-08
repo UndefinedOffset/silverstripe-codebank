@@ -86,27 +86,29 @@ class CodeBankConfig extends DataObject {
         
         
         //Check for and perform any needed updates
-        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+        $codeVersion=singleton('CodeBank')->getVersion();
+        $codeVersionTmp=explode(' ', $codeVersion);
+        if($version[0]!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=$codeVersion) {
             $updateXML=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/airUpdate.xml'));
             $latestVersion=strip_tags($updateXML->version->asXML());
             $versionTmp=explode(' ', $latestVersion);
             
             //Sanity Check code version against latest
-            if($versionTmp[1]<CB_BUILD_DATE) {
-                DB::alteration_message('Unknown Code Bank server version '.CB_VERSION.' '.CB_BUILD_DATE.', current version available for download is '.$latestVersion, 'error');
+            if(version_compare($codeVersionTmp[0], $versionTmp[0], '>')) {
+                DB::alteration_message('Unknown Code Bank server version '.$codeVersion.', current version available for download is '.$latestVersion, 'error');
                 return;
             }
             
             //Sanity Check make sure latest version is installed
-            if(CB_VERSION.' '.CB_BUILD_DATE!=$latestVersion) {
+            if($codeVersionTmp[0]!=$versionTmp[0]) {
                 DB::alteration_message('A Code Bank Server update is available, please <a href="http://programs.edchipman.ca/applications/code-bank/">download</a> and install the update then run dev/build again.', 'error');
                 return;
             }
             
             //Sanity Check database version against latest
-            $dbVerTmp=explode(' ', $dbVersion);
-            if($versionTmp[1]<CodeBankConfig::CurrentConfig()->Version) {
-                DB::alteration_message('Code Bank Server database version '.$dbVersion.', current version available for download is '.$latestVersion, 'error');
+            $dbVerTmp=explode(' ', CodeBankConfig::CurrentConfig()->Version);
+            if(version_compare($dbVerTmp[0], $versionTmp[0], '>')) {
+                DB::alteration_message('Code Bank Server database version '.CodeBankConfig::CurrentConfig()->Version.', current version available for download is '.$latestVersion, 'error');
                 return;
             }
             
