@@ -4,6 +4,10 @@ define('CB_VERSION', '@@VERSION@@');
 define('CB_DIR', basename(dirname(__FILE__)));
 
 
+//Add the include path for the thirdparty folder (fixes zend api's)
+set_include_path(get_include_path().PATH_SEPARATOR.dirname(__FILE__).'/thirdparty/');
+
+
 //CMS Menu
 CMSMenu::remove_menu_item('CodeBankAddSnippet');
 CMSMenu::remove_menu_item('CodeBankEditSnippet');
