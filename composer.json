@@ -20,6 +20,6 @@
         "issues": "https://github.com/undefinedoffset/silverstripe-codebank/issues"
     },
     "extra": {
-        "installer-name": "codebank"
+        "installer-name": "CodeBank"
     }
 }
