@@ -88,7 +88,8 @@ class CodeBankConfig extends DataObject {
         //Check for and perform any needed updates
         $codeVersion=singleton('CodeBank')->getVersion();
         $codeVersionTmp=explode(' ', $codeVersion);
-        if($version[0]!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=$codeVersion) {
+        $dbVerTmp=explode(' ', CodeBankConfig::CurrentConfig()->Version);
+        if($version[0]!='@@VERSION@@' && $codeVersionTmp[0]!=$dbVerTmp[0]) {
             $updateXML=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/airUpdate.xml'));
             $latestVersion=strip_tags($updateXML->version->asXML());
             $versionTmp=explode(' ', $latestVersion);
@@ -106,8 +107,7 @@ class CodeBankConfig extends DataObject {
             }
             
             //Sanity Check database version against latest
-            $dbVerTmp=explode(' ', CodeBankConfig::CurrentConfig()->Version);
-            if(version_compare($dbVerTmp[0], $versionTmp[0], '>')) {
+            if(version_compare($dbVerTmp[0], $versionTmp[0], '<')) {
                 DB::alteration_message('Code Bank Server database version '.CodeBankConfig::CurrentConfig()->Version.', current version available for download is '.$latestVersion, 'error');
                 return;
             }
