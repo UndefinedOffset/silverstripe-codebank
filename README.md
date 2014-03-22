@@ -1,5 +1,7 @@
 Code Bank (Server)
 =================
+[![Latest Stable Version](https://poser.pugx.org/undefinedoffset/silverstripe-codebank/v/stable.png)](https://packagist.org/packages/undefinedoffset/silverstripe-codebank) [![Total Downloads](https://poser.pugx.org/undefinedoffset/silverstripe-codebank/downloads.png)](https://packagist.org/packages/undefinedoffset/silverstripe-codebank) [![Latest Unstable Version](https://poser.pugx.org/undefinedoffset/silverstripe-codebank/v/unstable.png)](https://packagist.org/packages/undefinedoffset/silverstripe-codebank) [![License](https://poser.pugx.org/undefinedoffset/silverstripe-codebank/license.png)](https://packagist.org/packages/undefinedoffset/silverstripe-codebank)
+
 Code Bank is a code snippet manager with syntax highlighting for multiple languages including C++, ActionScript, Flex, HTML and SQL to name a few. Code Bank also has a simple revision history with a compare viewer so you can see the changes side-by-side between two revisions.
 
 
