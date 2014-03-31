@@ -59,9 +59,11 @@ class CodeBankConfig extends DataObject {
         parent::requireDefaultRecords();
         
         
+        $codeVersion=singleton('CodeBank')->getVersion();
+        
         if(!CodeBankConfig::get()->first()) {
             $conf=new CodeBankConfig();
-            $conf->Version=CB_VERSION.' '.CB_BUILD_DATE;
+            $conf->Version=$codeVersion;
             $conf->write();
             
             DB::alteration_message('Default Code Bank Config Created', 'created');
@@ -86,10 +88,9 @@ class CodeBankConfig extends DataObject {
         
         
         //Check for and perform any needed updates
-        $codeVersion=singleton('CodeBank')->getVersion();
         $codeVersionTmp=explode(' ', $codeVersion);
         $dbVerTmp=explode(' ', CodeBankConfig::CurrentConfig()->Version);
-        if($version[0]!='@@VERSION@@' && $codeVersionTmp[0]!=$dbVerTmp[0]) {
+        if($codeVersionTmp[0]!='@@VERSION@@' && $codeVersionTmp[0]!=$dbVerTmp[0]) {
             $updateXML=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/airUpdate.xml'));
             $latestVersion=strip_tags($updateXML->version->asXML());
             $versionTmp=explode(' ', $latestVersion);
