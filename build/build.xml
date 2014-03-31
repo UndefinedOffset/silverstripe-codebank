@@ -129,17 +129,11 @@
         
         
         <!-- Replace mysite config -->
-        <copy file="config.yml" todir="${releaseFolder}/mysite/_config"/>
+        <copy file="config.yml" todir="${releaseFolder}/mysite/_config/" overwrite="yes"/>
         
         
         <!-- Replace Fav Icon -->
         <copy file="favicon.ico" todir="${releaseFolder}"/>
-        
-        
-        <!-- Patch config.yml -->
-        <replace file="${releaseFolder}/mysite/_config/config.yml">
-            <replacefilter token="theme: 'simple'" value="theme: 'codeBank'"/>
-        </replace>
         
         
         <!-- Patch install.php5 -->
