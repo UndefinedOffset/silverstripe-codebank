@@ -136,6 +136,12 @@
         <copy file="favicon.ico" todir="${releaseFolder}"/>
         
         
+        <!-- Patch config.yml -->
+        <replace file="${releaseFolder}/mysite/_config/config.yml">
+            <replacefilter token="theme: 'simple'" value="theme: 'codeBank'"/>
+        </replace>
+        
+        
         <!-- Patch install.php5 -->
         <replace file="${releaseFolder}/framework/dev/install/install.php5">
             <replacefilter token="// Set the current theme. More themes can be downloaded from" value=""/>
