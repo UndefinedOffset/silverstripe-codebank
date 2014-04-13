@@ -189,7 +189,10 @@ class CodeBankConfig extends DataObject {
         $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest')->setItemEditFormCallback(function(Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
                                                                                                     Requirements::javascript(CB_DIR.'/javascript/SnippetPackages.ItemEditForm.js');
                                                                                                     
-                                                                                                    $form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
+                                                                                                    if($form->getRecord() && $form->getRecord()->ID>0) {
+                                                                                                    	$form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
+                                                                                                    }
+                                                                                                    
                                                                                                     $form->addExtraClass('CodeBankPackages');
                                                                                                 });
         
