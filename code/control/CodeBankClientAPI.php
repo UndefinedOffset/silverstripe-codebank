@@ -17,6 +17,9 @@ class CodeBank_ClientAPI extends Controller {
      * Handles all amf requests
      */
     public function index() {
+        //Ensure the session is started
+    	Session::start();
+    	
         //Start the server
         $server=new CodeBankAMFServer();
         

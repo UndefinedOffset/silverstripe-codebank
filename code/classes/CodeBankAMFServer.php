@@ -119,5 +119,13 @@ class CodeBankAMFServer extends Zend_Amf_Server {
         
         $this->_table=$table;
     }
+    
+    /**
+     * Whether of not the server is using sessions
+     * @return bool
+     */
+    public function isSession() {
+        return ($this->_session || array_key_exists($this->_sessionName, $_COOKIE));
+    }
 }
 ?>
