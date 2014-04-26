@@ -649,7 +649,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 if($lockData && isset($lockData->packages)) {
                     foreach ($lockData->packages as $package) {
                         if($package->name=='undefinedoffset/silverstripe-codebank' && isset($package->version)) {
-                            $version=$package->version;
+                            $version=$package->version.(isset($package->time) ? ' '.date('Ymd', strtotime($package->time)):'');
                             break;
                         }
                     }
