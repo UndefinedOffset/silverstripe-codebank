@@ -109,48 +109,48 @@ class CodeBankConfig extends DataObject {
             
             //Sanity Check database version against latest
             if(version_compare($dbVerTmp[0], $versionTmp[0], '<')) {
-	            $data=array(
-	                        'version'=>CodeBankConfig::CurrentConfig()->Version,
-	                        'db_type'=>'SERVER'
-	                    );
-	            
-	            $data=http_build_query($data);
-	            
-	            
-	            $context=stream_context_create(array(
-	                                                'http'=>array(
-	                                                            'method'=>'POST',
-	                                                            'header'=>"Content-type: application/x-www-form-urlencoded\r\n"
-	                                                                        ."Content-Length: ".strlen($data)."\r\n",
-	                                                            'content'=>$data
-	                                                        )
-	                                            ));
-	            
-	            
-	            //Download and run queries needed
-	            $sql=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/DatabaseUpgrade.php', false, $context));
-	            $sets=count($sql->query);
-	            foreach($sql->query as $query) {
-	                $queries=explode('$',$query);
-	                $t=count($queries);
-	            
-	                foreach($queries as $query) {
-	                    if(empty($query)) {
-	                        continue;
-	                    }
-	            
-	                    DB::query($query);
-	                }
-	            }
-	            
-	            
-	            //Update Database Version
-	            $codeBankConfig=CodeBankConfig::CurrentConfig();
-	            $codeBankConfig->Version=$latestVersion;
-	            $codeBankConfig->write();
-	            
-	            
-	            DB::alteration_message('Code Bank Server database upgraded', 'changed');
+                $data=array(
+                            'version'=>CodeBankConfig::CurrentConfig()->Version,
+                            'db_type'=>'SERVER'
+                        );
+                
+                $data=http_build_query($data);
+                
+                
+                $context=stream_context_create(array(
+                                                    'http'=>array(
+                                                                'method'=>'POST',
+                                                                'header'=>"Content-type: application/x-www-form-urlencoded\r\n"
+                                                                            ."Content-Length: ".strlen($data)."\r\n",
+                                                                'content'=>$data
+                                                            )
+                                                ));
+                
+                
+                //Download and run queries needed
+                $sql=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/DatabaseUpgrade.php', false, $context));
+                $sets=count($sql->query);
+                foreach($sql->query as $query) {
+                    $queries=explode('$',$query);
+                    $t=count($queries);
+                
+                    foreach($queries as $query) {
+                        if(empty($query)) {
+                            continue;
+                        }
+                
+                        DB::query($query);
+                    }
+                }
+                
+                
+                //Update Database Version
+                $codeBankConfig=CodeBankConfig::CurrentConfig();
+                $codeBankConfig->Version=$latestVersion;
+                $codeBankConfig->write();
+                
+                
+                DB::alteration_message('Code Bank Server database upgraded', 'changed');
             }
         }
     }
@@ -186,7 +186,7 @@ class CodeBankConfig extends DataObject {
                                                                                                     Requirements::javascript(CB_DIR.'/javascript/SnippetPackages.ItemEditForm.js');
                                                                                                     
                                                                                                     if($form->getRecord() && $form->getRecord()->ID>0) {
-                                                                                                    	$form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
+                                                                                                        $form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
                                                                                                     }
                                                                                                     
                                                                                                     $form->addExtraClass('CodeBankPackages');

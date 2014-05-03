@@ -18,8 +18,8 @@ class CodeBank_ClientAPI extends Controller {
      */
     public function index() {
         //Ensure the session is started
-    	Session::start();
-    	
+        Session::start();
+        
         //Start the server
         $server=new CodeBankAMFServer();
         

@@ -35,7 +35,7 @@ class CodeBankSessionManager implements CodeBank_APIClass {
                                         'hasIPAgreement'=>!empty($ipAgrement),
                                         'preferences'=>$prefs,
                                         'isAdmin'=>(Permission::check('ADMIN')!==false),
-                						'displayName'=>(trim($member->Name)=='' ? $member->Email:trim($member->Name))
+                                        'displayName'=>(trim($member->Name)=='' ? $member->Email:trim($member->Name))
                                     );
             }catch (Exception $e) {
                 //Something happend on the server

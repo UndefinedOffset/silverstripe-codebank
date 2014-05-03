@@ -86,7 +86,7 @@ class CodeBankServerController implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
     
         $response['login']=true;
-        $response['data']=array(CB_VERSION, CB_BUILD_DATE);
+        $response['data']=explode(' ', singleton('CodeBank')->getVersion());
         return $response;
     }
     
