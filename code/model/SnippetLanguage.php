@@ -189,6 +189,10 @@ class SnippetLanguage extends DataObject {
             return false;
         }
         
+        if($this->Folders()->count()>0 || $this->Snippets()->count()>0) {
+            return false;
+        }
+        
         return true;
     }
     
