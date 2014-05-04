@@ -14,7 +14,7 @@ class CodeBankSessionManager implements CodeBank_APIClass {
         $member=MemberAuthenticator::authenticate(array(
                                                         'Email'=>$data->user,
                                                         'Password'=>$data->pass
-                                                    ), false);
+                                                    ));
         
         if($member instanceof Member && $member->ID!=0 && Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             try {
