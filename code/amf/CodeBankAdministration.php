@@ -70,7 +70,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             if(!Permission::check('ADMIN') || !property_exists($data, 'id')) {
                 $member=Member::currentUser();
                 
-                $e=PasswordEncryptor::create_for_algorithm($this->PasswordEncryption);
+                $e=PasswordEncryptor::create_for_algorithm($member->PasswordEncryption);
                 if(!$e->check($member->Password, $data->currPassword, $member->Salt, $member)) {
                     $response['status']='EROR';
                     $response['message']=_t('CodeBankAPI.CURRENT_PASSWORD_MATCH', '_Current password does not match');
@@ -98,6 +98,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['status']='HELO';
             $response['message']=_t('CodeBankAPI.PASSWORD_CHANGED', '_User\'s password changed successfully');
         }catch (Exception $e) {
+            var_dump($e->getMessage());
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
