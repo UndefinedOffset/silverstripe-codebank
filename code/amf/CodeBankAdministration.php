@@ -67,7 +67,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(!Permission::check('ADMIN')) {
+            if(!Permission::check('ADMIN') || !property_exists($data, 'id')) {
                 $member=Member::currentUser();
                 
                 $e=PasswordEncryptor::create_for_algorithm($this->PasswordEncryption);
