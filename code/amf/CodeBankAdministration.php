@@ -121,7 +121,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         
         try {
-            if(Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>1) {
+            if(Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.EMAIL_EXISTS', '_An account with that email already exists');
                 
