@@ -248,7 +248,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         try {
             $lang=SnippetLanguage::get()->byID(intval($data->id));
             if(!empty($lang) && $lang!==false && $lang->ID!=0) {
-                if($lang->UserLanguage==false || $lang->Snippets()->Count()>0) {
+                if($lang->canDelete()==false) {
                     $response['status']='EROR';
                     $response['message']=_t('CodeBankAPI.LANGUAGE_DELETE_ERROR', '_Language cannot be deleted, it is either not a user language or has snippets attached to it');
                     
@@ -291,8 +291,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         
         try {
-            $lang=SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."' AND ID<>=".intval($data->id));
-            if(!empty($lang) && $lang!==false && $lang->ID>0) {
+            if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
             
@@ -322,6 +321,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['status']='HELO';
             $response['message']="Language edited successfully";
         }catch (Exception $e) {
+            var_dump($e->getMessage());
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
