@@ -46,6 +46,10 @@ SnippetFolder:
     folder3:
         Name: "Test Folder 3"
         LanguageID: 9
+    folder4:
+        Name: "Decendent Folder"
+        LanguageID: 3
+        ParentID: =>SnippetFolder.folder2
 
 Snippet:
     snippet1:
@@ -70,7 +74,14 @@ Snippet:
         Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
         Tags: "test,php,lorem,hello world"
         LanguageID: 3
-        Package: =>SnippetPackage.package1
+        Creator: =>Member.admin
+        LastEditor: =>Member.apiuser
+    snippet4:
+        Title: "PHP Test 3"
+        Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
+        Tags: "test,php,lorem,hello world"
+        LanguageID: 3
+        Folder: =>SnippetFolder.folder2
         Creator: =>Member.admin
         LastEditor: =>Member.apiuser
 

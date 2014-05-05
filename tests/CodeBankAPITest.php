@@ -423,6 +423,308 @@ class CodeBankAPITest extends SapphireTest {
     }
     
     /**
+     * Tests saving a snippet through the api
+     */
+    public function testSaveSnippet() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        $snippet=$this->objFromFixture('Snippet', 'snippet1');
+        
+        
+        //Test saving a snippet
+        $response=$apiClass->saveSnippet($this->fakeRequest(array(
+                                                                'id'=>$snippet->ID,
+                                                                'title'=>'API Snippet',
+                                                                'description'=>$snippet->Description,
+                                                                'code'=>'<?php print "hello api"; ?>',
+                                                                'tags'=>$snippet->Tags,
+                                                                'language'=>$snippet->LanguageID,
+                                                                'packageID'=>$snippet->PackageID
+                                                            )));
+        
+        //Validate the response
+        $response=$this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+    }
+    
+    /**
+     * Tests deleting a snippet through the api
+     */
+    public function testDeleteSnippet() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'noaccess')->login();
+        $snippet=$this->objFromFixture('Snippet', 'snippet1');
+        
+        
+        //Test deleting a snippet with a user with no api access
+        $response=$apiClass->deleteSnippet($this->fakeRequest(array(
+                                                                'id'=>$snippet->ID
+                                                            )));
+        
+        //Validate the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
+        $this->assertEquals('Not authorized', $response['message'], 'Response message should have been not authorized');
+        
+        
+        
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        
+        //Test deleting a snippet with a user with api access
+        $response=$apiClass->deleteSnippet($this->fakeRequest(array(
+                                                                    'id'=>$snippet->ID
+                                                                )));
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+    }
+    
+    /**
+     * Tests removing a snippet from a package
+     */
+    public function testRemoveSnippetFromPackage() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        $package=$this->objFromFixture('SnippetPackage', 'package1');
+        $snippet=$this->objFromFixture('Snippet', 'snippet1');
+        
+        
+        //Test deleting a snippet with a user with api access
+        $response=$apiClass->packageRemoveSnippet($this->fakeRequest(array(
+                                                                    'packageID'=>$package->ID,
+                                                                    'snippetID'=>$snippet->ID
+                                                                )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        
+        //Verify that the package no longer contains the snippet
+        $this->assertEquals(0, $package->Snippets()->filter('ID', $snippet->ID)->count(), 'Snippet was not removed from the package');
+    }
+    
+    /**
+     * Tests adding a snippet to a package
+     */
+    public function testAddSnippetToPackage() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        $package=$this->objFromFixture('SnippetPackage', 'package1');
+        $snippet=$this->objFromFixture('Snippet', 'snippet3');
+        
+        
+        //Test deleting a snippet with a user with api access
+        $response=$apiClass->addSnippetToPackage($this->fakeRequest(array(
+                                                                    'packageID'=>$package->ID,
+                                                                    'snippetID'=>$snippet->ID
+                                                                )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        
+        //Verify that the package now contains the snippet
+        $this->assertGreaterThan(0, $package->Snippets()->filter('ID', $snippet->ID)->count(), 'Snippet was not added to the package');
+    }
+    
+    /**
+     * Tests creating a package
+     */
+    public function testCreatePackage() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        
+        //Test creating a package with a user with api access
+        $response=$apiClass->createPackage($this->fakeRequest(array(
+                                                                    'title'=>'API Package'
+                                                                )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+    }
+    
+    /**
+     * Tests saving a package
+     */
+    public function testSavingPackage() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        
+        //Test saving a package with a user with api access
+        $response=$apiClass->savePackage($this->fakeRequest(array(
+                                                                'packageID'=>$this->objFromFixture('SnippetPackage', 'package1')->ID,
+                                                                'title'=>'API Package'
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+    }
+    
+    /**
+     * Tests deleting a package
+     */
+    public function testDeletePackage() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        
+        //Test deleting a package with a user with api access
+        $response=$apiClass->deletePackage($this->fakeRequest(array(
+                                                                'id'=>$this->objFromFixture('SnippetPackage', 'package1')->ID
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+    }
+    
+    /**
+     * Tests creating a folder, as well as checks to see that the duplicate detection is working and that detection for different languages is also working
+     */
+    public function testCreatingFolder() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        
+        //Test creating a folder
+        $response=$apiClass->newFolder($this->fakeRequest(array(
+                                                                'name'=>'API Folder',
+                                                                'languageID'=>9,
+                                                                'parentID'=>0
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        
+        //Test creating a duplicate folder
+        $response=$apiClass->newFolder($this->fakeRequest(array(
+                                                                'name'=>'API Folder',
+                                                                'languageID'=>9,
+                                                                'parentID'=>0
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
+        $this->assertEquals(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), $response['message'], 'Response message should have been that there is a duplicate');
+        
+        
+        //Test creating a folder under a different language
+        $response=$apiClass->newFolder($this->fakeRequest(array(
+                                                                'name'=>'API Folder 2',
+                                                                'languageID'=>9,
+                                                                'parentID'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
+        $this->assertEquals(_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet'), $response['message'], 'Response message should have been that the parent folder is in a different language');
+    }
+    
+    /**
+     * Tests renaming a folder, also tests to ensure that the duplicate checking is working
+     */
+    public function testRenameFolder() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+
+        //Test renaming a folder
+        $response=$apiClass->renameFolder($this->fakeRequest(array(
+                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
+                                                                'name'=>'Lorem Ipsum'
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+
+        //Test renaming a folder to a duplicate
+        $response=$apiClass->renameFolder($this->fakeRequest(array(
+                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
+                                                                'name'=>'Test Folder 2'
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
+        $this->assertEquals(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), $response['message'], 'Response message should have been that there is a duplicate');
+    }
+    
+    /**
+     * Tests to see that if a folder is deleted the decendent folders are moved up to the language and that the snippets are also removed correctly
+     */
+    public function testDeleteFolder() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+
+        //Test deleting a folder
+        $response=$apiClass->deleteFolder($this->fakeRequest(array(
+                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder2')->ID
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        //Check the folder id of the snippet
+        $this->assertEquals(0, $this->objFromFixture('Snippet', 'snippet4')->FolderID, 'Folder id was not reset on the snippet');
+
+        //Check the parent id of the folder
+        $this->assertEquals(0, $this->objFromFixture('SnippetFolder', 'folder4')->ParentID, 'Parent id was not reset on the folder');
+    }
+    
+    /**
+     * Tests moving a snippet to a folder, then to one in another language
+     */
+    public function testMoveSnippet() {
+        $apiClass=new CodeBankSnippets();
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+        $snippet=$this->objFromFixture('Snippet', 'snippet1');
+        $folder=$this->objFromFixture('SnippetFolder', 'folder2');
+        
+
+        //Test moving the snippet to a folder
+        $response=$apiClass->moveSnippet($this->fakeRequest(array(
+                                                                'id'=>$snippet->ID,
+                                                                'folderID'=>$folder->ID
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        //Check to see if the snippet actually changed folders
+        $this->assertEquals($folder->ID, $this->objFromFixture('Snippet', 'snippet1')->FolderID, 'Snippet did not actually move folders');
+        
+        
+        //Test moving the snippet to a folder in a different language
+        $folder=$this->objFromFixture('SnippetFolder', 'folder3');
+        $response=$apiClass->moveSnippet($this->fakeRequest(array(
+                                                                'id'=>$snippet->ID,
+                                                                'folderID'=>$folder->ID
+                                                            )));
+        
+        
+        //Validate the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
+        $this->assertEquals(_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet'), $response['message'], 'Response message should have been that the parent folder is in a different language');
+    }
+    
+    /**
      * Loads the contents of a url, with sensitivity for allow_url_fopen being off
      * @param {string} $url URL to load
      * @return {mixed} Returns the contents of the loaded url or false
