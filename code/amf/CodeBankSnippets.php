@@ -469,7 +469,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         try {
             $snippet=Snippet::get()->byID(intval($data->id));
             if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
-                if($snippet->CreatorID!=Member::currentUserID() && !Permission::check('ADMIN')) {
+                if($snippet->canDelete()==false) {
                     $response['status']="EROR";
                     $response['message']="Not authorized";
                     
@@ -997,16 +997,16 @@ class CodeBankSnippets implements CodeBank_APIClass {
         }
         
         
-        //try {
+        try {
             $snippet->FolderID=$data->folderID;
             $snippet->write();
             
             
             $response['status']="HELO";
-        /*}catch(Exception $e) {
+        }catch(Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
-        }*/
+        }
         
         
         return $response;
