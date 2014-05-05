@@ -371,7 +371,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippet->PackageID=$data->packageID;
             
             if($data->folderID>0) {
-                $folder=Folder::get()->byID(intval($data->folderID));
+                $folder=SnippetFolder::get()->byID(intval($data->folderID));
                 if(empty($folder) || $folder===false || $folder->ID==0) {
                     $response['status']="EROR";
                     $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
