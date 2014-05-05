@@ -14,6 +14,13 @@ class SnippetLanguageTest extends SapphireTest {
         singleton('SnippetLanguage')->requireDefaultRecords();
     }
     
+    public function tearDown() {
+        parent::tearDown();
+        
+        //Remove the extra_languages config key from code bank, cleans up after running the unit tests
+        Config::inst()->remove('CodeBank', 'extra_languages');
+    }
+    
     /**
      * Checks to see if the user can't delete a default language
      */

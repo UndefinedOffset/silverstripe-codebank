@@ -730,11 +730,7 @@ class CodeBankAPITest extends SapphireTest {
      * @return {mixed} Returns the contents of the loaded url or false
      */
     private function getURLContents($url) {
-        if(ini_get('allow_url_fopen')==true) {
-            $contents=@file_get_contents($url);
-            $responseHeaders=$this->parseHeaders($http_response_header);
-            $contents=array('content'=>$contents, 'content-type'=>$responseHeaders['content-type']);
-        }else if(function_exists('curl_init') && $ch = curl_init()) {
+        if(function_exists('curl_init') && $ch = curl_init()) {
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -742,7 +738,7 @@ class CodeBankAPITest extends SapphireTest {
             $contents=array('content'=>curl_exec($ch), 'content-type'=>curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
             curl_close($ch);
         }else {
-            user_error('Allow URL Fopen appears to be off and could not fallback to curl', E_USER_ERROR);
+            user_error('PHP Curl is not enabled', E_USER_ERROR);
         }
         
         return $contents;
