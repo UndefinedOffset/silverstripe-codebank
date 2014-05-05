@@ -1,0 +1,17 @@
+SnippetLanguage:
+    language1:
+        Name: "Fixture Language"
+    language2:
+        Name: "Fixture Language 2"
+    language3:
+        Name: "Fixture Language 3"
+
+Snippet:
+    snippet1:
+        Title: "Fixture Snippet"
+        Language: =>SnippetLanguage.language1
+
+SnippetFolder:
+    folder1:
+        Title: "Fixture Folder"
+        Language: =>SnippetLanguage.language3

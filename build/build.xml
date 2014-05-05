@@ -68,6 +68,8 @@
                 <exclude name=".buildpath"/>
                 <exclude name="release"/>
             	<exclude name="release/**"/>
+                <exclude name="tests"/>
+                <exclude name="tests/**"/>
             </fileset>
         </copy>
         

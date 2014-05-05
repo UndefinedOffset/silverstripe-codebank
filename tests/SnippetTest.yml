@@ -1,0 +1,88 @@
+Group:
+    admins:
+        Title: Administrators
+    codebankusers:
+        Title: "Code Bank Users"
+        Description: "Code Bank Access Group"
+        Code: "code-bank-api"
+
+Permission:
+    admins:
+        Code: ADMIN
+        Group: =>Group.admins
+    codebankusers:
+        Code: CODE_BANK_ACCESS
+        Group: =>Group.codebankusers
+
+Member:
+    admin:
+        FirstName: "Default"
+        Surname: "Admin"
+        Email: "admin"
+        Password: "admin"
+        Groups: =>Group.admins
+    apiuser:
+        FirstName: "API"
+        Surname: "User"
+        Email: "apiuser"
+        Password: "apiuser"
+        Groups: =>Group.codebankusers
+    noaccess:
+        FirstName: "NoAccess"
+        Surname: "user"
+        Email: "noaccess"
+
+SnippetPackage:
+    package1:
+        Title: "Test Package"
+
+SnippetFolder:
+    folder1:
+        Name: "Test Folder"
+        LanguageID: 3
+    folder2:
+        Name: "Test Folder 2"
+        LanguageID: 3
+    folder3:
+        Name: "Test Folder 3"
+        LanguageID: 9
+
+Snippet:
+    snippet1:
+        Title: "PHP Test"
+        Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
+        Tags: "test,php,lorem,hello world"
+        LanguageID: 3
+        Package: =>SnippetPackage.package1
+        Folder: =>SnippetFolder.folder1
+        Creator: =>Member.admin
+        LastEditor: =>Member.apiuser
+    snippet2:
+        Title: "CSS Test"
+        Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
+        Tags: "test,css,lorem,hello world"
+        LanguageID: 9
+        Package: =>SnippetPackage.package1
+        Creator: =>Member.admin
+        LastEditor: =>Member.apiuser
+    snippet3:
+        Title: "PHP Test 2"
+        Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
+        Tags: "test,php,lorem,hello world"
+        LanguageID: 3
+        Package: =>SnippetPackage.package1
+        Creator: =>Member.admin
+        LastEditor: =>Member.apiuser
+
+SnippetVersion:
+    snippet1version1:
+        Created: "2014-04-27 15:27:00"
+        Text: "<?php echo 'Hello World'; ?>"
+        Parent: =>Snippet.snippet1
+    snippet1version2:
+        Created: "2014-04-27 15:46:00" 
+        Text: "<?php print 'Hello World'; ?>"
+        Parent: =>Snippet.snippet1
+    snippet2version1:
+        Text: "body {color: #FF0000;}"
+        Parent: =>Snippet.snippet2
