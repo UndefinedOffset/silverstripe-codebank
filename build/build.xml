@@ -5,8 +5,8 @@
     
     <property name="releaseDir" location="../release"/>
     <property name="releaseFolder" location="${releaseDir}/codeBankServer"/>
-    <property name="moduleReleaseArchive" value="CodeBank.zip"/>
-    <property name="standaloneReleaseArchive" value="codeBankServer.zip"/>
+    <property name="moduleReleaseArchive" value="Module-CodeBank.zip"/>
+    <property name="standaloneReleaseArchive" value="Standalone-CodeBank.zip"/>
     
     <target name="updateSilverStripe">
         <delete file="cache/stable-download.html"/>
