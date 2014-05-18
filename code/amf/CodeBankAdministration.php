@@ -321,7 +321,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $response['status']='HELO';
             $response['message']="Language edited successfully";
         }catch (Exception $e) {
-            var_dump($e->getMessage());
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
