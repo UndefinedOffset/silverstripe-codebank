@@ -7,6 +7,7 @@ Code Bank is a code snippet manager with syntax highlighting for multiple langua
 
 ###Requirements:
 * SilverStripe Framework 3.1.x (See http://www.silverstripe.org/system-requirements/ for SilverStripe requirements)
+* PHP Zip extension (See http://ca1.php.net/manual/en/book.zip.php for installation instructions)
 
 
 ###Installation (Module)
