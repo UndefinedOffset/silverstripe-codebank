@@ -88,7 +88,7 @@ class CodeBank_ClientAPI extends Controller {
             
             //If the temp dir doesn't exist create it
             if(!file_exists(ASSETS_PATH.'/.codeBankTemp')) {
-                mkdir(ASSETS_PATH.'/.codeBankTemp', 0644);
+                mkdir(ASSETS_PATH.'/.codeBankTemp', Config::inst()->get('Filesystem', 'folder_create_mask'));
             }
             
             
@@ -97,7 +97,7 @@ class CodeBank_ClientAPI extends Controller {
                 
                 $res=$zip->open(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip', ZIPARCHIVE::CREATE);
                 
-                if($res) {
+                if($res===true) {
                     $path='';
                     $text=preg_split("/[\n\r]/", $snippet->getSnippetText());
                     $folder=str_replace('.', '/', trim(preg_replace('/^package (.*?)((\s*)\{)?$/i', '\\1', $text[0])));
@@ -116,13 +116,18 @@ class CodeBank_ClientAPI extends Controller {
                     
                     $zip->addFromString($folder.'/'.$className.'.'.$snippet->Language()->FileExtension, $snippet->getSnippetText());
                     
-                    $zip->Close();
-                    chmod(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip',0600);
-                    
-                    
-                    //Send File
-                    SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
-                    unlink(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
+                    if($zip->Close()!==false) {
+                        chmod(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip',0600);
+                        
+                        
+                        //Send File
+                        SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
+                        unlink(ASSETS_PATH.'/.codeBankTemp/'.$fileID.'.zip');
+                    }else {
+                        header("HTTP/1.1 500 Internal Server Error");
+                    }
+                }else {
+                    header("HTTP/1.1 500 Internal Server Error");
                 }
             }else {
                 SS_HTTPRequest::send_file($snippet->getSnippetText(), $fileID.'.'.$snippet->Language()->FileExtension, 'text/plain')->output();
@@ -219,14 +224,14 @@ class CodeBank_ClientAPI extends Controller {
             
             //If the temp dir doesn't exist create it
             if(!file_exists(ASSETS_PATH.'/.codeBankTemp')) {
-                mkdir(ASSETS_PATH.'/.codeBankTemp', 0644);
+                mkdir(ASSETS_PATH.'/.codeBankTemp', Config::inst()->get('Filesystem', 'folder_create_mask'));
             }
             
             
             $zip=new ZipArchive();
             $res=$zip->open(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip', ZIPARCHIVE::CREATE);
             
-            if($res) {
+            if($res===true) {
                 $snippets=$package->Snippets();
                 
                 foreach($snippets as $snippet) {
@@ -255,13 +260,16 @@ class CodeBank_ClientAPI extends Controller {
                     }
                 }
                 
-                $zip->Close();
-                chmod(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip',0600);
-                
-                
-                //Send File
-                SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
-                unlink(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip');
+                if($zip->Close()!==false) {
+                    chmod(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip',0600);
+                    
+                    
+                    //Send File
+                    SS_HTTPRequest::send_file(file_get_contents(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip'), $fileID.'.zip', 'application/octet-stream')->output();
+                    unlink(ASSETS_PATH.'/.codeBankTemp/package-'.$fileID.'.zip');
+                }else {
+                    header("HTTP/1.1 500 Internal Server Error");
+                }
             }else {
                 header("HTTP/1.1 500 Internal Server Error");
             }
