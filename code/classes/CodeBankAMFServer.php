@@ -57,6 +57,15 @@ class CodeBankAMFServer extends Zend_Amf_Server {
         }else if($info instanceof Zend_Server_Reflection_Method) {
             // Get class
             $class=$info->getDeclaringClass()->getName();
+            
+            //Check permissions
+            if($this->_canAccess($class)==false) {
+                $response=CodeBank_ClientAPI::responseBase();
+                $response['status']='EROR';
+                $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
+                return $response;
+            }
+            
             if('static'==$info->isStatic()) {
                 // for some reason, invokeArgs() does not work the same as
                 // invoke(), and expects the first argument to be an object.
@@ -126,6 +135,48 @@ class CodeBankAMFServer extends Zend_Amf_Server {
      */
     public function isSession() {
         return ($this->_session || array_key_exists($this->_sessionName, $_COOKIE));
+    }
+    
+    /**
+     * Checks to see if the member can access the requested class
+     * @param {string|CodeBank_APIClass} $object Name of the class to check or an instance of CodeBank_APIClass
+     */
+    protected function _canAccess($object) {
+        if(!is_object($object)) {
+            $object=singleton($object);
+        }
+        
+        //Ensure the object is an instance of CodeBank_APIClass
+        if(!($object instanceof CodeBank_APIClass)) {
+            //If in dev mode and object is an instance of ZendAmfServiceBrowser return true
+            if(Director::isDev() && $object instanceof ZendAmfServiceBrowser) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        
+        //Fetch permissions from the object
+        $perms=$object->getRequiredPermissions();
+        
+        //Check to see if the permissions are not empty
+        if(!empty($perms) && $perms!==false) {
+            //Ensure we have an array, if not throw an exception
+            if(!is_array($perms)) {
+                throw new Zend_Amf_Exception('CodeBank_APIClass::getRequiredPermissions() Should return an array of permissions to check');
+                return false;
+            }
+            
+            //Loop through and ensure the user has the required permissions return false if they are missing any
+            foreach($perms as $permission) {
+                if(!Permission::check($permission)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
     }
 }
 ?>

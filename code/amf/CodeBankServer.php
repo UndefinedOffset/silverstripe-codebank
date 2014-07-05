@@ -78,6 +78,54 @@ class CodeBankServer implements CodeBank_APIClass {
         
         return $response;
     }
+    
+    /**
+     * Changes a users password
+     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @return {array} Returns a standard response array
+     */
+    public function changePassword($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        
+        try {
+            $member=Member::currentUser();
+            
+            $e=PasswordEncryptor::create_for_algorithm($member->PasswordEncryption);
+            if(!$e->check($member->Password, $data->currPassword, $member->Salt, $member)) {
+                $response['status']='EROR';
+                $response['message']=_t('CodeBankAPI.CURRENT_PASSWORD_MATCH', '_Current password does not match');
+                
+                return $response;
+            }
+            
+            
+            if(!$member->changePassword($data->password)) {
+                $response['status']='EROR';
+                $response['message']=_t('CodeBankAPI.NEW_PASSWORD_NOT_VALID', '_New password is not valid');
+                
+                return $response;
+            }
+            
+            
+            $response['status']='HELO';
+            $response['message']=_t('CodeBankAPI.PASSWORD_CHANGED', '_User\'s password changed successfully');
+        }catch (Exception $e) {
+            $response['status']='EROR';
+            $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
+        }
+        
+        return $response;
+    }
+    
+    /**
+     * Gets the permissions required to access the class
+     * @return {array} Array of permission names to check
+     */
+    public function getRequiredPermissions() {
+        return array(
+                    'CODE_BANK_ACCESS'
+                );
+    }
 }
 
 class CodeBankServerController implements CodeBank_APIClass {
@@ -99,6 +147,14 @@ class CodeBankServerController implements CodeBank_APIClass {
         $response['data']=session_id();
     
         return $response;
+    }
+    
+    /**
+     * Gets the permissions required to access the class
+     * @return {array} Array of permission names to check
+     */
+    public function getRequiredPermissions() {
+        return null;
     }
 }
 ?>

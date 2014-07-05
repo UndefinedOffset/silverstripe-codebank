@@ -1112,5 +1112,15 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         return $array;
     }
+    
+    /**
+     * Gets the permissions required to access the class
+     * @return {array} Array of permission names to check
+     */
+    public function getRequiredPermissions() {
+        return array(
+                    'CODE_BANK_ACCESS'
+                );
+    }
 }
 ?>

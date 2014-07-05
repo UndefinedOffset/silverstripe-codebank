@@ -69,5 +69,13 @@ class CodeBankSessionManager implements CodeBank_APIClass {
         
         return $response;
     }
+    
+    /**
+     * Gets the permissions required to access the class
+     * @return {array} Array of permission names to check
+     */
+    public function getRequiredPermissions() {
+        return null;
+    }
 }
 ?>

@@ -7,13 +7,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
     public function getUsersList() {
         $response=CodeBank_ClientAPI::responseBase();
         
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
-        
         $members=Permission::get_members_by_permission(array('ADMIN', 'CODE_BANK_ACCESS'));
         foreach($members as $member) {
             $response['data'][]=array(
@@ -34,13 +27,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
      */
     public function deleteUser($data) {
         $response=CodeBank_ClientAPI::responseBase();
-        
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
         
         try {
             $member=Member::get()->filter('ID', intval($data->id))->where('ID<>'.Member::currentUserID())->First();
@@ -67,24 +53,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(!Permission::check('ADMIN') || !property_exists($data, 'id')) {
-                $member=Member::currentUser();
+            $member=Member::get()->byID(intval($data->id));
+            if(empty($member) || $member===false || $member->ID==0) {
+                $response['status']='EROR';
+                $response['message']=_t('CodeBankAPI.MEMBER_NOT_FOUND', '_Member not found');
                 
-                $e=PasswordEncryptor::create_for_algorithm($member->PasswordEncryption);
-                if(!$e->check($member->Password, $data->currPassword, $member->Salt, $member)) {
-                    $response['status']='EROR';
-                    $response['message']=_t('CodeBankAPI.CURRENT_PASSWORD_MATCH', '_Current password does not match');
-                    
-                    return $response;
-                }
-            }else {
-                $member=Member::get()->byID(intval($data->id));
-                if(empty($member) || $member===false || $member->ID==0) {
-                    $response['status']='EROR';
-                    $response['message']=_t('CodeBankAPI.MEMBER_NOT_FOUND', '_Member not found');
-                    
-                    return $response;
-                }
+                return $response;
             }
             
             if(!$member->changePassword($data->password)) {
@@ -112,13 +86,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
      */
     public function createUser($data) {
         $response=CodeBank_ClientAPI::responseBase();
-        
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
         
         try {
             if(Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>0) {
@@ -164,13 +131,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
     public function getAdminLanguages() {
         $response=CodeBank_ClientAPI::responseBase();
         
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
-        
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
             $response['data'][]=array(
@@ -195,13 +155,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
      */
     public function createLanguage($data) {
         $response=CodeBank_ClientAPI::responseBase();
-        
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
         
         try {
             if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
@@ -237,13 +190,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
      */
     public function deleteLanguage($data) {
         $response=CodeBank_ClientAPI::responseBase();
-        
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
         
         try {
             $lang=SnippetLanguage::get()->byID(intval($data->id));
@@ -283,13 +229,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
     public function editLanguage($data) {
         $response=CodeBank_ClientAPI::responseBase();
         
-        if(!Permission::check('ADMIN')) {
-            $response['status']='EROR';
-            $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
-            return $response;
-        }
-        
-        
         try {
             if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
                 $response['status']='EROR';
@@ -326,6 +265,17 @@ class CodeBankAdministration implements CodeBank_APIClass {
         }
         
         return $response;
+    }
+    
+    /**
+     * Gets the permissions required to access the class
+     * @return {array} Array of permission names to check
+     */
+    public function getRequiredPermissions() {
+        return array(
+                    'CODE_BANK_ACCESS',
+                    'ADMIN'
+                );
     }
 }
 ?>
