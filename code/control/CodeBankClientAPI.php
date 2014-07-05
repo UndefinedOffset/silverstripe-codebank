@@ -7,6 +7,8 @@ class CodeBank_ClientAPI extends Controller {
                                         'export_to_client'
                                     );
     
+    private $_testAMFRequest=false;
+    
     public function init() {
         parent::init();
         
@@ -36,17 +38,28 @@ class CodeBank_ClientAPI extends Controller {
             ZendAmfServiceBrowser::$ZEND_AMF_SERVER=$server;
         }
         
+        if(class_exists('CodeBankAPITest') && $this->_testAMFRequest!==false) {
+            $server->setRequest($this->_testAMFRequest);
+            $server->setResponse(new Zend_Amf_Response());
+        }
+        
         $server->setProduction(!Director::isDev()); //Server debug, bind to opposite of Director::isDev()
         
         //Start the response
         $response=$server->handle();
         
-        //Output
-        echo $response;
         
-        //Save session and exit
+        //If not in test mode add the application/x-amf content type
+        if(!class_exists('CodeBankAPITest')) {
+            $this->response->addHeader('Content-Type', 'application/x-amf');
+        }
+        
+        
+        //Save session
         Session::save();
-        exit;
+        
+        //Output
+        return $response;
     }
     
     /**
@@ -299,6 +312,16 @@ class CodeBank_ClientAPI extends Controller {
         $responseBase['session']=(Member::currentUserID()==0 ? 'expired':'valid');
         
         return $responseBase;
+    }
+    
+    /**
+     * Implented for test only, sets the request to pass to the amf server
+     * @param {Test_Amf_Request} $request Test AMF Request
+     */
+    public function setTestRequest(Zend_Amf_Request $request) {
+        if(class_exists('CodeBankAPITest')) {
+            $this->_testAMFRequest=$request;
+        }
     }
     
     /**

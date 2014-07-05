@@ -17,26 +17,20 @@ class CodeBankAPITest extends SapphireTest {
     
     /**
      * Tests the api end point to ensure it is active and returning the correct response for a ping
-     * @TODO Fix so that this can be run, seems that travis does not by default come with apache. If we switch to testing with php 5.4 we can use php's built in server like the framework does
      */
-    /*public function testAPIEndpoint() {
-        $response=$this->getURLContents(Controller::join_links(Director::absoluteBaseURL(), 'code-bank-api'));
+    public function testAPIEndpoint() {
+        $response=$this->getAMFResponse('ServerController.connect');
         
         
-        //Test that the content type is correct
-        $this->assertEquals('application/x-amf', $response['content-type']);
-        
-        
-        //Test that we recieved the default endpoint notice, we base64 encode it because it can contain binary data
-        $this->assertEquals('PHA+WmVuZCBBbWYgRW5kcG9pbnQ8L3A+AAAAAAAA', base64_encode($response['content']), 'API response was not what was expected, this could indicate an error has occured or there is a problem in the response');
-    }*/
+        //Test that we recieved the default endpoint notice
+        $this->assertNotEquals(false, $response, 'API response was not what was expected, this could indicate an error has occured or there is a problem in the response');
+    }
     
     /**
      * Tests to see if the login method in the session manager actually login a user
      */
     public function testLogin() {
-        $apiClass=new CodeBankSessionManager();
-        $response=$apiClass->login($this->fakeRequest(array('user'=>'admin', 'pass'=>'admin')));
+        $response=$this->getAMFResponse('SessionManager.login', array('user'=>'admin', 'pass'=>'admin'));
         
         
         //Check the response to ensure it is HELO
@@ -51,8 +45,6 @@ class CodeBankAPITest extends SapphireTest {
      * Test to see if the logout method in the session manager actually logs the user out
      */
     public function testLogout() {
-        $apiClass=new CodeBankSessionManager();
-        
         //Login the admin user
         $this->objFromFixture('Member', 'admin')->login();
         
@@ -62,7 +54,7 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Attempt to logout
-        $apiClass->logout();
+        $this->getAMFResponse('SessionManager.logout');
         
         
         //Verify the user was logged out
@@ -73,13 +65,11 @@ class CodeBankAPITest extends SapphireTest {
      * Tests generic api access to see if user control is enforced correctly
      */
     public function testAPIAccess() {
-        $apiClass=new CodeBankSnippets();
-        
         //Login the noaccess account
         $this->objFromFixture('Member', 'noaccess')->login();
         
         //Try to get the languages
-        $response=$apiClass->getLanguages();
+        $response=$this->getAMFResponse('Snippets.getLanguages');
         
         
         //Test response
@@ -92,7 +82,7 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Try to get the languages
-        $response=$apiClass->getLanguages();
+        $response=$this->getAMFResponse('Snippets.getLanguages');
         
         
         //Test response
@@ -103,7 +93,6 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see if a member can update their preferences
      */
     public function testMemberSavePreferences() {
-        $apiClass=new CodeBankServer();
         $member=$this->objFromFixture('Member', 'apiuser');
         $member->login();
         
@@ -114,7 +103,7 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Fetch the message from the api
-        $response=$apiClass->savePreferences($this->fakeRequest(array('heartbeat'=>$heartBeat)));
+        $response=$this->getAMFResponse('Server.savePreferences', array('heartbeat'=>$heartBeat));
         
         
         //Re-fetch the apiuser account
@@ -129,12 +118,11 @@ class CodeBankAPITest extends SapphireTest {
      * Checks to see if a non-admin user can access admin specific sections
      */
     public function testAdminPermissionFailure() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'apiuser')->login(); //Login apiuser
         
         
         //Try fetching users list with a user with just CODE_BANK_API permissions
-        $response=$apiClass->getUsersList();
+        $response=$this->getAMFResponse('Administration.getUsersList');
         
         
         //Verify the response was an error
@@ -145,7 +133,7 @@ class CodeBankAPITest extends SapphireTest {
         $this->objFromFixture('Member', 'admin')->login(); //Login admin user
         
         //Try fetching users list with a user with ADMIN permissions
-        $response=$apiClass->getUsersList();
+        $response=$this->getAMFResponse('Administration.getUsersList');
         
         
         //Verify the response was an error
@@ -156,12 +144,11 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see if admin's can delete a user, also checks to see that a normal user cannot
      */
     public function testAdminDeleteUser() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'apiuser')->login(); //Login apiuser
         
         
         //Try deleting with a user with just CODE_BANK_API permissions
-        $response=$apiClass->deleteUser($this->fakeRequest(array('id'=>3)));
+        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>3));
         
         
         //Verify the response was an error
@@ -177,7 +164,7 @@ class CodeBankAPITest extends SapphireTest {
         $this->objFromFixture('Member', 'admin')->login(); //Login admin user
         
         //Try deleting with a user with ADMIN permissions
-        $response=$apiClass->deleteUser($this->fakeRequest(array('id'=>3)));
+        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>3));
         
         
         //Verify the response was an error
@@ -192,12 +179,11 @@ class CodeBankAPITest extends SapphireTest {
      * Test the change password system, first checks to ensure that a user changing their password must provide the current password, then checks to see if an admin can change another user's password
      */
     public function testChangePassword() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'admin')->login(); //Login admin
         
         
         //Test incorrect current password
-        $response=$apiClass->changeUserPassword($this->fakeRequest(array('currPassword'=>'nimda', 'password'=>'admin1')));
+        $response=$this->getAMFResponse('Server.changePassword', array('currPassword'=>'nimda', 'password'=>'admin1'));
         
         
         //Verify the response
@@ -206,7 +192,7 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test chancing with the correct current password
-        $response=$apiClass->changeUserPassword($this->fakeRequest(array('currPassword'=>'admin', 'password'=>'admin1')));
+        $response=$this->getAMFResponse('Server.changePassword', array('currPassword'=>'admin', 'password'=>'admin1'));
         
         
         //Verify the response
@@ -214,28 +200,38 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test chancing with the correct current password
-        $response=$apiClass->changeUserPassword($this->fakeRequest(array('id'=>$this->objFromFixture('Member', 'noaccess')->ID, 'password'=>'admin1')));
+        $response=$this->getAMFResponse('Administration.changeUserPassword', array('id'=>$this->objFromFixture('Member', 'noaccess')->ID, 'password'=>'admin1'));
         
         
         //Verify the response
         $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
+        
+        
+        //Try changing another users pasword where they don't have admin permissions
+        $this->objFromFixture('Member', 'apiuser')->login(); //Login non-admin
+        
+        //Test chancing with the correct current password
+        $response=$this->getAMFResponse('Administration.changeUserPassword', array('id'=>$this->objFromFixture('Member', 'noaccess')->ID, 'password'=>'admin1'));
+        
+        
+        //Verify the response
+        $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
     }
     
     /**
      * Tests to see if an admin can create a user, also checks to see if duplicate detection is functioning correctly
      */
     public function testCreateUser() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'admin')->login(); //Login admin
         
         
         //Test creating a user
-        $response=$apiClass->createUser($this->fakeRequest(array(
-                                                                'firstname'=>'Joe',
-                                                                'surname'=>'User',
-                                                                'username'=>'joe@example.com',
-                                                                'Password'=>'joespass'
-                                                            )));
+        $response=$this->getAMFResponse('Administration.createUser', array(
+                                                                            'firstname'=>'Joe',
+                                                                            'surname'=>'User',
+                                                                            'username'=>'joe@example.com',
+                                                                            'Password'=>'joespass'
+                                                                        ));
         
         
         //Validate the response
@@ -243,12 +239,12 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test creating a user who already exists in the database
-        $response=$apiClass->createUser($this->fakeRequest(array(
-                                                                'firstname'=>'Joe',
-                                                                'surname'=>'User',
-                                                                'username'=>'joe@example.com',
-                                                                'Password'=>'joespass'
-                                                            )));
+        $response=$this->getAMFResponse('Administration.createUser', array(
+                                                                            'firstname'=>'Joe',
+                                                                            'surname'=>'User',
+                                                                            'username'=>'joe@example.com',
+                                                                            'Password'=>'joespass'
+                                                                        ));
         
         
         //Validate the response
@@ -260,15 +256,14 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see if the language creation is working correctly
      */
     public function testCreateLanguage() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'admin')->login(); //Login admin
         
         
         //Test creating a language
-        $response=$apiClass->createLanguage($this->fakeRequest(array(
-                                                                'language'=>'API Language',
-                                                                'fileExtension'=>'api'
-                                                            )));
+        $response=$this->getAMFResponse('Administration.createLanguage', array(
+                                                                                'language'=>'API Language',
+                                                                                'fileExtension'=>'api'
+                                                                            ));
         
         
         //Validate the response
@@ -276,10 +271,10 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test creating a duplicate language
-        $response=$apiClass->createLanguage($this->fakeRequest(array(
-                                                                'language'=>'API Language',
-                                                                'fileExtension'=>'api'
-                                                            )));
+        $response=$this->getAMFResponse('Administration.createLanguage', array(
+                                                                            'language'=>'API Language',
+                                                                            'fileExtension'=>'api'
+                                                                        ));
         
         
         //Validate the response
@@ -291,12 +286,11 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see if the language deletion is working correctly
      */
     public function testDeleteLanguage() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'admin')->login(); //Login admin
         
         
         //Try deleting a default language
-        $response=$apiClass->deleteLanguage($this->fakeRequest(array('id'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID)));
+        $response=$this->getAMFResponse('Administration.deleteLanguage', array('id'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID));
         
         
         //Validate the response
@@ -320,7 +314,7 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Try deleting a the language
-        $response=$apiClass->deleteLanguage($this->fakeRequest(array('id'=>$lang->ID)));
+        $response=$this->getAMFResponse('Administration.deleteLanguage', array('id'=>$lang->ID));
         
         
         //Validate the response
@@ -330,7 +324,7 @@ class CodeBankAPITest extends SapphireTest {
         
         //Delete the snippet and try again
         $snippet->delete();
-        $response=$apiClass->deleteLanguage($this->fakeRequest(array('id'=>$lang->ID)));
+        $response=$this->getAMFResponse('Administration.deleteLanguage', array('id'=>$lang->ID));
         
         
         //Validate the response
@@ -341,7 +335,6 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see if the language editing is working correctly
      */
     public function testEditLanguage() {
-        $apiClass=new CodeBankAdministration();
         $this->objFromFixture('Member', 'admin')->login(); //Login admin
         
         
@@ -354,12 +347,12 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test creating a language
-        $response=$apiClass->editLanguage($this->fakeRequest(array(
-                                                                'id'=>$lang->ID,
-                                                                'language'=>'API Language 2',
-                                                                'fileExtension'=>'api2',
-                                                                'hidden'=>false
-                                                            )));
+        $response=$this->getAMFResponse('Administration.editLanguage', array(
+                                                                            'id'=>$lang->ID,
+                                                                            'language'=>'API Language 2',
+                                                                            'fileExtension'=>'api2',
+                                                                            'hidden'=>false
+                                                                        ));
         
         
         //Validate the response
@@ -371,12 +364,12 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test editing to a duplicate language
-        $response=$apiClass->editLanguage($this->fakeRequest(array(
-                                                                'id'=>$lang->ID,
-                                                                'language'=>'PHP',
-                                                                'fileExtension'=>'api',
-                                                                'hidden'=>false
-                                                            )));
+        $response=$this->getAMFResponse('Administration.editLanguage', array(
+                                                                            'id'=>$lang->ID,
+                                                                            'language'=>'PHP',
+                                                                            'fileExtension'=>'api',
+                                                                            'hidden'=>false
+                                                                        ));
         
         
         //Validate the response
@@ -388,35 +381,34 @@ class CodeBankAPITest extends SapphireTest {
      * Tests creating a snippet from the api
      */
     public function testNewSnippet() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         
         //Test creating a snippet
-        $response=$apiClass->newSnippet($this->fakeRequest(array(
-                                                                'title'=>'API Snippet',
-                                                                'description'=>'This is a snippet created from the api',
-                                                                'code'=>'<?php print "hello api"; ?>',
-                                                                'tags'=>'api,test,snippet,php',
-                                                                'language'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID,
-                                                                'packageID'=>0,
-                                                                'folderID'=>0
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.newSnippet', array(
+                                                                            'title'=>'API Snippet',
+                                                                            'description'=>'This is a snippet created from the api',
+                                                                            'code'=>'<?php print "hello api"; ?>',
+                                                                            'tags'=>'api,test,snippet,php',
+                                                                            'language'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID,
+                                                                            'packageID'=>0,
+                                                                            'folderID'=>0
+                                                                        ));
         
         //Validate the response
         $response=$this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
         
         
         //Test creating a snippet, that belongs to a folder in another language
-        $response=$apiClass->newSnippet($this->fakeRequest(array(
-                                                                'title'=>'API Snippet',
-                                                                'description'=>'This is a snippet created from the api',
-                                                                'code'=>'<?php print "hello api"; ?>',
-                                                                'tags'=>'api,test,snippet,php',
-                                                                'language'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID,
-                                                                'packageID'=>0,
-                                                                'folderID'=>$this->objFromFixture('SnippetFolder', 'folder3')->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.newSnippet', array(
+                                                                            'title'=>'API Snippet',
+                                                                            'description'=>'This is a snippet created from the api',
+                                                                            'code'=>'<?php print "hello api"; ?>',
+                                                                            'tags'=>'api,test,snippet,php',
+                                                                            'language'=>SnippetLanguage::get()->filter('Name', 'PHP')->first()->ID,
+                                                                            'packageID'=>0,
+                                                                            'folderID'=>$this->objFromFixture('SnippetFolder', 'folder3')->ID
+                                                                        ));
         
         //Validate the response
         $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
@@ -427,21 +419,20 @@ class CodeBankAPITest extends SapphireTest {
      * Tests saving a snippet through the api
      */
     public function testSaveSnippet() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         
         //Test saving a snippet
-        $response=$apiClass->saveSnippet($this->fakeRequest(array(
-                                                                'id'=>$snippet->ID,
-                                                                'title'=>'API Snippet',
-                                                                'description'=>$snippet->Description,
-                                                                'code'=>'<?php print "hello api"; ?>',
-                                                                'tags'=>$snippet->Tags,
-                                                                'language'=>$snippet->LanguageID,
-                                                                'packageID'=>$snippet->PackageID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.saveSnippet', array(
+                                                                    'id'=>$snippet->ID,
+                                                                    'title'=>'API Snippet',
+                                                                    'description'=>$snippet->Description,
+                                                                    'code'=>'<?php print "hello api"; ?>',
+                                                                    'tags'=>$snippet->Tags,
+                                                                    'language'=>$snippet->LanguageID,
+                                                                    'packageID'=>$snippet->PackageID
+                                                                ));
         
         //Validate the response
         $response=$this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
@@ -451,19 +442,18 @@ class CodeBankAPITest extends SapphireTest {
      * Tests deleting a snippet through the api
      */
     public function testDeleteSnippet() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'noaccess')->login();
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         
         //Test deleting a snippet with a user with no api access
-        $response=$apiClass->deleteSnippet($this->fakeRequest(array(
-                                                                'id'=>$snippet->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.deleteSnippet', array(
+                                                                        'id'=>$snippet->ID
+                                                                    ));
         
         //Validate the response
         $this->assertEquals('EROR', $response['status'], 'Response status should have been EROR');
-        $this->assertEquals('Not authorized', $response['message'], 'Response message should have been not authorized');
+        $this->assertEquals(_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied'), $response['message'], 'Response message should have been permission denied');
         
         
         
@@ -471,9 +461,9 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test deleting a snippet with a user with api access
-        $response=$apiClass->deleteSnippet($this->fakeRequest(array(
-                                                                    'id'=>$snippet->ID
-                                                                )));
+        $response=$this->getAMFResponse('Snippets.deleteSnippet', array(
+                                                                        'id'=>$snippet->ID
+                                                                    ));
         
         //Validate the response
         $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
@@ -483,7 +473,6 @@ class CodeBankAPITest extends SapphireTest {
      * Tests removing a snippet from a package
      */
     public function testRemoveSnippetFromPackage() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         $package=$this->objFromFixture('SnippetPackage', 'package1');
@@ -491,10 +480,10 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test deleting a snippet with a user with api access
-        $response=$apiClass->packageRemoveSnippet($this->fakeRequest(array(
-                                                                    'packageID'=>$package->ID,
-                                                                    'snippetID'=>$snippet->ID
-                                                                )));
+        $response=$this->getAMFResponse('Snippets.packageRemoveSnippet', array(
+                                                                                'packageID'=>$package->ID,
+                                                                                'snippetID'=>$snippet->ID
+                                                                            ));
         
         
         //Validate the response
@@ -509,7 +498,6 @@ class CodeBankAPITest extends SapphireTest {
      * Tests adding a snippet to a package
      */
     public function testAddSnippetToPackage() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         $package=$this->objFromFixture('SnippetPackage', 'package1');
@@ -517,10 +505,10 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test deleting a snippet with a user with api access
-        $response=$apiClass->addSnippetToPackage($this->fakeRequest(array(
-                                                                    'packageID'=>$package->ID,
-                                                                    'snippetID'=>$snippet->ID
-                                                                )));
+        $response=$this->getAMFResponse('Snippets.addSnippetToPackage', array(
+                                                                            'packageID'=>$package->ID,
+                                                                            'snippetID'=>$snippet->ID
+                                                                        ));
         
         
         //Validate the response
@@ -535,14 +523,13 @@ class CodeBankAPITest extends SapphireTest {
      * Tests creating a package
      */
     public function testCreatePackage() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         
         //Test creating a package with a user with api access
-        $response=$apiClass->createPackage($this->fakeRequest(array(
-                                                                    'title'=>'API Package'
-                                                                )));
+        $response=$this->getAMFResponse('Snippets.createPackage', array(
+                                                                        'title'=>'API Package'
+                                                                    ));
         
         
         //Validate the response
@@ -553,15 +540,14 @@ class CodeBankAPITest extends SapphireTest {
      * Tests saving a package
      */
     public function testSavingPackage() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         
         //Test saving a package with a user with api access
-        $response=$apiClass->savePackage($this->fakeRequest(array(
-                                                                'packageID'=>$this->objFromFixture('SnippetPackage', 'package1')->ID,
-                                                                'title'=>'API Package'
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.savePackage', array(
+                                                                    'packageID'=>$this->objFromFixture('SnippetPackage', 'package1')->ID,
+                                                                    'title'=>'API Package'
+                                                                ));
         
         
         //Validate the response
@@ -572,14 +558,13 @@ class CodeBankAPITest extends SapphireTest {
      * Tests deleting a package
      */
     public function testDeletePackage() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         
         //Test deleting a package with a user with api access
-        $response=$apiClass->deletePackage($this->fakeRequest(array(
-                                                                'id'=>$this->objFromFixture('SnippetPackage', 'package1')->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.deletePackage', array(
+                                                                        'id'=>$this->objFromFixture('SnippetPackage', 'package1')->ID
+                                                                    ));
         
         
         //Validate the response
@@ -590,16 +575,15 @@ class CodeBankAPITest extends SapphireTest {
      * Tests creating a folder, as well as checks to see that the duplicate detection is working and that detection for different languages is also working
      */
     public function testCreatingFolder() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         
         //Test creating a folder
-        $response=$apiClass->newFolder($this->fakeRequest(array(
-                                                                'name'=>'API Folder',
-                                                                'languageID'=>9,
-                                                                'parentID'=>0
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.newFolder', array(
+                                                                    'name'=>'API Folder',
+                                                                    'languageID'=>9,
+                                                                    'parentID'=>0
+                                                                ));
         
         
         //Validate the response
@@ -607,11 +591,11 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test creating a duplicate folder
-        $response=$apiClass->newFolder($this->fakeRequest(array(
-                                                                'name'=>'API Folder',
-                                                                'languageID'=>9,
-                                                                'parentID'=>0
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.newFolder', array(
+                                                                    'name'=>'API Folder',
+                                                                    'languageID'=>9,
+                                                                    'parentID'=>0
+                                                                ));
         
         
         //Validate the response
@@ -620,11 +604,11 @@ class CodeBankAPITest extends SapphireTest {
         
         
         //Test creating a folder under a different language
-        $response=$apiClass->newFolder($this->fakeRequest(array(
-                                                                'name'=>'API Folder 2',
-                                                                'languageID'=>9,
-                                                                'parentID'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.newFolder', array(
+                                                                    'name'=>'API Folder 2',
+                                                                    'languageID'=>9,
+                                                                    'parentID'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID
+                                                                ));
         
         
         //Validate the response
@@ -636,15 +620,14 @@ class CodeBankAPITest extends SapphireTest {
      * Tests renaming a folder, also tests to ensure that the duplicate checking is working
      */
     public function testRenameFolder() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
 
         //Test renaming a folder
-        $response=$apiClass->renameFolder($this->fakeRequest(array(
-                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
-                                                                'name'=>'Lorem Ipsum'
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.renameFolder', array(
+                                                                        'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
+                                                                        'name'=>'Lorem Ipsum'
+                                                                    ));
         
         
         //Validate the response
@@ -652,10 +635,10 @@ class CodeBankAPITest extends SapphireTest {
         
 
         //Test renaming a folder to a duplicate
-        $response=$apiClass->renameFolder($this->fakeRequest(array(
-                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
-                                                                'name'=>'Test Folder 2'
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.renameFolder', array(
+                                                                        'id'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID,
+                                                                        'name'=>'Test Folder 2'
+                                                                    ));
         
         
         //Validate the response
@@ -667,14 +650,13 @@ class CodeBankAPITest extends SapphireTest {
      * Tests to see that if a folder is deleted the decendent folders are moved up to the language and that the snippets are also removed correctly
      */
     public function testDeleteFolder() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
 
         //Test deleting a folder
-        $response=$apiClass->deleteFolder($this->fakeRequest(array(
-                                                                'id'=>$this->objFromFixture('SnippetFolder', 'folder2')->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.deleteFolder', array(
+                                                                        'id'=>$this->objFromFixture('SnippetFolder', 'folder2')->ID
+                                                                    ));
         
         
         //Validate the response
@@ -691,7 +673,6 @@ class CodeBankAPITest extends SapphireTest {
      * Tests moving a snippet to a folder, then to one in another language
      */
     public function testMoveSnippet() {
-        $apiClass=new CodeBankSnippets();
         $this->objFromFixture('Member', 'apiuser')->login();
         
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
@@ -699,10 +680,10 @@ class CodeBankAPITest extends SapphireTest {
         
 
         //Test moving the snippet to a folder
-        $response=$apiClass->moveSnippet($this->fakeRequest(array(
-                                                                'id'=>$snippet->ID,
-                                                                'folderID'=>$folder->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.moveSnippet', array(
+                                                                    'id'=>$snippet->ID,
+                                                                    'folderID'=>$folder->ID
+                                                                ));
         
         
         //Validate the response
@@ -714,10 +695,10 @@ class CodeBankAPITest extends SapphireTest {
         
         //Test moving the snippet to a folder in a different language
         $folder=$this->objFromFixture('SnippetFolder', 'folder3');
-        $response=$apiClass->moveSnippet($this->fakeRequest(array(
-                                                                'id'=>$snippet->ID,
-                                                                'folderID'=>$folder->ID
-                                                            )));
+        $response=$this->getAMFResponse('Snippets.moveSnippet', array(
+                                                                    'id'=>$snippet->ID,
+                                                                    'folderID'=>$folder->ID
+                                                                ));
         
         
         //Validate the response
@@ -726,53 +707,11 @@ class CodeBankAPITest extends SapphireTest {
     }
     
     /**
-     * Loads the contents of a url, with sensitivity for allow_url_fopen being off
-     * @param {string} $url URL to load
-     * @return {mixed} Returns the contents of the loaded url or false
-     */
-    private function getURLContents($url) {
-        if(function_exists('curl_init') && $ch = curl_init()) {
-            curl_setopt($ch, CURLOPT_URL, $url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-            
-            $contents=array('content'=>curl_exec($ch), 'content-type'=>curl_getinfo($ch, CURLINFO_CONTENT_TYPE));
-            curl_close($ch);
-        }else {
-            user_error('PHP Curl is not enabled', E_USER_ERROR);
-        }
-        
-        return $contents;
-    }
-    
-    /**
-     * Parses the headers contained in $http_response_header into an associative array
-     * @param {array} $headers Headers contained in $http_response_header
-     * @return {array} Associative array representing the headers
-     */
-    private function parseHeaders($headers) {
-        $result=array();
-        
-        foreach($headers as $header) {
-            $tmp=explode(':', $header);
-            if(count($tmp)>1) {
-                $name=strtolower($tmp[0]);
-                unset($tmp[0]);
-                
-                $result[$name]=trim(implode(':', $tmp));
-            }
-        }
-        
-        return $result;
-    }
-    
-    
-    /**
      * Generates a fake request object to be passed to the api class
      * @param {array} $data Associative array of data to be converted into a request object
      * @return {stdObject} Standard php object to be sent to the client
      */
-    private function fakeRequest($data) {
+    protected function arrayToObject($data) {
         $request=new stdClass();
         
         foreach($data as $prop=>$value) {
@@ -780,6 +719,78 @@ class CodeBankAPITest extends SapphireTest {
         }
         
         return $request;
+    }
+    
+    /**
+     * Handles passing a request through the amf client
+     * @param {string} $servicePath Service path i.e ServerController.connect
+     * @param {object|array} $data Data to be sent with the request should be an array or an object
+     * @return {array} Server response
+     */
+    protected function getAMFResponse($servicePath, $data=null) {
+        require_once 'Zend/Amf/Request.php';
+        require_once 'Zend/Amf/Constants.php';
+        require_once 'Zend/Amf/Value/MessageBody.php';
+        require_once 'Zend/Amf/Value/Messaging/RemotingMessage.php';
+        require_once 'Zend/Amf/Value/Messaging/ErrorMessage.php';
+        
+        
+        if($data) {
+            if(is_array($data)) {
+                $data=$this->arrayToObject($data);
+            }else if(!is_object($data)) {
+                user_error('$data is not an array or object', E_USER_ERROR);
+            }
+        }
+        
+        
+        //Find the method and service
+        $service=explode('.', $servicePath);
+        $method=array_pop($service);
+        $service=implode('.', $service);
+        
+        
+        //Build the message
+        $message=new Zend_Amf_Value_Messaging_RemotingMessage();
+        $message->parameters=$data;
+        $message->operation=$method;
+        $message->source=$service;
+        
+        
+        //Build the message body
+        $body=new Zend_Amf_Value_MessageBody($servicePath, '/1', array($data));
+        
+        
+        //Build the AMF Request
+        $request=new Zend_Amf_Request();
+        $request->addAmfBody($body);
+        $request->setObjectEncoding(Zend_Amf_Constants::AMF3_OBJECT_ENCODING);
+        
+        
+        //Init the client api
+        $amfClient=new CodeBank_ClientAPI();
+        $amfClient->setTestRequest($request);
+        
+        //Capture the response as an amf input stream
+        ob_start();
+        $response=$amfClient->index();
+        ob_end_clean();
+        
+        
+        //Get the amf bodies
+        $bodies=$response->getAmfBodies();
+        if(count($bodies)>0) {
+            $body=$bodies[0]->getData();
+            if($body instanceof Zend_Amf_Value_Messaging_ErrorMessage) {
+                $this->fail('AMF Server returned an error: '. $body->faultString."\n\n".$body->faultDetail);
+                
+                return false;
+            }
+            
+            return $body;
+        }
+        
+        return false;
     }
 }
 ?>
