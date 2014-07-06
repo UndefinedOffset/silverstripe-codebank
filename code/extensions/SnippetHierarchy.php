@@ -580,7 +580,7 @@ class SnippetHierarchy extends DataExtension {
             if($this->owner->ID==0) {
                 $staged=SnippetLanguage::get();
             }else {
-                $staged=ArrayList::create(array_merge($this->owner->Folders()->toArray(), $this->owner->Snippets()->where('"FolderID"=0')->toArray()));
+                $staged=ArrayList::create(array_merge($this->owner->Folders()->toArray(), $this->owner->Snippets()->filter('FolderID', 0)->toArray()));
             }
         }else if($baseClass=='SnippetFolder') {
             $staged=ArrayList::create(array_merge($this->owner->Folders()->toArray(), $this->owner->Snippets()->toArray()));

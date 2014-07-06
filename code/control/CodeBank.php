@@ -165,7 +165,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         if($record) {
             $fields->push($idField=new HiddenField("ID", false, $id));
-            $versions=$record->Versions()->where('ID<>'.$record->CurrentVersionID)->Map('ID', 'Created');
+            $versions=$record->Versions()->filter('ID:not', $record->CurrentVersionID)->Map('ID', 'Created');
             $actions=new FieldList(
                                     new FormAction('doCopy', _t('CodeBank.COPY', '_Copy')),
                                     new FormAction('doEditRedirect', _t('CodeBank.EDIT', '_Edit')),
@@ -368,9 +368,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
             $next=$prev=null;
             $className=$this->stat('tree_class');
-            $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->where('"FolderID"='.$record->FolderID)->filter('Title:GreaterThan', $record->Title)->first();
+            $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('FolderID', $record->FolderID)->filter('Title:GreaterThan', $record->Title)->first();
             if(!$next) {
-                $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->where('"FolderID"='.$record->FolderID)->filter('Title:LessThan', $record->Title)->reverse()->first();
+                $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('FolderID', $record->FolderID)->filter('Title:LessThan', $record->Title)->reverse()->first();
             }
             
             $link=Controller::join_links($recordController->Link("show"), $record->ID);
@@ -962,7 +962,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      */
     public function doAddFolder($data, Form $form) {
         //Existing Check
-        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')->filter('LanguageID', intval($data['LanguageID']));
+        $existingCheck=SnippetFolder::get()->filter('Name:nocase', Convert::raw2sql($data['Name']))->filter('LanguageID', intval($data['LanguageID']));
         
         if(array_key_exists('FolderID', $data)) {
             $existingCheck=$existingCheck->filter('ParentID', intval($data['FolderID']));
@@ -1089,10 +1089,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         //Existing Check
         $existingCheck=SnippetFolder::get()
-                                            ->where('"Name" LIKE \''.Convert::raw2sql($data['Name']).'\'')
+                                            ->filter('Name:nocase', Convert::raw2sql($data['Name']))
                                             ->filter('LanguageID', $folder->LanguageID)
                                             ->filter('ParentID', $folder->ParentID)
-                                            ->where('"ID"<>'.$folder->ID);
+                                            ->filter('ID:not', $folder->ID);
         if($existingCheck->Count()>0) {
             $form->sessionMessage(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), 'bad');
             return $this->redirectBack();

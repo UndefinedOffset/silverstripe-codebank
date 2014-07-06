@@ -32,6 +32,18 @@ Member:
         Surname: "user"
         Email: "noaccess"
 
+SnippetLanguage:
+    language1:
+        Name: "PHP"
+        Extension: "php"
+        HighlightCode: "Php"
+        UserLanguage: false
+    language2:
+        Name: "CSS"
+        Extension: "css"
+        HighlightCode: "Css"
+        UserLanguage: false
+
 SnippetPackage:
     package1:
         Title: "Test Package"
@@ -39,16 +51,16 @@ SnippetPackage:
 SnippetFolder:
     folder1:
         Name: "Test Folder"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
     folder2:
         Name: "Test Folder 2"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
     folder3:
         Name: "Test Folder 3"
-        LanguageID: 9
+        LanguageID: =>SnippetLanguage.language2
     folder4:
         Name: "Decendent Folder"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
         ParentID: =>SnippetFolder.folder2
 
 Snippet:
@@ -56,7 +68,7 @@ Snippet:
         Title: "PHP Test"
         Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
         Tags: "test,php,lorem,hello world"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
         Package: =>SnippetPackage.package1
         Folder: =>SnippetFolder.folder1
         Creator: =>Member.admin
@@ -65,7 +77,7 @@ Snippet:
         Title: "CSS Test"
         Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
         Tags: "test,css,lorem,hello world"
-        LanguageID: 9
+        LanguageID: =>SnippetLanguage.language2
         Package: =>SnippetPackage.package1
         Creator: =>Member.admin
         LastEditor: =>Member.apiuser
@@ -73,14 +85,14 @@ Snippet:
         Title: "PHP Test 2"
         Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
         Tags: "test,php,lorem,hello world"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
         Creator: =>Member.admin
         LastEditor: =>Member.apiuser
     snippet4:
         Title: "PHP Test 3"
         Description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer non mauris id nibh viverra rutrum nec et orci."
         Tags: "test,php,lorem,hello world"
-        LanguageID: 3
+        LanguageID: =>SnippetLanguage.language1
         Folder: =>SnippetFolder.folder2
         Creator: =>Member.admin
         LastEditor: =>Member.apiuser

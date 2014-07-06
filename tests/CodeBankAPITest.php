@@ -145,10 +145,11 @@ class CodeBankAPITest extends SapphireTest {
      */
     public function testAdminDeleteUser() {
         $this->objFromFixture('Member', 'apiuser')->login(); //Login apiuser
+        $memberToDelete=Member::get()->filter('Email', 'noaccess')->first()->ID;
         
         
         //Try deleting with a user with just CODE_BANK_API permissions
-        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>3));
+        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>$memberToDelete));
         
         
         //Verify the response was an error
@@ -164,7 +165,7 @@ class CodeBankAPITest extends SapphireTest {
         $this->objFromFixture('Member', 'admin')->login(); //Login admin user
         
         //Try deleting with a user with ADMIN permissions
-        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>3));
+        $response=$this->getAMFResponse('Administration.deleteUser', array('id'=>$memberToDelete));
         
         
         //Verify the response was an error
@@ -576,24 +577,26 @@ class CodeBankAPITest extends SapphireTest {
      */
     public function testCreatingFolder() {
         $this->objFromFixture('Member', 'apiuser')->login();
+        $languageID=SnippetLanguage::get()->filter('Name', 'CSS')->first()->ID;
         
         
         //Test creating a folder
         $response=$this->getAMFResponse('Snippets.newFolder', array(
                                                                     'name'=>'API Folder',
-                                                                    'languageID'=>9,
+                                                                    'languageID'=>$languageID,
                                                                     'parentID'=>0
                                                                 ));
         
         
         //Validate the response
+        print $response['message'];
         $this->assertEquals('HELO', $response['status'], 'Response status should have been HELO');
         
         
         //Test creating a duplicate folder
         $response=$this->getAMFResponse('Snippets.newFolder', array(
                                                                     'name'=>'API Folder',
-                                                                    'languageID'=>9,
+                                                                    'languageID'=>$languageID,
                                                                     'parentID'=>0
                                                                 ));
         
@@ -606,7 +609,7 @@ class CodeBankAPITest extends SapphireTest {
         //Test creating a folder under a different language
         $response=$this->getAMFResponse('Snippets.newFolder', array(
                                                                     'name'=>'API Folder 2',
-                                                                    'languageID'=>9,
+                                                                    'languageID'=>$languageID,
                                                                     'parentID'=>$this->objFromFixture('SnippetFolder', 'folder1')->ID
                                                                 ));
         

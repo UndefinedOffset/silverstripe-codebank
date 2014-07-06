@@ -29,7 +29,8 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            $member=Member::get()->filter('ID', intval($data->id))->where('ID<>'.Member::currentUserID())->First();
+            $member=Member::get()->filter('ID', intval($data->id))->filter('ID:not', Member::currentUserID())->First();
+            var_dump($member);
             if(!empty($member) && $member!==false && $member->ID!=0) {
                 $member->delete();
             }
@@ -157,7 +158,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
+            if(SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
                 
@@ -230,7 +231,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(SnippetLanguage::get()->where("Name LIKE '".Convert::raw2sql($data->language)."'")->Count()>0) {
+            if(SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
             

@@ -115,7 +115,7 @@ class SnippetLanguage extends DataObject {
         $defaultLangs=array_keys($this->defaultLanguages);
         $dbLangCount=SnippetLanguage::get()
                                         ->filter('Name', $defaultLangs)
-                                        ->filter('UserLanguage', false)
+                                        ->filter('UserLanguage', 0)
                                         ->Count();
         if($dbLangCount<count($defaultLangs)) {
             foreach($this->defaultLanguages as $name=>$data) {
@@ -216,7 +216,7 @@ class SnippetLanguage extends DataObject {
     }
     
     public function Folders() {
-        return $this->getComponents('Folders', 'ParentID=0');
+        return $this->getComponents('Folders')->filter('ParentID', 0);
     }
     
     /**

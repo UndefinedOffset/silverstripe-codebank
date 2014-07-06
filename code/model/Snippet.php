@@ -159,7 +159,7 @@ class Snippet extends DataObject {
     protected function onBeforeDelete() {
         parent::onBeforeDelete();
         
-        DB::query('DELETE FROM SnippetVersion WHERE ParentID='.$this->ID);
+        SnippetVersion::get()->filter('ParentID', $this->ID)->removeAll();
     }
     
     /**

@@ -643,7 +643,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         //Lookup snippets
-        $snippets=Snippet::get()->where("\"Snippet\".\"Title\" LIKE '".Convert::raw2sql($data->pattern)."%'")->limit(20);
+        $snippets=Snippet::get()->filter('Title:StartsWith', Convert::raw2sql($data->pattern))->limit(20);
         
         
         $response['status']='HELO';
@@ -835,7 +835,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         //Check existing
-        $existingCheck=SnippetFolder::get()->where('"Name" LIKE \''.Convert::raw2sql($data->name).'\'')->filter('LanguageID', $language->ID)->filter('ParentID', $data->parentID);
+        $existingCheck=SnippetFolder::get()->filter('Name:nocase', Convert::raw2sql($data->name))->filter('LanguageID', $language->ID)->filter('ParentID', $data->parentID);
         
         
         if($existingCheck->Count()>0) {
@@ -890,8 +890,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         //Check existing
         $existingCheck=SnippetFolder::get()
-                                            ->where('"ID"<>'.$snippetFolder->ID)
-                                            ->where('"Name" LIKE \''.Convert::raw2sql($data->name).'\'')
+                                            ->filter('ID:not', $snippetFolder->ID)
+                                            ->filter('Name:nocase', Convert::raw2sql($data->name))
                                             ->filter('LanguageID', $snippetFolder->LanguageID)
                                             ->filter('ParentID', $snippetFolder->ParentID);
         
