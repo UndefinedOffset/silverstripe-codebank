@@ -23,6 +23,8 @@ class SnippetFolder extends DataObject {
                                         'SnippetFolder'
                                     );
     
+    private static $default_sort='Name';
+    
     private static $default_child='Snippet';
     private static $default_parent='SnippetLanguage';
     
