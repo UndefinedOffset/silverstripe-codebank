@@ -709,6 +709,9 @@ class CodeBankAPITest extends SapphireTest {
         $this->assertEquals(_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet'), $response['message'], 'Response message should have been that the parent folder is in a different language');
     }
     
+    /**
+     * Tests to see is snippet search is working as expected
+     */
     public function testSnippetSearch() {
         $this->objFromFixture('Member', 'apiuser')->login();
         
