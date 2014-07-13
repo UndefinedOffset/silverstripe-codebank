@@ -53,50 +53,36 @@ class SnippetTreeFilter extends Object {
             return array();
         }
         
-        $ids=array();
         
-        $q=new SQLQuery();
-        $q->setSelect(array('"SnippetLanguage"."ID"'))
-            ->setFrom('"SnippetLanguage"')
-            ->addInnerJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"')
-            ->setGroupBy('"SnippetLanguage"."ID"');
+        $q=SnippetLanguage::get()
+                                ->innerJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"');
         
         if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-            $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
+            $q=$q->filter('ID', intval($this->params['LanguageID']));
         }
         
-        $q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
+        $q=$q->filter('Snippets.ID', array_keys($this->_cache_snippet_ids));
         
-        foreach($q->execute() as $row) {
-            $ids[]=array('ID'=>$row['ID']);
-        }
         
-        return $ids;
+        return $q->column('ID');
     }
     
     /**
      * @return Array Map of Snippet IDs
      */
     public function snippetsIncluded() {
-        $ids=array();
-        $q=new SQLQuery();
-        $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
+        $q=Snippet::get();
         
         if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-            $q->addWhere('"Snippet"."LanguageID"='.intval($this->params['LanguageID']));
+            $q=$q->filter('LanguageID', intval($this->params['LanguageID']));
         }
         
         if(isset($this->params['Term']) && !empty($this->params['Term'])) {
             $SQL_val=Convert::raw2sql($this->params['Term']);
-            $q->addWhere("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
+            $q=$q->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
         }
         
-        
-        foreach($q->execute() as $row) {
-            $ids[]=array('ID'=>$row['ID']);
-        }
-        
-        return $ids;
+        return $q->column('ID');
     }
     
     /**
@@ -113,24 +99,15 @@ class SnippetTreeFilter extends Object {
         
         $ids=array();
         
-        $q=new SQLQuery();
-        $q->setSelect(array('"SnippetFolder"."ID"'))
-            ->setFrom('"SnippetFolder"')
-            ->addInnerJoin('SnippetLanguage', '"SnippetLanguage"."ID"="SnippetFolder"."LanguageID"')
-            ->addInnerJoin('Snippet', '"Snippet"."FolderID"="SnippetFolder"."ID"')
-            ->setGroupBy('"SnippetFolder"."ID"');
+        $q=SnippetFolder::get();
         
         if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-            $q->addWhere('"SnippetLanguage"."ID"='.intval($this->params['LanguageID']));
+            $q=$q->filter('LanguageID', intval($this->params['LanguageID']));
         }
         
-        $q->addWhere('"Snippet"."ID" IN('.implode(',', array_keys($this->_cache_snippet_ids)).')');
+        $q=$q->filter('Snippets.ID', array_keys($this->_cache_snippet_ids));
         
-        foreach($q->execute() as $row) {
-            $ids[]=array('ID'=>$row['ID']);
-        }
-        
-        return $ids;
+        return $q->column('ID');
     }
     
     /**
@@ -141,8 +118,8 @@ class SnippetTreeFilter extends Object {
         if($snippetLanguages=$this->snippetLanguagesIncluded()) {
             // And keep a record of parents we don't need to get
             // parents of themselves, as well as IDs to mark
-            foreach($snippetLanguages as $langArr) {
-                $this->_cache_language_ids[$langArr['ID']]=true;
+            foreach($snippetLanguages as $langId) {
+                $this->_cache_language_ids[$langId]=true;
             }
         }
     }
@@ -155,8 +132,8 @@ class SnippetTreeFilter extends Object {
         if($snippets=$this->snippetsIncluded()) {
             // And keep a record of parents we don't need to get
             // parents of themselves, as well as IDs to mark
-            foreach($snippets as $snippetArr) {
-                $this->_cache_snippet_ids[$snippetArr['ID']]=true;
+            foreach($snippets as $snippetId) {
+                $this->_cache_snippet_ids[$snippetId]=true;
             }
         }
     }
@@ -169,8 +146,8 @@ class SnippetTreeFilter extends Object {
         if($snippetFolders=$this->snippetFoldersIncluded()) {
             // And keep a record of parents we don't need to get
             // parents of themselves, as well as IDs to mark
-            foreach($snippetFolders as $folderArr) {
-                $this->_cache_folder_ids[$folderArr['ID']]=true;
+            foreach($snippetFolders as $folderId) {
+                $this->_cache_folder_ids[$folderId]=true;
             }
         }
     }
