@@ -709,6 +709,42 @@ class CodeBankAPITest extends SapphireTest {
         $this->assertEquals(_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet'), $response['message'], 'Response message should have been that the parent folder is in a different language');
     }
     
+    public function testSnippetSearch() {
+        $this->objFromFixture('Member', 'apiuser')->login();
+        
+
+        //Test moving searching for a snippet
+        $response=$this->getAMFResponse('Snippets.searchSnippets', array(
+                                                                        'query'=>'PHP Test'
+                                                                    ));
+        
+        //Verify we have a good response
+        $this->assertNotEquals('EROR', $response['status']);
+        
+        
+        $expectedSnippet=$this->objFromFixture('Snippet', 'snippet1');
+        $found=false;
+        if(is_array($response['data']) && count($response['data'])>0) {
+            foreach($response['data'] as $language) {
+                if(is_array($language['folders']) && count($language['folders'])>0) {
+                    foreach($language['folders'] as $folder) {
+                        if(is_array($folder['snippets']) && count($folder['snippets'])>0) {
+                            foreach($folder['snippets'] as $snippet) {
+                                if($snippet->id==$expectedSnippet->ID) {
+                                    $found=true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //Verify that the expected snippet was found in the results
+        $this->assertEquals(true, $found, 'Expected snippet not found in the result set');
+    }
+    
     /**
      * Generates a fake request object to be passed to the api class
      * @param {array} $data Associative array of data to be converted into a request object

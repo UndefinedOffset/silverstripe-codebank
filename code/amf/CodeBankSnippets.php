@@ -82,7 +82,16 @@ class CodeBankSnippets implements CodeBank_APIClass {
         foreach($folders as $folder) {
             $snippets=$folder->Snippets();
             if(!empty($searchQuery) && $searchQuery!==false) {
-                $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($searchQuery)."' IN BOOLEAN MODE)");
+                if(DB::getConn() instanceof MySQLDatabase) {
+                    $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($searchQuery)."' IN BOOLEAN MODE)");
+                }else {
+                    $searchQuery=Convert::raw2sql($searchQuery);
+                    $snippets=$snippets->filterAny(array(
+                                                        'Title:PartialMatch'=>$searchQuery,
+                                                        'Description:PartialMatch'=>$searchQuery,
+                                                        'Tags:PartialMatch'=>$searchQuery
+                                                    ));
+                }
             }
             
             $snippets=$this->overviewList($snippets, 'Title', 'ID', 'LanguageID');
@@ -154,7 +163,19 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=Snippet::get()->filter('LanguageID', $lang->ID)->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            $snippets=Snippet::get()->filter('LanguageID', $lang->ID);
+            
+            if(DB::getConn() instanceof MySQLDatabase) {
+                $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            }else {
+                $searchQuery=Convert::raw2sql($data->query);
+                $snippets=$snippets->filterAny(array(
+                                                    'Title:PartialMatch'=>$searchQuery,
+                                                    'Description:PartialMatch'=>$searchQuery,
+                                                    'Tags:PartialMatch'=>$searchQuery
+                                                ));
+            }
+            
             if($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->filter('FolderID', 0)->map('ID', 'Title')->toArray());
                 $response['data'][]=array(

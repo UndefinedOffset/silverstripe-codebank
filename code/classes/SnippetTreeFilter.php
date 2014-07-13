@@ -79,7 +79,15 @@ class SnippetTreeFilter extends Object {
         
         if(isset($this->params['Term']) && !empty($this->params['Term'])) {
             $SQL_val=Convert::raw2sql($this->params['Term']);
-            $q=$q->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
+            if(DB::getConn() instanceof MySQLDatabase) {
+                $q=$q->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
+            }else {
+                $q=$q->filterAny(array(
+                                        'Title:PartialMatch'=>$SQL_val,
+                                        'Description:PartialMatch'=>$SQL_val,
+                                        'Tags:PartialMatch'=>$SQL_val
+                                    ));
+            }
         }
         
         return $q->column('ID');
