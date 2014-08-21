@@ -8,7 +8,6 @@ class PackageSelectionField extends DropdownField {
                                         'Field',
                                         'addPackage',
                                         'AddPackageForm',
-                                        'doAddPackage',
                                         'ReloadField'
                                     );
     
