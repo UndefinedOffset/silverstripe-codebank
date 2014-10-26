@@ -30,7 +30,6 @@ class CodeBankAdministration implements CodeBank_APIClass {
         
         try {
             $member=Member::get()->filter('ID', intval($data->id))->filter('ID:not', Member::currentUserID())->First();
-            var_dump($member);
             if(!empty($member) && $member!==false && $member->ID!=0) {
                 $member->delete();
             }
