@@ -80,18 +80,18 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $result=array();
         
         foreach($folders as $folder) {
-            $snippets=$folder->Snippets();
             if(!empty($searchQuery) && $searchQuery!==false) {
-                if(DB::getConn() instanceof MySQLDatabase) {
-                    $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($searchQuery)."' IN BOOLEAN MODE)");
+                $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
+                if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+                    $searchEngine=new $searchEngine();
                 }else {
-                    $searchQuery=Convert::raw2sql($searchQuery);
-                    $snippets=$snippets->filterAny(array(
-                                                        'Title:PartialMatch'=>$searchQuery,
-                                                        'Description:PartialMatch'=>$searchQuery,
-                                                        'Tags:PartialMatch'=>$searchQuery
-                                                    ));
+                    //Class is missing or invalid so fallback to the default
+                    $searchEngine=new DefaultCodeBankSearchEngine();
                 }
+                
+                $snippets=$searchEngine->doSnippetSearch($searchQuery, false, $folder->ID);
+            }else {
+                $snippets=$folder->Snippets();
             }
             
             $snippets=$this->overviewList($snippets, 'Title', 'ID', 'LanguageID');
@@ -163,18 +163,16 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         $languages=SnippetLanguage::get();
         foreach($languages as $lang) {
-            $snippets=Snippet::get()->filter('LanguageID', $lang->ID);
-            
-            if(DB::getConn() instanceof MySQLDatabase) {
-                $snippets=$snippets->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".Convert::raw2sql($data->query)."' IN BOOLEAN MODE)");
+            $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
+            if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+                $searchEngine=new $searchEngine();
             }else {
-                $searchQuery=Convert::raw2sql($data->query);
-                $snippets=$snippets->filterAny(array(
-                                                    'Title:PartialMatch'=>$searchQuery,
-                                                    'Description:PartialMatch'=>$searchQuery,
-                                                    'Tags:PartialMatch'=>$searchQuery
-                                                ));
+                //Class is missing or invalid so fallback to the default
+                $searchEngine=new DefaultCodeBankSearchEngine();
             }
+            
+            $snippets=$searchEngine->doSnippetSearch($data->query, $lang->ID);
+            
             
             if($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->filter('FolderID', 0)->map('ID', 'Title')->toArray());

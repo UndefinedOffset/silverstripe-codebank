@@ -71,26 +71,16 @@ class SnippetTreeFilter extends Object {
      * @return Array Map of Snippet IDs
      */
     public function snippetsIncluded() {
-        $q=Snippet::get();
-        
-        if(isset($this->params['LanguageID']) && !empty($this->params['LanguageID'])) {
-            $q=$q->filter('LanguageID', intval($this->params['LanguageID']));
+        $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
+        if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+            $searchEngine=new $searchEngine();
+        }else {
+            //Class is missing or invalid so fallback to the default
+            $searchEngine=new DefaultCodeBankSearchEngine();
         }
         
-        if(isset($this->params['Term']) && !empty($this->params['Term'])) {
-            $SQL_val=Convert::raw2sql($this->params['Term']);
-            if(DB::getConn() instanceof MySQLDatabase) {
-                $q=$q->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
-            }else {
-                $q=$q->filterAny(array(
-                                        'Title:PartialMatch'=>$SQL_val,
-                                        'Description:PartialMatch'=>$SQL_val,
-                                        'Tags:PartialMatch'=>$SQL_val
-                                    ));
-            }
-        }
         
-        return $q->column('ID');
+        return $searchEngine->doSnippetSearch($this->params['Term'], $this->params['LanguageID'])->column('ID');
     }
     
     /**

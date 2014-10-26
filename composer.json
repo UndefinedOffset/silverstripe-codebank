@@ -21,5 +21,8 @@
     },
     "extra": {
         "installer-name": "CodeBank"
+    },
+    "suggest": {
+        "silverstripe/fulltextsearch": "Adds support for Fulltext Search engines like Sphinx and Solr"
     }
 }

@@ -5,6 +5,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     private static $url_rule='/$Action/$ID/$OtherID';
     private static $url_priority=59;
     private static $filter_class='SnippetTreeFilter';
+    private static $snippet_search_engine='DefaultCodeBankSearchEngine';
     
     private static $required_permission_codes=array(
                                                     'CODE_BANK_ACCESS'

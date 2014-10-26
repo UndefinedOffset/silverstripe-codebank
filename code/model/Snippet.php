@@ -19,18 +19,18 @@ class Snippet extends DataObject {
                              );
     
     private static $extensions=array(
-                                    'SnippetHierarchy',
-                                    "FulltextSearchable('Title,Description,Tags')"
+                                    'SnippetHierarchy'
                                 );
     
     private static $default_sort='Title, ID';
     
-    private static $create_table_options=array(
-                                            'MySQLDatabase'=>'ENGINE=MyISAM'
-                                        );
-    
     private static $allowed_children=array();
     private static $default_child=null;
+    
+    private static $solr_boost_fields=array(
+                                            'Snippet_Title'=>2,
+                                            'Snippet_Description'=>1
+                                        );
     
     
     /**
@@ -84,6 +84,24 @@ class Snippet extends DataObject {
         
         return false;
     }
+    
+    /**
+     * Check the database schema and update it as necessary.
+     */
+    public function requireTable() {
+        //Init the search engine
+        $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
+        if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+            $searchEngine::requireTable();
+        }else {
+            //Class is missing or invalid so fallback to the default
+            DefaultCodeBankSearchEngine::requireTable();
+        }
+        
+        parent::requireTable();
+    }
+    
+    
     
     /**
      * Gets fields used in the cms
