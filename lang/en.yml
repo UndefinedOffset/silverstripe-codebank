@@ -64,6 +64,9 @@ en:
         CREATE: "Create"
         NO_DIFFERENCES: "There are no differences between the revisions"
         PRINT_COPYRIGHT: "Printed from Code Bank which is copyright {year} Ed Chipman"
+        APPEND_IMPORT: "Import and Append Data (keep your existing data however appending may cause duplicates)"
+        IMPORT_LANG_NOT_FOUND: "Import failed language not found"
+        IMPORT_SNIP_NOT_FOUND: "Import failed snippet not found"
     CodeBankConfig:
         MAIN: "IP Message"
         IP_MESSAGE: "Intellectual Property Message"

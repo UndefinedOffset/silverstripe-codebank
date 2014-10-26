@@ -141,7 +141,8 @@ class CodeBankSettings extends CodeBank {
                             new LiteralField('ImportWarning', '<p class="message warning">'._t('CodeBank.IMPORT_DATA_WARNING', '_Warning clicking import will erase all snippets in the database, it is recommended you backup your database before proceeding').'</p>'),
                             new TabSet('Root',
                                                 new Tab('Main',
-                                                                $uploadField
+                                                                $uploadField,
+                                                                new CheckboxField('AppendData', _t('CodeBank.APPEND_IMPORT', '_Import and Append Data (keep your existing data however appending may cause duplicates)'))
                                                             )
                                             )
                         );
@@ -215,46 +216,138 @@ class CodeBankSettings extends CodeBank {
         }
         
         
-        //Empty the tables
-        DB::query('DELETE FROM Snippet');
-        DB::query('DELETE FROM SnippetVersion');
-        DB::query('DELETE FROM SnippetLanguage');
-        DB::query('DELETE FROM SnippetPackage');
-        DB::query('DELETE FROM SnippetFolder');
+        //If not appending empty the tables
+        if(!isset($data['AppendData'])) {
+            DB::query('DELETE FROM Snippet');
+            DB::query('DELETE FROM SnippetVersion');
+            DB::query('DELETE FROM SnippetLanguage');
+            DB::query('DELETE FROM SnippetPackage');
+            DB::query('DELETE FROM SnippetFolder');
+        }else {
+            $langMap=array();
+            $pkgMap=array();
+            $folderMap=array();
+            $snipMap=array();
+        }
         
         
         //Import Languages
         foreach($fileData->data->languages as $lang) {
-            DB::query('INSERT INTO "SnippetLanguage" ("ID", "ClassName", "Created", "LastEdited", "Name", "FileExtension", "HighlightCode", "UserLanguage") '.
-                    "VALUES(".intval($lang->id).",'SnippetLanguage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($lang->language)."','".Convert::raw2sql($lang->file_extension)."','".Convert::raw2sql($lang->shjs_code)."',".intval($lang->user_language).")");
+            if(isset($data['AppendData'])) {
+                $dbLang=SnippetLanguage::get()->filter('Name:ExactMatch:nocase', Convert::raw2sql($lang->language))->first();
+                if(!empty($dbLang) && $dbLang!==false && $dbLang->ID>0) {
+                    $langMap['lang-'.$lang->id]=$dbLang->ID;
+                }else {
+                    $newLang=new SnippetLanguage();
+                    $newLang->Name=$lang->language;
+                    $newLang->FileExtension=$lang->file_extension;
+                    $newLang->HighlightCode=$lang->shjs_code;
+                    $newLang->UserLanguage=$lang->user_language;
+                    $newLang->write();
+                    
+                    $langMap['lang-'.$lang->id]=$newLang->ID;
+                    unset($newLang);
+                }
+            }else {
+                DB::query('INSERT INTO "SnippetLanguage" ("ID", "ClassName", "Created", "LastEdited", "Name", "FileExtension", "HighlightCode", "UserLanguage") '.
+                        "VALUES(".intval($lang->id).",'SnippetLanguage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($lang->language)."','".Convert::raw2sql($lang->file_extension)."','".Convert::raw2sql($lang->shjs_code)."',".intval($lang->user_language).")");
+            }
         }
         
         
         //Import Packages
         foreach($fileData->data->packages as $pkg) {
-            DB::query('INSERT INTO "SnippetPackage" ("ID", "ClassName", "Created", "LastEdited", "Title") '.
-                    "VALUES(".intval($pkg->id).",'SnippetPackage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($pkg->title)."')");
-        }
-        
-        
-        //Import Snippets
-        foreach($fileData->data->snippets as $snip) {
-            DB::query('INSERT INTO "Snippet" ("ID", "ClassName", "Created", "LastEdited", "Title", "Description", "Tags", "LanguageID", "CreatorID", "LastEditorID", "PackageID", "FolderID") '.
-                    "VALUES(".intval($snip->id).",'Snippet', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($snip->title)."', '".Convert::raw2sql($snip->description)."', '".Convert::raw2sql($snip->tags)."', ".intval($snip->fkLanguage).", ".Member::currentUserID().", ".Member::currentUserID().", ".intval($snip->fkPackageID).", ".intval($snip->fkFolderID).")");
-        }
-        
-        
-        //Import Snippet Versions
-        foreach($fileData->data->versions as $ver) {
-            DB::query('INSERT INTO "SnippetVersion" ("ID", "ClassName", "Created", "LastEdited", "Text", "ParentID") '.
-                    "VALUES(".intval($ver->id).",'SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($ver->fkSnippit).")");
+            if(isset($data['AppendData'])) {
+                $newPkg=new SnippetPackage();
+                $newPkg->Title=$pkg->title;
+                $newPkg->write();
+                
+                $pkgMap['pkg-'.$pkg->id]=$newPkg->ID;
+                unset($newPkg);
+            }else {
+                DB::query('INSERT INTO "SnippetPackage" ("ID", "ClassName", "Created", "LastEdited", "Title") '.
+                        "VALUES(".intval($pkg->id).",'SnippetPackage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($pkg->title)."')");
+            }
         }
         
         
         //Import Folders
         foreach($fileData->data->folders as $folder) {
-            DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name", "ParentID", "LanguageID") '.
-                    "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."', ".intval($folder->fkParentId).", ".intval($folder->fkLanguageId).")");
+            if(isset($data['AppendData'])) {
+                if(!isset($langMap['lang-'.$folder->fkLanguageId])) {
+                    if(DB::getConn()->supportsTransactions()) {
+                        DB::getConn()->transactionRollback();
+                    }
+                    
+                    $form->sessionMessage(_t('CodeBank.IMPORT_LANG_NOT_FOUND', '_Import failed language not found'), 'bad');
+                    return $this->redirectBack();
+                }
+                
+                $newFld=new SnippetFolder();
+                $newFld->Name=$folder->name;
+                $newFld->ParentID=($folder->fkParentId>0 && isset($folderMap['fld-'.$folder->fkParentId]) ? $folderMap['fld-'.$folder->fkParentId]:0);
+                $newFld->LanguageID=$langMap['lang-'.$folder->fkLanguageId];
+                $newFld->write();
+                
+                $folderMap['fld-'.$folder->id]=$newFld->ID;
+                unset($newFld);
+            }else {
+                DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name", "ParentID", "LanguageID") '.
+                        "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."', ".intval($folder->fkParentId).", ".intval($folder->fkLanguageId).")");
+            }
+        }
+        
+        
+        //Import Snippets
+        foreach($fileData->data->snippets as $snip) {
+            if(isset($data['AppendData'])) {
+                if(!isset($langMap['lang-'.$snip->fkLanguage])) {
+                    if(DB::getConn()->supportsTransactions()) {
+                        DB::getConn()->transactionRollback();
+                    }
+                    
+                    $form->sessionMessage(_t('CodeBank.IMPORT_LANG_NOT_FOUND', '_Import failed language not found'), 'bad');
+                    return $this->redirectBack();
+                }
+                
+                $newSnip=new Snippet();
+                $newSnip->Title=$snip->title;
+                $newSnip->Description=$snip->description;
+                $newSnip->Tags=$snip->tags;
+                $newSnip->LanguageID=$langMap['lang-'.$snip->fkLanguage];
+                $newSnip->CreatorID=Member::currentUserID();
+                $newSnip->LastEditorID=Member::currentUserID();
+                $newSnip->PackageID=($snip->fkPackageID>0 && isset($pkgMap['pkg-'.$snip->fkPackageID]) ? $pkgMap['pkg-'.$snip->fkPackageID]:0);
+                $newSnip->FolderID=($snip->fkFolderID>0 && isset($folderMap['fld-'.$snip->fkFolderID]) ? $folderMap['fld-'.$snip->fkFolderID]:0);
+                $newSnip->write();
+                
+                $snipMap['snip-'.$snip->id]=$newSnip->ID;
+                unset($newSnip);
+            }else {
+                DB::query('INSERT INTO "Snippet" ("ID", "ClassName", "Created", "LastEdited", "Title", "Description", "Tags", "LanguageID", "CreatorID", "LastEditorID", "PackageID", "FolderID") '.
+                        "VALUES(".intval($snip->id).",'Snippet', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($snip->title)."', '".Convert::raw2sql($snip->description)."', '".Convert::raw2sql($snip->tags)."', ".intval($snip->fkLanguage).", ".Member::currentUserID().", ".Member::currentUserID().", ".intval($snip->fkPackageID).", ".intval($snip->fkFolderID).")");
+            }
+        }
+        
+        
+        //Import Snippet Versions
+        foreach($fileData->data->versions as $ver) {
+            if(isset($data['AppendData'])) {
+                if(!isset($snipMap['snip-'.$ver->fkSnippit])) {
+                    if(DB::getConn()->supportsTransactions()) {
+                        DB::getConn()->transactionRollback();
+                    }
+                
+                    $form->sessionMessage(_t('CodeBank.IMPORT_SNIP_NOT_FOUND', '_Import failed snippet not found'), 'bad');
+                    return $this->redirectBack();
+                }
+                
+                DB::query('INSERT INTO "SnippetVersion" ("ClassName", "Created", "LastEdited", "Text", "ParentID") '.
+                        "VALUES('SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($snipMap['snip-'.$ver->fkSnippit]).")");
+            }else {
+                DB::query('INSERT INTO "SnippetVersion" ("ID", "ClassName", "Created", "LastEdited", "Text", "ParentID") '.
+                        "VALUES(".intval($ver->id).",'SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($ver->fkSnippit).")");
+            }
         }
         
         
