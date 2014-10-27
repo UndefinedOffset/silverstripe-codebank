@@ -64,6 +64,18 @@ CodeBank:
           Brush: "mysite/javascript/shBrushEx.js" #Relative Path to the snippet highlighter brush
 ```
 
+
+###Switching the search engine
+By default Code Bank uses MySQL's fulltext searching and on databases like Postgres it uses a partial match filtering for searching both from the client and in the web interface. Code Bank provides support for switching the engine to Solr if you have the [silverstripe/fulltextsearch](https://github.com/silverstripe-labs/silverstripe-fulltextsearch) installed and a Solr server available. You may switch the search engine by adding the following to your mysite/_config/config.yml after add flush=1 to the url to update the config cache.
+```yml
+CodeBank:
+    snippet_search_engine: "SolrCodeBankSearchEngine"
+```
+
+####Writing your own engine
+Code Bank provides an api for you to hook in your own engine, you simply need to implement the [ICodeBankSearchEngine](https://github.com/UndefinedOffset/silverstripe-codebank/blob/master/code/search/ICodeBankSearchEngine.php)  interface and define the methods in the interface. The key thing to remember is that the doSnippetSearch() method takes 3 parameters the first $keyword, is the term/keyword the user is searching for (this maybe empty), the second ($langugeID) is the database ID of the language the user is filtering to. The last parameter ($folderID) is the ID of the folder the system is requesting matches for. The method itself should always return a SS_List subclass typically it should be DataList containing or pointing to only snippets. To enable your custom engine follow the [steps above](#switching-the-search-engine).
+
+
 ###Attribution:
 * Some Icons are from the Fudge Icon Set http://p.yusukekamiyamane.com/
 * Code Bank Logo is derived from the Tango Desktop Project http://tango.freedesktop.org
