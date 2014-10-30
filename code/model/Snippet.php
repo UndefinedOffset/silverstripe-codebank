@@ -27,11 +27,6 @@ class Snippet extends DataObject {
     private static $allowed_children=array();
     private static $default_child=null;
     
-    private static $solr_boost_fields=array(
-                                            'Snippet_Title'=>2,
-                                            'Snippet_Description'=>1
-                                        );
-    
     
     /**
      * Checks to see if the member can view or not

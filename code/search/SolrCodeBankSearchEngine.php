@@ -34,7 +34,10 @@ class SolrCodeBankSearchEngine implements ICodeBankSearchEngine {
         }
         
         //Configure search
-        $searchQuery->search($keywords, null, Snippet::config()->solr_boost_fields);
+        $searchQuery->search($keywords, null, array(
+                                                    'Snippet_Title'=>2,
+                                                    'Snippet_Description'=>1
+                                                ));
         
         return $searchIndex->search($searchQuery, null, null)->Matches->getList();
     }
