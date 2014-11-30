@@ -149,6 +149,7 @@ en:
         FOLDER_DOES_NOT_EXIST: "Folder does not exist"
         FOLDER_NOT_LANGUAGE: "Folder is not in the same language as the snippet"
         LANGUAGE_HIDDEN: "You cannot assign this snippet to a hidden language"
+        PASSWORD_SENT_TEXT: "A reset link has been sent to '{email}', provided an account exists for this email address."
     CodeBankLegacyMigrate:
         TITLE: "Legacy Code Bank Migration"
         DESCRIPTION: "Migrates a Code Bank 2.2 Database to the new system, please run this only once when migrating from a 2.2 install of Code Bank"

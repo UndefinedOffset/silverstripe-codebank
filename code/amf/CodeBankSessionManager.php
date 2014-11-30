@@ -2,7 +2,7 @@
 class CodeBankSessionManager implements CodeBank_APIClass {
     /**
      * Attempt to login
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
     public function login($data) {
@@ -68,6 +68,52 @@ class CodeBankSessionManager implements CodeBank_APIClass {
         }
         
         return $response;
+    }
+    
+    /**
+     * Method for allowing a user to reset their password
+     * @param {stdClass} $data Data passed from ActionScript
+     * @return {array} Returns a standard response array
+     */
+    public function lostPassword($data) {
+        $response=CodeBank_ClientAPI::responseBase();
+        $response['login']=true;
+        
+        
+		$SQL_email=Convert::raw2sql($data->user);
+		$member=Member::get_one('Member', "\"Email\"='{$SQL_email}'");
+
+		// Allow vetoing forgot password requests
+		$sng=new MemberLoginForm(Controller::has_curr() ? Controller::curr():singleton('Controller'), 'LoginForm');
+		$results=$sng->extend('forgotPassword', $member);
+		if($results && is_array($results) && in_array(false, $results, true)) {
+		    $response['status']='HELO';
+			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data['Email']));
+		}
+
+		if($member) {
+			$token=$member->generateAutologinTokenAndStoreHash();
+
+			$e=Member_ForgotPasswordEmail::create();
+			$e->populateTemplate($member);
+			$e->populateTemplate(array(
+				'PasswordResetLink'=>Security::getPasswordResetLink($member, $token)
+			));
+			$e->setTo($member->Email);
+			$e->send();
+
+			$response['status']='HELO';
+			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
+		}else if(!empty($data->user)) {
+			$response['status']='HELO';
+			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
+		}else {
+			$response['status']='EROR';
+			$response['message']=_t('Member.ENTEREMAIL', 'Please enter an email address to get a password reset link.');
+		}
+		
+		
+		return $response;
     }
     
     /**

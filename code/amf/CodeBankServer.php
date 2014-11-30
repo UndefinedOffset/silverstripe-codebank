@@ -81,7 +81,7 @@ class CodeBankServer implements CodeBank_APIClass {
     
     /**
      * Changes a users password
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
     public function changePassword($data) {

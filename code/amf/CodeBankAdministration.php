@@ -22,7 +22,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
     
     /**
      * Deletes a user
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
     public function deleteUser($data) {
@@ -46,7 +46,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
     
     /**
      * Changes a users password
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
     public function changeUserPassword($data) {
@@ -81,7 +81,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
     
     /**
      * Creates a user in the database
-     * @param {stdClass} $data Data passed from ActionScript from ActionScript
+     * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
     public function createUser($data) {
