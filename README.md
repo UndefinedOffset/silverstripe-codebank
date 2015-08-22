@@ -12,7 +12,7 @@ Code Bank is a code snippet manager with syntax highlighting for multiple langua
 
 ###Installation (Module)
 ```
-composer require undefinedoffset/silverstripe-codebank
+composer require undefinedoffset/silverstripe-codebank 3.*@stable
 ```
 
 ####Manual Install (Module only)
