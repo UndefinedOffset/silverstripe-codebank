@@ -1,11 +1,13 @@
 <?php
-class CodeBankSessionManager implements CodeBank_APIClass {
+class CodeBankSessionManager implements CodeBank_APIClass
+{
     /**
      * Attempt to login
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function login($data) {
+    public function login($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         $response['login']=true;
@@ -16,7 +18,7 @@ class CodeBankSessionManager implements CodeBank_APIClass {
                                                         'Password'=>$data->pass
                                                     ));
         
-        if($member instanceof Member && $member->ID!=0 && Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+        if ($member instanceof Member && $member->ID!=0 && Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             try {
                 $member->logIn();
                 
@@ -37,12 +39,12 @@ class CodeBankSessionManager implements CodeBank_APIClass {
                                         'isAdmin'=>(Permission::check('ADMIN')!==false),
                                         'displayName'=>(trim($member->Name)=='' ? $member->Email:trim($member->Name))
                                     );
-            }catch (Exception $e) {
+            } catch (Exception $e) {
                 //Something happend on the server
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
             }
-        }else {
+        } else {
             //Bad username/pass combo
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.INVALID_LOGIN', '_Invalid Login');
@@ -56,14 +58,15 @@ class CodeBankSessionManager implements CodeBank_APIClass {
      * Closes the users session
      * @return {array} Default response base
      */
-    public function logout() {
+    public function logout()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Session now expired
         $response['session']='expired';
         
         $member=Member::currentUser();
-        if($member) {
+        if ($member) {
             $member->logOut();
         }
         
@@ -75,53 +78,54 @@ class CodeBankSessionManager implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function lostPassword($data) {
+    public function lostPassword($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         $response['login']=true;
         
         
-		$SQL_email=Convert::raw2sql($data->user);
-		$member=Member::get_one('Member', "\"Email\"='{$SQL_email}'");
+        $SQL_email=Convert::raw2sql($data->user);
+        $member=Member::get_one('Member', "\"Email\"='{$SQL_email}'");
 
-		// Allow vetoing forgot password requests
-		$sng=new MemberLoginForm(Controller::has_curr() ? Controller::curr():singleton('Controller'), 'LoginForm');
-		$results=$sng->extend('forgotPassword', $member);
-		if($results && is_array($results) && in_array(false, $results, true)) {
-		    $response['status']='HELO';
-			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data['Email']));
-		}
+        // Allow vetoing forgot password requests
+        $sng=new MemberLoginForm(Controller::has_curr() ? Controller::curr():singleton('Controller'), 'LoginForm');
+        $results=$sng->extend('forgotPassword', $member);
+        if ($results && is_array($results) && in_array(false, $results, true)) {
+            $response['status']='HELO';
+            $response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data['Email']));
+        }
 
-		if($member) {
-			$token=$member->generateAutologinTokenAndStoreHash();
+        if ($member) {
+            $token=$member->generateAutologinTokenAndStoreHash();
 
-			$e=Member_ForgotPasswordEmail::create();
-			$e->populateTemplate($member);
-			$e->populateTemplate(array(
-				'PasswordResetLink'=>Security::getPasswordResetLink($member, $token)
-			));
-			$e->setTo($member->Email);
-			$e->send();
+            $e=Member_ForgotPasswordEmail::create();
+            $e->populateTemplate($member);
+            $e->populateTemplate(array(
+                'PasswordResetLink'=>Security::getPasswordResetLink($member, $token)
+            ));
+            $e->setTo($member->Email);
+            $e->send();
 
-			$response['status']='HELO';
-			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
-		}else if(!empty($data->user)) {
-			$response['status']='HELO';
-			$response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
-		}else {
-			$response['status']='EROR';
-			$response['message']=_t('Member.ENTEREMAIL', 'Please enter an email address to get a password reset link.');
-		}
-		
-		
-		return $response;
+            $response['status']='HELO';
+            $response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
+        } elseif (!empty($data->user)) {
+            $response['status']='HELO';
+            $response['message']=_t('CodeBankAPI.PASSWORD_SENT_TEXT', "A reset link has been sent to '{email}', provided an account exists for this email address.", array('email'=>$data->user));
+        } else {
+            $response['status']='EROR';
+            $response['message']=_t('Member.ENTEREMAIL', 'Please enter an email address to get a password reset link.');
+        }
+        
+        
+        return $response;
     }
     
     /**
      * Gets the permissions required to access the class
      * @return {array} Array of permission names to check
      */
-    public function getRequiredPermissions() {
+    public function getRequiredPermissions()
+    {
         return null;
     }
 }
-?>

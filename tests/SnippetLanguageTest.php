@@ -1,8 +1,10 @@
 <?php
-class SnippetLanguageTest extends SapphireTest {
+class SnippetLanguageTest extends SapphireTest
+{
     public static $fixture_file='SnippetLanguageTest.yml';
     
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
         
         
@@ -14,7 +16,8 @@ class SnippetLanguageTest extends SapphireTest {
         singleton('SnippetLanguage')->requireDefaultRecords();
     }
     
-    public function tearDown() {
+    public function tearDown()
+    {
         parent::tearDown();
         
         //Remove the extra_languages config key from code bank, cleans up after running the unit tests
@@ -24,7 +27,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Checks to see if the user can't delete a default language
      */
-    public function testCantDeleteDefaultLanguage() {
+    public function testCantDeleteDefaultLanguage()
+    {
         $language=SnippetLanguage::get()->filter('Name', 'PHP')->first();
         
         
@@ -34,7 +38,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a user can delete a user language without children
      */
-    public function testCanDeleteUserLanguage() {
+    public function testCanDeleteUserLanguage()
+    {
         $language=$this->objFromFixture('SnippetLanguage', 'language2');
         
         
@@ -44,7 +49,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see that a user can't delete a user language with snippets
      */
-    public function testCantDeleteUserLanguageWithSnippet() {
+    public function testCantDeleteUserLanguageWithSnippet()
+    {
         $language=$this->objFromFixture('SnippetLanguage', 'language1');
         
         
@@ -54,7 +60,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see that a user can't delete a user language with folders
      */
-    public function testCantDeleteUserLanguageWithFolder() {
+    public function testCantDeleteUserLanguageWithFolder()
+    {
         $language=$this->objFromFixture('SnippetLanguage', 'language3');
         
         
@@ -64,7 +71,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a valid language can be added via the config layer
      */
-    public function testValidCustomLanguage() {
+    public function testValidCustomLanguage()
+    {
         CodeBank::config()->extra_languages=array(array(
                                                 'Name'=>'Test Language',
                                                 'FileName'=>'tst',
@@ -83,7 +91,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a language defined in the config missing components generates an error and is not added
      */
-    public function testInvalidCustomLanguage() {
+    public function testInvalidCustomLanguage()
+    {
         CodeBank::config()->extra_languages=array(array(
                                                 'Name'=>'Test Language 1',
                                                 'HighlightCode'=>'tst1'
@@ -93,10 +102,10 @@ class SnippetLanguageTest extends SapphireTest {
         try {
             //Try populating the default records
             singleton('SnippetLanguage')->requireDefaultRecords();
-        }catch(PHPUnit_Framework_Error_Warning $e) {
-            if(strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
+        } catch (PHPUnit_Framework_Error_Warning $e) {
+            if (strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
                 $didExpectedError=true;
-            }else {
+            } else {
                 throw $e; //Ensure the error is re-thrown, it doesn't match what we're expecting
             }
         }
@@ -113,7 +122,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a language defined in the config with a remote url generates an error and is not added
      */
-    public function testCustomLanguageBrushInvalidRemotePath() {
+    public function testCustomLanguageBrushInvalidRemotePath()
+    {
         CodeBank::config()->extra_languages=array(array(
                                                 'Name'=>'Test Language 2',
                                                 'FileName'=>'tst',
@@ -125,10 +135,10 @@ class SnippetLanguageTest extends SapphireTest {
         try {
             //Try populating the default records
             singleton('SnippetLanguage')->requireDefaultRecords();
-        }catch(PHPUnit_Framework_Error_Warning $e) {
-            if(strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
+        } catch (PHPUnit_Framework_Error_Warning $e) {
+            if (strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
                 $didExpectedError=true;
-            }else {
+            } else {
                 throw $e; //Ensure the error is re-thrown, it doesn't match what we're expecting
             }
         }
@@ -145,7 +155,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a language defined in the config with a absolute file path generates an error and is not added
      */
-    public function testCustomLanguageBrushInvalidLocalPath() {
+    public function testCustomLanguageBrushInvalidLocalPath()
+    {
         CodeBank::config()->extra_languages=array(array(
                                                 'Name'=>'Test Language 3',
                                                 'FileName'=>'tst',
@@ -157,10 +168,10 @@ class SnippetLanguageTest extends SapphireTest {
         try {
             //Try populating the default records
             singleton('SnippetLanguage')->requireDefaultRecords();
-        }catch(PHPUnit_Framework_Error_Warning $e) {
-            if(strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
+        } catch (PHPUnit_Framework_Error_Warning $e) {
+            if (strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
                 $didExpectedError=true;
-            }else {
+            } else {
                 throw $e; //Ensure the error is re-thrown, it doesn't match what we're expecting
             }
         }
@@ -177,7 +188,8 @@ class SnippetLanguageTest extends SapphireTest {
     /**
      * Tests to see if a language defined in the config with a brush that does not end in .js generates an error and is not added
      */
-    public function testNonJSCustomLanguageBrush() {
+    public function testNonJSCustomLanguageBrush()
+    {
         CodeBank::config()->extra_languages=array(array(
                                                 'Name'=>'Test Language 4',
                                                 'FileName'=>'tst',
@@ -189,10 +201,10 @@ class SnippetLanguageTest extends SapphireTest {
         try {
             //Try populating the default records
             singleton('SnippetLanguage')->requireDefaultRecords();
-        }catch(PHPUnit_Framework_Error_Warning $e) {
-            if(strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
+        } catch (PHPUnit_Framework_Error_Warning $e) {
+            if (strpos($e->getMessage(), 'Invalid snippet user language found in config')!==false) {
                 $didExpectedError=true;
-            }else {
+            } else {
                 throw $e; //Ensure the error is re-thrown, it doesn't match what we're expecting
             }
         }
@@ -206,4 +218,3 @@ class SnippetLanguageTest extends SapphireTest {
         $this->assertEquals(0, SnippetLanguage::get()->filter('Name', 'Test Language 4')->count(), 'Invalid language was created');
     }
 }
-?>

@@ -1,5 +1,6 @@
 <?php
-class SnippetPackage extends DataObject {
+class SnippetPackage extends DataObject
+{
     private static $db=array(
                             'Title'=>'Varchar(300)'
                          );
@@ -16,8 +17,9 @@ class SnippetPackage extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can view false otherwise
      */
-    public function canView($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canView($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -29,8 +31,9 @@ class SnippetPackage extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can edit false otherwise
      */
-    public function canEdit($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canEdit($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -42,8 +45,9 @@ class SnippetPackage extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can delete false otherwise
      */
-    public function canDelete($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canDelete($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -55,8 +59,9 @@ class SnippetPackage extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can create false otherwise
      */
-    public function canCreate($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canCreate($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -67,7 +72,8 @@ class SnippetPackage extends DataObject {
      * Gets fields used in the cms
      * @return {FieldList} Fields to be used
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields=new FieldList(
                             new TabSet('Root',
                                             new Tab('Main', _t('SnippetPackage.MAIN', '_Main'),
@@ -77,9 +83,9 @@ class SnippetPackage extends DataObject {
                             new HiddenField('ID', 'ID')
                         );
         
-        if($this->ID==0) {
+        if ($this->ID==0) {
             $fields->addFieldToTab('Root.Main', new LabelField('Snippets', _t('SnippetPackage.SNIPPETS_AFTER_FIRST_SAVE', '_Snippets can be added after saving for the first time')));
-        }else {
+        } else {
             $packageGrid=new GridField('Snippets', _t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets'), $this->Snippets(), GridFieldConfig_RelationEditor::create(10));
             $packageGrid->getConfig()->removeComponentsByType('GridFieldEditButton')
                                     ->removeComponentsByType('GridFieldAddNewButton')
@@ -98,7 +104,8 @@ class SnippetPackage extends DataObject {
      * Gets validator used in the cms
      * @return {RequiredFields} Required fields validator
      */
-    public function getCMSValidator() {
+    public function getCMSValidator()
+    {
         return new RequiredFields(
                                 'Title'
                             );
@@ -108,7 +115,8 @@ class SnippetPackage extends DataObject {
      * Return the CSS classes to apply to this node in the CMS tree
      * @return {string} Classes used in the cms tree
      */
-    public function CMSTreeClasses() {
+    public function CMSTreeClasses()
+    {
         $classes=sprintf('class-%s', $this->class);
         
         $classes.=$this->markingClasses();
@@ -120,10 +128,11 @@ class SnippetPackage extends DataObject {
      * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
      * @return string a html string ready to be directly used in a template
      */
-    public function getTreeTitle() {
+    public function getTreeTitle()
+    {
         $treeTitle = sprintf(
             "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+            Convert::raw2xml(str_replace(array("\n", "\r"), "", $this->Title))
         );
         
         return $treeTitle;
@@ -133,15 +142,16 @@ class SnippetPackage extends DataObject {
      * Always return true
      * @return {bool} Return true
      */
-    public function hasSnippets() {
+    public function hasSnippets()
+    {
         return true;
     }
     
-    public function summaryFields() {
+    public function summaryFields()
+    {
         return array(
                     'Title'=>_t('SnippetPackage.TITLE', '_Title'),
                     'Snippets.Count'=>_t('SnippetPackage.PACKAGE_SNIPPETS', '_Package Snippets')
                 );
     }
 }
-?>

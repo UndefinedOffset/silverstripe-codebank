@@ -1,5 +1,6 @@
 <?php
-interface ICodeBankSearchEngine {
+interface ICodeBankSearchEngine
+{
     /**
      * Allows for hooking in to modify the table of the snippet class for the search engine
      */
@@ -14,4 +15,3 @@ interface ICodeBankSearchEngine {
      */
     public function doSnippetSearch($keywords, $languageID=false, $folderID=false);
 }
-?>

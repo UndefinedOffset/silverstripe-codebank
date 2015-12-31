@@ -1,5 +1,6 @@
 <?php
-class CodeBank extends LeftAndMain implements PermissionProvider {
+class CodeBank extends LeftAndMain implements PermissionProvider
+{
     private static $url_segment='codeBank';
     private static $tree_class='SnippetLanguage';
     private static $url_rule='/$Action/$ID/$OtherID';
@@ -44,7 +45,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Constructor
      * @see LeftAndMain::__construct()
      */
-    public function __construct() {
+    public function __construct()
+    {
         parent::__construct();
         
         //Work around to allow dynamic path
@@ -54,7 +56,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     /**
      * Initializes the code bank admin
      */
-    public function init() {
+    public function init()
+    {
         parent::init();
         
         Requirements::css(CB_DIR.'/css/CodeBank.css');
@@ -63,15 +66,18 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         Requirements::javascript(CB_DIR.'/javascript/CodeBank.Tree.js');
         
-        if(!empty(CodeBankConfig::CurrentConfig()->IPMessage) && Session::get('CodeBankIPAgreed')!==true) {
+        if (!empty(CodeBankConfig::CurrentConfig()->IPMessage) && Session::get('CodeBankIPAgreed')!==true) {
             $this->redirect('admin/codeBank/agreement');
         }
     }
     
-    public function index($request) {
+    public function index($request)
+    {
         // In case we're not showing a specific record, explicitly remove any session state,
         // to avoid it being highlighted in the tree, and causing an edit form to show.
-        if(!$request->param('Action')) $this->setCurrentPageId(null);
+        if (!$request->param('Action')) {
+            $this->setCurrentPageId(null);
+        }
 
         return parent::index($request);
     }
@@ -81,7 +87,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {string} $action Action to be used
      * @return {string} Resulting link
      */
-    public function Link($action=null) {
+    public function Link($action=null)
+    {
         $link = Controller::join_links(
             $this->stat('url_base', true),
             $this->stat('url_segment', true), // in case we want to change the segment
@@ -98,7 +105,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {string} Link to
      * @return {string} Link with search params
      */
-    protected function LinkWithSearch($link) {
+    protected function LinkWithSearch($link)
+    {
         // Whitelist to avoid side effects
         $params=array(
                     'q'=>(array)$this->request->getVar('q'),
@@ -120,12 +128,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the main tab link
      * @return {string} URL to the main tab
      */
-    public function getLinkMain() {
-        if($this->currentPageID()!=0 && $this->class=='CodeBankEditSnippet') {
+    public function getLinkMain()
+    {
+        if ($this->currentPageID()!=0 && $this->class=='CodeBankEditSnippet') {
             return $this->LinkWithSearch(Controller::join_links($this->Link('show'), $this->currentPageID()));
-        }else if($this->currentPageID()!=0 && $this->class=='CodeBank') {
+        } elseif ($this->currentPageID()!=0 && $this->class=='CodeBank') {
             $otherID=null;
-            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+            if (!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
                 $otherID=intval($this->urlParams['OtherID']);
             }
             
@@ -141,8 +150,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {FieldList} $fields Fields to use
      * @return {Form} Form to be used
      */
-    public function getEditForm($id=null, $fields=null) {
-        if(!$id) {
+    public function getEditForm($id=null, $fields=null)
+    {
+        if (!$id) {
             $id=$this->currentPageID();
         }
         
@@ -151,12 +161,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         $record=$this->getRecord($id);
-        if($record && !$record->canView()) {
+        if ($record && !$record->canView()) {
             return Security::permissionFailure($this);
         }
         
         
-        if(!$fields) {
+        if (!$fields) {
             $fields=$form->Fields();
         }
         
@@ -164,7 +174,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $actions=$form->Actions();
         
         
-        if($record) {
+        if ($record) {
             $fields->push($idField=new HiddenField("ID", false, $id));
             $versions=$record->Versions()->filter('ID:not', $record->CurrentVersionID)->Map('ID', 'Created');
             $actions=new FieldList(
@@ -183,25 +193,25 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             // Use <button> to allow full jQuery UI styling
             $actionsFlattened=$actions->dataFields();
-            if($actionsFlattened) {
-                foreach($actionsFlattened as $action) {
-                    if($action instanceof FormAction) {
+            if ($actionsFlattened) {
+                foreach ($actionsFlattened as $action) {
+                    if ($action instanceof FormAction) {
                         $action->setUseButtonTag(true);
                     }
                 }
             }
             
             
-            if($record->hasMethod('getCMSValidator')) {
+            if ($record->hasMethod('getCMSValidator')) {
                 $validator=$record->getCMSValidator();
-            }else {
+            } else {
                 $validator=new RequiredFields();
             }
             
             
-            if($record->Package() && $record->Package()!==false && $record->Package()->ID!=0) {
+            if ($record->Package() && $record->Package()!==false && $record->Package()->ID!=0) {
                 $package=new ArrayList(array($record->Package()));
-            }else {
+            } else {
                 $package=null;
             }
             
@@ -228,9 +238,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             
             //Swap content for version text
-            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+            if (!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
                 $version=$record->Version(intval($this->urlParams['OtherID']));
-                if(!empty($version) && $version!==false && $version->ID!=0) {
+                if (!empty($version) && $version!==false && $version->ID!=0) {
                     $fields->dataFieldByName('SnippetText')->setValue($version->Text);
                     $fields->dataFieldByName('LastModified')->setValue($version->LastEdited);
                     $fields->dataFieldByName('CurrentVersionID')->setValue($version->ID);
@@ -257,14 +267,14 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             
             //Display message telling user to run dev/build because the version numbers are out of sync
-            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            if (CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
                 $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'Title');
-            }else if($this->hasOldTables()) {
+            } elseif ($this->hasOldTables()) {
                 $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'Title');
             }
             
             return $form;
-        }else if($id) {
+        } elseif ($id) {
             $form=CMSForm::create($this, 'EditForm', new FieldList(
                                                             new TabSet('Root',
                                                                             new Tab('Main', ' ',
@@ -279,22 +289,22 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             
             //Display message telling user to run dev/build because the version numbers are out of sync
-            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            if (CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
                 $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'), 'DoesntExist');
-            }else if($this->hasOldTables()) {
+            } elseif ($this->hasOldTables()) {
                 $form->Fields()->insertBefore(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'), 'DoesntExistLabel');
             }
-        }else {
+        } else {
             $form=$this->EmptyForm();
-            if(Session::get('CodeBank.deletedSnippetID')) {
+            if (Session::get('CodeBank.deletedSnippetID')) {
                 $form->Fields()->push(new HiddenField('ID', 'ID', Session::get('CodeBank.deletedSnippetID')));
             }
             
             
             //Display message telling user to run dev/build because the version numbers are out of sync
-            if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+            if (CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
                 $form->Fields()->push(new LiteralField('DBUpgrade', '<p class="message error">'._t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')).'</p>'));
-            }else if($this->hasOldTables()) {
+            } elseif ($this->hasOldTables()) {
                 $form->Fields()->push(new LiteralField('DBUpgrade', '<p class="message warning">'._t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')).'</p>'));
             }
         }
@@ -314,7 +324,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the link to the tree view
      * @return {string} Link to the tree load
      */
-    public function getLinkTreeView() {
+    public function getLinkTreeView()
+    {
         return $this->LinkWithSearch($this->Link('tree'));
     }
     
@@ -322,7 +333,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the snippet tree view
      * @return {string} Rendered snippet tree
      */
-    public function tree() {
+    public function tree()
+    {
         return $this->renderWith('CodeBank_TreeView');
     }
     
@@ -330,18 +342,19 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Get a subtree underneath the request param 'ID'.
      * If ID = 0, then get the whole tree.
      */
-    public function getsubtree($request) {
-        if(strpos($request->getVar('ID'), 'folder-')!==false) {
+    public function getsubtree($request)
+    {
+        if (strpos($request->getVar('ID'), 'folder-')!==false) {
             $folderID=(strpos($request->getVar('ID'), 'folder-')!==false ? intval(str_replace('folder-', '', $request->getVar('ID'))):null);
             $html=$this->getSiteTreeFor('SnippetFolder', $folderID, 'Children', null, array($this, 'hasSnippets'));
-        }else {
+        } else {
             $languageID=(strpos($request->getVar('ID'), 'language-')!==false ? intval(str_replace('language-', '', $request->getVar('ID'))):null);
             $html=$this->getSiteTreeFor($this->stat('tree_class'), $languageID, 'Children', null, array($this, 'hasSnippets'));
         }
 
         // Trim off the outer tag
-        $html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/','', $html);
-        $html=preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/','', $html);
+        $html=preg_replace('/^[\s\t\r\n]*<ul[^>]*>/', '', $html);
+        $html=preg_replace('/<\/ul[^>]*>[\s\t\r\n]*$/', '', $html);
         
         return $html;
     }
@@ -354,11 +367,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      *
      * @return String JSON
      */
-    public function updatetreenodes($request) {
+    public function updatetreenodes($request)
+    {
         $data=array();
         $ids=explode(',', $request->getVar('ids'));
-        foreach($ids as $id) {
-            if($id==Session::get('CodeBank.deletedSnippetID')) {
+        foreach ($ids as $id) {
+            if ($id==Session::get('CodeBank.deletedSnippetID')) {
                 Session::clear('CodeBank.deletedSnippetID');
                 $this->response->addHeader('Content-Type', 'text/json');
                 return '{"'.$id.'": false}';
@@ -370,7 +384,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $next=$prev=null;
             $className=$this->stat('tree_class');
             $next=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('FolderID', $record->FolderID)->filter('Title:GreaterThan', $record->Title)->first();
-            if(!$next) {
+            if (!$next) {
                 $prev=Snippet::get()->filter('LanguageID', $record->LanguageID)->filter('FolderID', $record->FolderID)->filter('Title:LessThan', $record->Title)->reverse()->first();
             }
             
@@ -394,7 +408,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Checks to see if the tree should be filtered or not
      * @return {bool}
      */
-    public function TreeIsFiltered() {
+    public function TreeIsFiltered()
+    {
         return ($this->request->getVar('q') || $this->request->getVar('tag') || $this->request->getVar('creator'));
     }
     
@@ -402,7 +417,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the snippet language tree as an unordered list
      * @return {string} XHTML forming the tree of languages to snippets
      */
-    public function SiteTreeAsUL() {
+    public function SiteTreeAsUL()
+    {
         $html=$this->getSiteTreeFor($this->stat('tree_class'), null, 'Children', null);
         
         $this->extend('updateSiteTreeAsUL', $html);
@@ -417,39 +433,40 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param $childrenMethod The method to call to get the children of the tree. For example, Children, AllChildrenIncludingDeleted, or AllHistoricalChildren
      * @return String Nested unordered list with links to each page
      */
-    public function getSiteTreeFor($className, $rootID=null, $childrenMethod=null, $numChildrenMethod=null, $filterFunction=null, $minNodeCount=30) {
+    public function getSiteTreeFor($className, $rootID=null, $childrenMethod=null, $numChildrenMethod=null, $filterFunction=null, $minNodeCount=30)
+    {
         // Filter criteria
         $params=$this->request->getVar('q');
         $tag=$this->request->getVar('tag');
         $creator=$this->request->getVar('creator');
-        if($params) {
+        if ($params) {
             $filterClass=CodeBank::$filter_class;
-            if($filterClass!='SnippetTreeFilter' && !is_subclass_of($filterClass, 'SnippetTreeFilter')) {
+            if ($filterClass!='SnippetTreeFilter' && !is_subclass_of($filterClass, 'SnippetTreeFilter')) {
                 throw new Exception(sprintf('Invalid filter class passed: %s', $filterClass));
             }
             
             $filter=new $filterClass($params);
-        }else if($tag && !empty($tag)) {
+        } elseif ($tag && !empty($tag)) {
             $filter=new SnippetTreeTagFilter($tag);
-        }else if($creator && intval($creator)>0) {
+        } elseif ($creator && intval($creator)>0) {
             $filter=new SnippetTreeCreatorFilter($creator);
-        }else {
+        } else {
             $filter=null;
         }
         
         
         // Default childrenMethod and numChildrenMethod
-        if(!$childrenMethod) {
+        if (!$childrenMethod) {
             $childrenMethod=($filter && $filter->getChildrenMethod() ? $filter->getChildrenMethod():'AllChildrenIncludingDeleted');
         }
         
         
-        if(!$numChildrenMethod) {
+        if (!$numChildrenMethod) {
             $numChildrenMethod='numChildren';
         }
         
         
-        if(!$filterFunction) {
+        if (!$filterFunction) {
             $filterFunction=($filter ? array($filter, 'isSnippetLanguageIncluded'):array($this, 'hasSnippets'));
         }
         
@@ -459,21 +476,21 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $obj=($record ? $record:singleton($className));
         
         // Mark the nodes of the tree to return
-        if($filterFunction) {
+        if ($filterFunction) {
             $obj->setMarkingFilterFunction($filterFunction);
         }
         
         $obj->markPartialTree($minNodeCount, $this, $childrenMethod, $numChildrenMethod);
         
         // Ensure current page is exposed
-        if($p=$this->currentPage()) {
+        if ($p=$this->currentPage()) {
             $obj->markToExpose($p);
         }
         
         // getChildrenAsUL is a flexible and complex way of traversing the tree
         $controller=$this;
         $recordController=singleton('CodeBank');
-        $titleFn=function(&$child) use(&$controller, &$recordController) {
+        $titleFn=function (&$child) use (&$controller, &$recordController) {
             $link=Controller::join_links($recordController->Link("show"), $child->ID);
             return CodeBank_TreeNode::create($child, $link, $controller->isCurrentPage($child))->forTemplate();
         };
@@ -483,16 +500,16 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         // Wrap the root if needs be.
-        if(!$rootID) {
+        if (!$rootID) {
             $rootLink=$this->Link('show') . '/root';
             
             // This lets us override the tree title with an extension
-            if($this->hasMethod('getCMSTreeTitle') && $customTreeTitle=$this->getCMSTreeTitle()) {
+            if ($this->hasMethod('getCMSTreeTitle') && $customTreeTitle=$this->getCMSTreeTitle()) {
                 $treeTitle=$customTreeTitle;
-            }else if(class_exists('SiteConfig')) {
+            } elseif (class_exists('SiteConfig')) {
                 $siteConfig=SiteConfig::current_site_config();
                 $treeTitle=$siteConfig->Title;
-            }else {
+            } else {
                 $treeTitle='...';
             }
             
@@ -507,15 +524,16 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {int} $id ID of the snippet to fetch
      * @return {DataObject} DataObject to use
      */
-    public function getRecord($id) {
+    public function getRecord($id)
+    {
         $className='Snippet';
-        if($className && $id instanceof $className) {
+        if ($className && $id instanceof $className) {
             return $id;
-        }else if($id=='root') {
+        } elseif ($id=='root') {
             return singleton($className);
-        }else if(is_numeric($id)) {
+        } elseif (is_numeric($id)) {
             return DataObject::get_by_id($className, $id);
-        }else {
+        } else {
             return false;
         }
     }
@@ -524,8 +542,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Returns the link to view/edit snippets
      * @return {string} Link to view/edit snippets
      */
-    public function getEditLink() {
-        if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+    public function getEditLink()
+    {
+        if (!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
             return $this->LinkWithSearch('admin/codeBank/show/'.$this->currentPageID().'/'.intval($this->urlParams['OtherID']));
         }
         
@@ -536,7 +555,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Returns the link to settings
      * @return {string} Link to settings
      */
-    public function getLinkSettings() {
+    public function getLinkSettings()
+    {
         return $this->LinkWithSearch('admin/codeBank/settings');
     }
     
@@ -544,14 +564,16 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Detects if a node has snippets or not
      * @return {bool} Returns the value if the language has snippets or not
      */
-    public function hasSnippets($node) {
+    public function hasSnippets($node)
+    {
         return $node->hasSnippets();
     }
     
     /**
      * @return ArrayList
      */
-    public function Breadcrumbs($unlinked=false) {
+    public function Breadcrumbs($unlinked=false)
+    {
         $defaultTitle=LeftAndMain::menu_title_for_class('CodeBank');
         $title=_t('CodeBank.MENUTITLE', $defaultTitle);
         $items=new ArrayList(array(
@@ -562,18 +584,18 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                 ));
         
         $record=$this->currentPage();
-        if($record && $record->exists()) {
-            if($record->hasExtension('Hierarchy')) {
+        if ($record && $record->exists()) {
+            if ($record->hasExtension('Hierarchy')) {
                 $ancestors=$record->getAncestors();
                 $ancestors=new ArrayList(array_reverse($ancestors->toArray()));
                 $ancestors->push($record);
-                foreach($ancestors as $ancestor) {
+                foreach ($ancestors as $ancestor) {
                     $items->push(new ArrayData(array(
                                                     'Title'=>$ancestor->Title,
                                                     'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $ancestor->ID))
                                                 )));
                 }
-            }else {
+            } else {
                 $items->push(new ArrayData(array(
                                                 'Title'=>$record->Title,
                                                 'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $record->ID))
@@ -588,7 +610,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Generates the search form
      * @return {Form} Form used for searching
      */
-    public function SearchForm() {
+    public function SearchForm()
+    {
         $languages=SnippetLanguage::get()
                                         ->leftJoin('Snippet', '"Snippet"."LanguageID"="SnippetLanguage"."ID"')
                                         ->where('"SnippetLanguage"."Hidden"=0 OR "Snippet"."ID" IS NOT NULL')
@@ -628,28 +651,29 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Gets the current version of Code Bank
      * @return {string} Version Number Plus Build Date
      */
-    final public function getVersion() {
-        if(CB_VERSION!='@@VERSION@@') {
+    final public function getVersion()
+    {
+        if (CB_VERSION!='@@VERSION@@') {
             return CB_VERSION.' '.CB_BUILD_DATE;
         }
         
         // Tries to obtain version number from composer.lock if it exists
         $composerLockPath=BASE_PATH.'/composer.lock';
-        if(file_exists($composerLockPath)) {
+        if (file_exists($composerLockPath)) {
             $cache=SS_Cache::factory('CodeBank_Version');
             $cacheKey=filemtime($composerLockPath);
             $version=$cache->load($cacheKey);
-            if($version) {
+            if ($version) {
                 $version=$version;
-            }else {
+            } else {
                 $version='';
             }
             
-            if(!$version && $jsonData=file_get_contents($composerLockPath)) {
+            if (!$version && $jsonData=file_get_contents($composerLockPath)) {
                 $lockData=json_decode($jsonData);
-                if($lockData && isset($lockData->packages)) {
+                if ($lockData && isset($lockData->packages)) {
                     foreach ($lockData->packages as $package) {
-                        if($package->name=='undefinedoffset/silverstripe-codebank' && isset($package->version)) {
+                        if ($package->name=='undefinedoffset/silverstripe-codebank' && isset($package->version)) {
                             $version=$package->version.(isset($package->time) ? ' '.date('Ymd', strtotime($package->time)):'');
                             break;
                         }
@@ -660,7 +684,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             }
         }
         
-        if(!empty($version)) {
+        if (!empty($version)) {
             return $version;
         }
         
@@ -671,24 +695,25 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles rendering of the compare view
      * @return {string} HTML to be sent to the browser
      */
-    public function compare() {
+    public function compare()
+    {
         $compareContent=false;
         
         
         //Get the Main Revision
         $snippet1=Snippet::get()->byID(intval($this->urlParams['ID']));
-        if(empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
+        if (empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
             $snippet1=false;
         }
         
-        if($snippet1!==false) {
+        if ($snippet1!==false) {
             //Get the Comparision Revision
             $snippet2=$snippet1->Version(intval($this->urlParams['OtherID']));
-            if(empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
+            if (empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
                 $snippet2=false;
             }
             
-            if($snippet2!==false) {
+            if ($snippet2!==false) {
                 $snippet1Text=preg_replace('/\r\n|\n|\r/', "\n", $snippet1->SnippetText);
                 $snippet2Text=preg_replace('/\r\n|\n|\r/', "\n", $snippet2->Text);
                 
@@ -697,7 +722,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 $renderer=new WP_Text_Diff_Renderer_Table();
                 
                 $renderedDiff=$renderer->render($diff);
-                if(!empty($renderedDiff)) {
+                if (!empty($renderedDiff)) {
                     $lTable='<table cellspacing="0" cellpadding="0" border="0" class="diff">'.
                                 '<colgroup>'.
                                     '<col class="ltype"/>'.
@@ -708,17 +733,17 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                     
                     header('content-type: text/plain');
                     $xml=simplexml_load_string('<tbody>'.str_replace('&nbsp;', ' ', $renderedDiff).'</tbody>');
-                    foreach($xml->children() as $row) {
+                    foreach ($xml->children() as $row) {
                         $i=0;
                         $lTable.='<tr>';
                         $rTable.='<tr>';
                         
-                        foreach($row->children() as $td) {
+                        foreach ($row->children() as $td) {
                             $attr=$td->attributes();
                             
-                            if($i==0) {
+                            if ($i==0) {
                                 $lTable.=$td->asXML();
-                            }else {
+                            } else {
                                 $rTable.=$td->asXML();
                             }
                             
@@ -752,40 +777,53 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Create serialized JSON string with tree hints data to be injected into 'data-hints' attribute of root node of jsTree.
      * @return {string} Serialized JSON
      */
-    public function getTreeHints() {
+    public function getTreeHints()
+    {
         $json = '';
 
         $classes = array('Snippet', 'SnippetLanguage', 'SnippetFolder');
 
-         $cacheCanCreate = array();
-         foreach($classes as $class) $cacheCanCreate[$class] = singleton($class)->canCreate();
+        $cacheCanCreate = array();
+        foreach ($classes as $class) {
+            $cacheCanCreate[$class] = singleton($class)->canCreate();
+        }
 
          // Generate basic cache key. Too complex to encompass all variations
          $cache=SS_Cache::factory('CodeBank_TreeHints');
-         $cacheKey = md5(implode('_', array(Member::currentUserID(), implode(',', $cacheCanCreate), implode(',', $classes))));
-         if($this->request->getVar('flush')) $cache->clean(Zend_Cache::CLEANING_MODE_ALL);
-         $json = $cache->load($cacheKey);
-         if(!$json) {
+        $cacheKey = md5(implode('_', array(Member::currentUserID(), implode(',', $cacheCanCreate), implode(',', $classes))));
+        if ($this->request->getVar('flush')) {
+            $cache->clean(Zend_Cache::CLEANING_MODE_ALL);
+        }
+        $json = $cache->load($cacheKey);
+        if (!$json) {
             $def['Root'] = array();
             $def['Root']['disallowedParents'] = array();
 
-            foreach($classes as $class) {
+            foreach ($classes as $class) {
                 $sng=singleton($class);
                 $allowedChildren = $sng->allowedChildren();
                 
                 // SiteTree::allowedChildren() returns null rather than an empty array if SiteTree::allowed_chldren == 'none'
-                if($allowedChildren == null) $allowedChildren = array();
+                if ($allowedChildren == null) {
+                    $allowedChildren = array();
+                }
                 
                 // Find i18n - names and build allowed children array
-                foreach($allowedChildren as $child) {
+                foreach ($allowedChildren as $child) {
                     $instance = singleton($child);
                     
-                    if($instance instanceof HiddenClass) continue;
+                    if ($instance instanceof HiddenClass) {
+                        continue;
+                    }
 
-                    if(!array_key_exists($child, $cacheCanCreate) || !$cacheCanCreate[$child]) continue;
+                    if (!array_key_exists($child, $cacheCanCreate) || !$cacheCanCreate[$child]) {
+                        continue;
+                    }
 
                     // skip this type if it is restricted
-                    if($instance->stat('need_permission') && !$this->can(singleton($class)->stat('need_permission'))) continue;
+                    if ($instance->stat('need_permission') && !$this->can(singleton($class)->stat('need_permission'))) {
+                        continue;
+                    }
 
                     $title = $instance->i18n_singular_name();
 
@@ -793,11 +831,15 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                 }
 
                 $allowedChildren = array_keys(array_diff($classes, $allowedChildren));
-                if($allowedChildren) $def[$class]['disallowedChildren'] = $allowedChildren;
+                if ($allowedChildren) {
+                    $def[$class]['disallowedChildren'] = $allowedChildren;
+                }
                 $defaultChild = $sng->default_child();
-                if($defaultChild != null) $def[$class]['defaultChild'] = $defaultChild;
-                if(isset($def[$class]['disallowedChildren'])) {
-                    foreach($def[$class]['disallowedChildren'] as $disallowedChild) {
+                if ($defaultChild != null) {
+                    $def[$class]['defaultChild'] = $defaultChild;
+                }
+                if (isset($def[$class]['disallowedChildren'])) {
+                    foreach ($def[$class]['disallowedChildren'] as $disallowedChild) {
                         $def[$disallowedChild]['disallowedParents'][] = $class;
                     }
                 }
@@ -816,10 +858,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles requests to add a snippet or folder to a language
      * @param {SS_HTTPRequest} $request HTTP Request
      */
-    public function addSnippet(SS_HTTPRequest $request)  {
-        if($request->getVar('Type')=='SnippetFolder') {
+    public function addSnippet(SS_HTTPRequest $request)
+    {
+        if ($request->getVar('Type')=='SnippetFolder') {
             return $this->redirect(Controller::join_links($this->Link('addFolder'), '?FolderID='.str_replace('folder-', '', $request->getVar('ID'))));
-        }else {
+        } else {
             return $this->redirect(Controller::join_links($this->Link('add'), '?LanguageID='.str_replace('language-', '', $request->getVar('ID'))));
         }
     }
@@ -828,24 +871,25 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles moving of a snippet when the tree is reordered
      * @param {SS_HTTPRequest} $request HTTP Request
      */
-    public function moveSnippet(SS_HTTPRequest $request) {
+    public function moveSnippet(SS_HTTPRequest $request)
+    {
         $snippet=Snippet::get()->byID(intval($request->getVar('ID')));
         
-        if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+        if (empty($snippet) || $snippet===false || $snippet->ID==0) {
             $this->response->setStatusCode(403, _t('CodeBank.SNIPPIT_NOT_EXIST', '_Snippit does not exist'));
             return;
         }
         
         $parentID=$request->getVar('ParentID');
-        if(strpos($parentID, 'language-')!==false) {
+        if (strpos($parentID, 'language-')!==false) {
             $lang=SnippetLanguage::get()->byID(intval(str_replace('language-', '', $parentID)));
-            if(empty($lang) || $lang===false || $lang->ID==0) {
+            if (empty($lang) || $lang===false || $lang->ID==0) {
                 $this->response->setStatusCode(403, _t('CodeBank.LANGUAGE_NOT_EXIST', '_Language does not exist'));
                 return;
             }
             
             
-            if($lang->ID!=$snippet->LanguageID) {
+            if ($lang->ID!=$snippet->LanguageID) {
                 $this->response->setStatusCode(403, _t('CodeBank.CANNOT_MOVE_TO_LANGUAGE', '_You cannot move a snippet to another language'));
                 return;
             }
@@ -856,15 +900,15 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             
             $this->response->addHeader('X-Status', rawurlencode(_t('CodeBank.SNIPPET_MOVED', '_Snippet moved successfully')));
             return;
-        }else if(strpos($parentID, 'folder-')!==false) {
+        } elseif (strpos($parentID, 'folder-')!==false) {
             $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $parentID)));
-            if(empty($folder) || $folder===false || $folder->ID==0) {
+            if (empty($folder) || $folder===false || $folder->ID==0) {
                 $this->response->setStatusCode(403, _t('CodeBank.FOLDER_NOT_EXIST', '_Folder does not exist'));
                 return;
             }
             
             
-            if($folder->LanguageID!=$snippet->LanguageID) {
+            if ($folder->LanguageID!=$snippet->LanguageID) {
                 $this->response->setStatusCode(403, _t('CodeBank.CANNOT_MOVE_TO_FOLDER', '_You cannot move a snippet to a folder in another language'));
                 return;
             }
@@ -884,7 +928,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles requests to add a folder
      * @return {string} HTML to be sent to the browser
      */
-    public function addFolder() {
+    public function addFolder()
+    {
         $form=$this->AddFolderForm();
         return $this->customise(array(
                                     'Content'=>' ',
@@ -896,7 +941,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Form used for adding a folder
      * @return {Form} Form to be used for adding a folder
      */
-    public function AddFolderForm() {
+    public function AddFolderForm()
+    {
         $fields=new FieldList(
                             new TabSet('Root',
                                             new Tab('Main', 'Main',
@@ -907,27 +953,27 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         $noParent=true;
-        if(strpos($this->request->getVar('ParentID'), 'language-')!==false) {
+        if (strpos($this->request->getVar('ParentID'), 'language-')!==false) {
             $fields->push(new HiddenField('LanguageID', 'LanguageID', intval(str_replace('language-', '', $this->request->getVar('ParentID')))));
             
             $noParent=false;
-        }else if(strpos($this->request->getVar('ParentID'), 'folder-')!==false) {
+        } elseif (strpos($this->request->getVar('ParentID'), 'folder-')!==false) {
             $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ParentID'))));
             
-            if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+            if (!empty($folder) && $folder!==false && $folder->ID!=0) {
                 $fields->push(new HiddenField('ParentID', 'ParentID', $folder->ID));
                 $fields->push(new HiddenField('LanguageID', 'LanguageID', $folder->LanguageID));
                 
                 $noParent=false;
             }
-        }else {
-            if($this->request->postVar('LanguageID')) {
+        } else {
+            if ($this->request->postVar('LanguageID')) {
                 $fields->push(new HiddenField('LanguageID', 'LanguageID', intval($this->request->postVar('LanguageID'))));
                 
                 $noParent=false;
             }
                
-            if($this->request->postVar('ParentID')) {
+            if ($this->request->postVar('ParentID')) {
                 $fields->push(new HiddenField('ParentID', 'ParentID', intval($this->request->postVar('ParentID'))));
                 
                 $noParent=false;
@@ -946,7 +992,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         //If no parent disable folder
-        if($noParent) {
+        if ($noParent) {
             $form->setMessage(_t('CodeBank.FOLDER_NO_PARENT', '_Folder does not have a parent language or folder'), 'bad');
             $form->setFields(new FieldList());
             $form->setActions(new FieldList());
@@ -961,17 +1007,18 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {Form} $form Submitting form
      * @return {string} HTML to be rendered
      */
-    public function doAddFolder($data, Form $form) {
+    public function doAddFolder($data, Form $form)
+    {
         //Existing Check
         $existingCheck=SnippetFolder::get()->filter('Name:nocase', Convert::raw2sql($data['Name']))->filter('LanguageID', intval($data['LanguageID']));
         
-        if(array_key_exists('FolderID', $data)) {
+        if (array_key_exists('FolderID', $data)) {
             $existingCheck=$existingCheck->filter('ParentID', intval($data['FolderID']));
-        }else {
+        } else {
             $existingCheck->filter('ParentID', 0);
         }
         
-        if($existingCheck->Count()>0) {
+        if ($existingCheck->Count()>0) {
             $form->sessionMessage(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), 'bad');
             return $this->redirectBack();
         }
@@ -981,7 +1028,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         $folder->Name=$data['Name'];
         $folder->LanguageID=$data['LanguageID'];
         
-        if(array_key_exists('ParentID', $data)) {
+        if (array_key_exists('ParentID', $data)) {
             $folder->ParentID=$data['ParentID'];
         }
         
@@ -992,7 +1039,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         //Find the next & previous nodes, for proper positioning (Sort isn't good enough - it's not a raw offset)
         $next=$prev=null;
         $next=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:GreaterThan', Convert::raw2sql($folder->Title))->first();
-        if(!$next) {
+        if (!$next) {
             $prev=SnippetFolder::get()->filter('LanguageID', $folder->LanguageID)->filter('ParentID', $folder->ParentID)->filter('Name:LessThan', Convert::raw2sql($folder->Title))->reverse()->first();
         }
         
@@ -1025,7 +1072,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles requests to rename a folder
      * @return {string} HTML to be sent to the browser
      */
-    public function renameFolder() {
+    public function renameFolder()
+    {
         $form=$this->RenameFolderForm();
         return $this->customise(array(
                                     'Content'=>' ',
@@ -1037,10 +1085,11 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Form used for renaming a folder
      * @return {Form} Form to be used for renaming a folder
      */
-    public function RenameFolderForm() {
+    public function RenameFolderForm()
+    {
         $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ID'))));
         
-        if(!empty($folder) && $folder!==false && $folder->ID!=0) {
+        if (!empty($folder) && $folder!==false && $folder->ID!=0) {
             $fields=new FieldList(
                                 new TabSet('Root',
                                                 new Tab('Main', 'Main',
@@ -1053,7 +1102,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
             $actions=new FieldList(
                                     new FormAction('doRenameFolder', _t('CodeBank.SAVE', '_Save'))
                                 );
-        }else {
+        } else {
             $fields=new FieldList();
             $actions=new FieldList();
         }
@@ -1065,9 +1114,9 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
         
         
         //If no parent disable folder
-        if(empty($folder) || $folder===false || $folder->ID==0) {
+        if (empty($folder) || $folder===false || $folder->ID==0) {
             $form->setMessage(_t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'), 'bad');
-        }else {
+        } else {
             $form->loadDataFrom($folder);
             $form->setFormAction(Controller::join_links($form->FormAction(), '?ID='.$folder->ID));
         }
@@ -1081,9 +1130,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * @param {Form} $form Submitting form
      * @return {string} HTML to be rendered
      */
-    public function doRenameFolder($data, Form $form) {
+    public function doRenameFolder($data, Form $form)
+    {
         $folder=SnippetFolder::get()->byID(intval($data['ID']));
-        if(empty($folder) || $folder===false || $folder->ID==0) {
+        if (empty($folder) || $folder===false || $folder->ID==0) {
             $form->sessionMessage(_t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'), 'bad');
             return $this->redirectBack();
         }
@@ -1094,7 +1144,7 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
                                             ->filter('LanguageID', $folder->LanguageID)
                                             ->filter('ParentID', $folder->ParentID)
                                             ->filter('ID:not', $folder->ID);
-        if($existingCheck->Count()>0) {
+        if ($existingCheck->Count()>0) {
             $form->sessionMessage(_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name'), 'bad');
             return $this->redirectBack();
         }
@@ -1119,9 +1169,10 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     /**
      * Deletes a folder node
      */
-    public function deleteFolder() {
+    public function deleteFolder()
+    {
         $folder=SnippetFolder::get()->byID(intval(str_replace('folder-', '', $this->request->getVar('ID'))));
-        if(empty($folder) || $folder===false || $folder->ID==0) {
+        if (empty($folder) || $folder===false || $folder->ID==0) {
             $this->response->setStatusCode(404, _t('CodeBank.FOLDER_NOT_FOUND', '_Folder could not be found'));
             return;
         }
@@ -1136,11 +1187,12 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Handles requests to print the current snippet
      * @return {string} Rendered template
      */
-    public function printSnippet() {
+    public function printSnippet()
+    {
         $record=$this->getRecord($this->currentPageID());
-        if(!empty($record) && $record!==false && $record->ID>0) {
+        if (!empty($record) && $record!==false && $record->ID>0) {
             $version=false;
-            if(!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
+            if (!empty($this->urlParams['OtherID']) && is_numeric($this->urlParams['OtherID'])) {
                 $version=$record->Version(intval($this->urlParams['OtherID']));
             }
             
@@ -1163,7 +1215,8 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Returns a map of permission codes to add to the dropdown shown in the Security section of the CMS.
      * @return {array} Map of codes to label
      */
-    public function providePermissions() {
+    public function providePermissions()
+    {
         return array(
                     'CODE_BANK_ACCESS'=>_t('CodeBank.ACCESS_CODE_BANK', '_Access Code Bank')
                 );
@@ -1173,12 +1226,13 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
      * Tests to see if the old tables exist
      * @return {bool} Returns boolean true if the old tables are detected and the migration file is not detected
      */
-    protected function hasOldTables() {
-        if(!file_exists(ASSETS_PATH.'/.codeBankMigrated')) {
+    protected function hasOldTables()
+    {
+        if (!file_exists(ASSETS_PATH.'/.codeBankMigrated')) {
             $tables=DB::tableList();
-            if(array_key_exists('snippits', $tables) && array_key_exists('snippit_search', $tables)) {
+            if (array_key_exists('snippits', $tables) && array_key_exists('snippit_search', $tables)) {
                 return true;
-            }else {
+            } else {
                 touch(ASSETS_PATH.'/.codeBankMigrated');
             }
         }
@@ -1187,18 +1241,20 @@ class CodeBank extends LeftAndMain implements PermissionProvider {
     }
 }
 
-class CodeBank_TreeNode extends LeftAndMain_TreeNode {
+class CodeBank_TreeNode extends LeftAndMain_TreeNode
+{
     /**
      * Returns template, for further processing by {@link Hierarchy->getChildrenAsUL()}. Does not include closing tag to allow this method to inject its own children.
      * @return {string} HTML to be used
      */
-    public function forTemplate() {
+    public function forTemplate()
+    {
         $obj=$this->obj;
-        if($this->obj instanceof SnippetLanguage) {
+        if ($this->obj instanceof SnippetLanguage) {
             $liAttrib='id="language-'.$obj->ID.'" data-id="language-'.$obj->ID.'"';
-        }else if($this->obj instanceof SnippetFolder) {
+        } elseif ($this->obj instanceof SnippetFolder) {
             $liAttrib='id="folder-'.$obj->ID.'" data-id="folder-'.$obj->ID.'" data-languageID="'.$obj->LanguageID.'"';
-        }else {
+        } else {
             $liAttrib='id="record-'.$obj->ID.'" data-id="'.$obj->ID.'" data-languageID="'.$obj->LanguageID.'"';
         }
         
@@ -1208,4 +1264,3 @@ class CodeBank_TreeNode extends LeftAndMain_TreeNode {
                 "<ins class=\"jstree-icon\">&nbsp;</ins><span class=\"text\">".($obj->TreeTitle)."</span></a>";
     }
 }
-?>

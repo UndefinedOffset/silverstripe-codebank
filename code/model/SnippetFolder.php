@@ -1,5 +1,6 @@
 <?php
-class SnippetFolder extends DataObject {
+class SnippetFolder extends DataObject
+{
     private static $db=array(
                             'Name'=>'Varchar(150)'
                          );
@@ -34,8 +35,9 @@ class SnippetFolder extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can view false otherwise
      */
-    public function canView($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canView($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -47,8 +49,9 @@ class SnippetFolder extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can edit false otherwise
      */
-    public function canEdit($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canEdit($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -60,8 +63,9 @@ class SnippetFolder extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can delete false otherwise
      */
-    public function canDelete($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canDelete($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -73,8 +77,9 @@ class SnippetFolder extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can create false otherwise
      */
-    public function canCreate($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canCreate($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -86,7 +91,8 @@ class SnippetFolder extends DataObject {
      * Gets fields used in the cms
      * @return {FieldList} Fields to be used
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         return new FieldList(
                             new TextField('Name', _t('SnippetFolder.NAME', '_Name'), null, 150)
                         );
@@ -96,7 +102,8 @@ class SnippetFolder extends DataObject {
      * Determins if the folder has snippets
      * return {bool} Returns true so that folders always show
      */
-    public function hasSnippets() {
+    public function hasSnippets()
+    {
         return true;
     }
     
@@ -104,10 +111,11 @@ class SnippetFolder extends DataObject {
      * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
      * @return {string} a html string ready to be directly used in a template
      */
-    public function getTreeTitle() {
+    public function getTreeTitle()
+    {
         $treeTitle = sprintf(
             "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+            Convert::raw2xml(str_replace(array("\n", "\r"), "", $this->Title))
         );
         
         return $treeTitle;
@@ -117,7 +125,8 @@ class SnippetFolder extends DataObject {
      * Return the CSS classes to apply to this node in the CMS tree
      * @return {string} Classes used in the cms tree
      */
-    public function CMSTreeClasses() {
+    public function CMSTreeClasses()
+    {
         $classes=sprintf('class-%s', $this->class);
         
         $classes.=$this->markingClasses();
@@ -128,7 +137,8 @@ class SnippetFolder extends DataObject {
     /**
      * Removes all snippets from the folder before deleting
      */
-    protected function onBeforeDelete() {
+    protected function onBeforeDelete()
+    {
         parent::onBeforeDelete();
         
         //Remove all Snippets from this folder
@@ -142,18 +152,19 @@ class SnippetFolder extends DataObject {
      * Returns an array of the class names of classes that are allowed to be children of this class.
      * @return {array} Array of children
      */
-    public function allowedChildren() {
+    public function allowedChildren()
+    {
         $allowedChildren = array();
         $candidates = $this->stat('allowed_children');
-        if($candidates && $candidates != "none") {
-            foreach($candidates as $candidate) {
+        if ($candidates && $candidates != "none") {
+            foreach ($candidates as $candidate) {
                 // If a classname is prefixed by "*", such as "*Page", then only that
                 // class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
-                if(substr($candidate,0,1) == '*') {
-                    $allowedChildren[] = substr($candidate,1);
+                if (substr($candidate, 0, 1) == '*') {
+                    $allowedChildren[] = substr($candidate, 1);
                 } else {
                     $subclasses = ClassInfo::subclassesFor($candidate);
-                    foreach($subclasses as $subclass) {
+                    foreach ($subclasses as $subclass) {
                         $allowedChildren[] = $subclass;
                     }
                 }
@@ -167,8 +178,8 @@ class SnippetFolder extends DataObject {
      * Returns the default child for this class
      * @return {string} Class name of the default child
      */
-    public function default_child() {
+    public function default_child()
+    {
         return $this->stat('default_child');
     }
 }
-?>

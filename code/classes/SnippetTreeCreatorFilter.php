@@ -1,20 +1,22 @@
 <?php
-class SnippetTreeCreatorFilter extends SnippetTreeFilter {
+class SnippetTreeCreatorFilter extends SnippetTreeFilter
+{
     /**
      * @return Array Map of Snippet Language IDs
      */
-    public function snippetLanguagesIncluded() {
+    public function snippetLanguagesIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->creator)) {
+        if (!empty($this->creator)) {
             $q->setWhereAny(array(
                                 "\"CreatorID\"=".intval($this->creator)
                             ));
         }
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['LanguageID']);
         }
         
@@ -24,19 +26,20 @@ class SnippetTreeCreatorFilter extends SnippetTreeFilter {
     /**
      * @return Array Map of Snippet IDs
      */
-    public function snippetsIncluded() {
+    public function snippetsIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->creator)) {
+        if (!empty($this->creator)) {
             $q->setWhereAny(array(
                             "\"CreatorID\"=".intval($this->creator)
                         ));
         }
         
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['ID']);
         }
         
@@ -45,22 +48,22 @@ class SnippetTreeCreatorFilter extends SnippetTreeFilter {
     /**
      * @return Array Map of Snippet Folder IDs
      */
-    public function snippetFoldersIncluded() {
+    public function snippetFoldersIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."FolderID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->creator)) {
+        if (!empty($this->creator)) {
             $q->setWhereAny(array(
                                 "\"CreatorID\"=".intval($this->creator)
                             ));
         }
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['FolderID']);
         }
         
         return $ids;
     }
 }
-?>

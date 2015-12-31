@@ -1,5 +1,6 @@
 <?php
-class CodeBankIPAgreement extends CodeBank {
+class CodeBankIPAgreement extends CodeBank
+{
     private static $url_segment='codeBank/agreement';
     private static $url_rule='/$Action/$ID/$OtherID';
     private static $url_priority=64;
@@ -17,13 +18,14 @@ class CodeBankIPAgreement extends CodeBank {
     /**
      * Initializes the code bank admin
      */
-    public function init() {
+    public function init()
+    {
         LeftAndMain::init();
     
         Requirements::css(CB_DIR.'/css/CodeBank.css');
         Requirements::customScript("var CB_DIR='".CB_DIR."';", 'cb_dir');
         
-        if(empty(CodeBankConfig::CurrentConfig()->IPMessage) || Session::get('CodeBankIPAgreed')===true) {
+        if (empty(CodeBankConfig::CurrentConfig()->IPMessage) || Session::get('CodeBankIPAgreed')===true) {
             $this->redirect('admin/codeBank');
         }
     }
@@ -34,9 +36,10 @@ class CodeBankIPAgreement extends CodeBank {
      * @param {FieldList} $fields Fields to use
      * @return {Form} Form to be used
      */
-    public function getEditForm($id=null, $fields=null) {
+    public function getEditForm($id=null, $fields=null)
+    {
         $defaultPanel=Config::inst()->get('AdminRootController', 'default_panel');
-        if($defaultPanel=='CodeBank') {
+        if ($defaultPanel=='CodeBank') {
             $defaultPanel='SecurityAdmin';
             $sng=singleton($defaultPanel);
         }
@@ -53,7 +56,7 @@ class CodeBankIPAgreement extends CodeBank {
                         );
         
         
-        if(Session::get('CodeBankIPAgreed')===true) {
+        if (Session::get('CodeBankIPAgreed')===true) {
             $fields->addFieldToTab('Root.Main', new HiddenField('AgreementAgreed', 'AgreementAgreed', Session::get('CodeBankIPAgreed')));
         }
         
@@ -72,9 +75,9 @@ class CodeBankIPAgreement extends CodeBank {
         
         
         //Display message telling user to run dev/build because the version numbers are out of sync
-        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+        if (CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
             $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
-        }else if($this->hasOldTables()) {
+        } elseif ($this->hasOldTables()) {
             $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
         }
         
@@ -87,7 +90,8 @@ class CodeBankIPAgreement extends CodeBank {
         return $form;
     }
     
-    public function doAgree($data, Form $form) {
+    public function doAgree($data, Form $form)
+    {
         Session::set('CodeBankIPAgreed', true);
         
         return $this->getResponseNegotiator()->respond($this->request);
@@ -96,7 +100,8 @@ class CodeBankIPAgreement extends CodeBank {
     /**
      * @return ArrayList
      */
-    public function Breadcrumbs($unlinked=false) {
+    public function Breadcrumbs($unlinked=false)
+    {
         $defaultTitle=LeftAndMain::menu_title_for_class('CodeBankIPAgreement');
         $title=_t('CodeBankIPAgreement.MENUTITLE', $defaultTitle);
         $items=new ArrayList(array(
@@ -107,18 +112,18 @@ class CodeBankIPAgreement extends CodeBank {
                                 ));
         
         $record=$this->currentPage();
-        if($record && $record->exists()) {
-            if($record->hasExtension('Hierarchy')) {
+        if ($record && $record->exists()) {
+            if ($record->hasExtension('Hierarchy')) {
                 $ancestors=$record->getAncestors();
                 $ancestors=new ArrayList(array_reverse($ancestors->toArray()));
                 $ancestors->push($record);
-                foreach($ancestors as $ancestor) {
+                foreach ($ancestors as $ancestor) {
                     $items->push(new ArrayData(array(
                                                     'Title'=>$ancestor->Title,
                                                     'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $ancestor->ID))
                                                 )));
                 }
-            }else {
+            } else {
                 $items->push(new ArrayData(array(
                                                 'Title'=>$record->Title,
                                                 'Link'=>($unlinked ? false:Controller::join_links($this->Link('show'), $record->ID))
@@ -129,4 +134,3 @@ class CodeBankIPAgreement extends CodeBank {
         return $items;
     }
 }
-?>

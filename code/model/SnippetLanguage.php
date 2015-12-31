@@ -1,5 +1,6 @@
 <?php
-class SnippetLanguage extends DataObject {
+class SnippetLanguage extends DataObject
+{
     private static $db=array(
                             'Name'=>'Varchar(100)',
                             'FileExtension'=>'Varchar(45)',
@@ -98,8 +99,9 @@ class SnippetLanguage extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can view false otherwise
      */
-    public function canView($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canView($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -109,7 +111,8 @@ class SnippetLanguage extends DataObject {
     /**
      * Adds the default languages if they are missing
      */
-    public function requireDefaultRecords() {
+    public function requireDefaultRecords()
+    {
         parent::requireDefaultRecords();
         
         $defaultLangs=array_keys($this->defaultLanguages);
@@ -117,9 +120,9 @@ class SnippetLanguage extends DataObject {
                                         ->filter('Name', $defaultLangs)
                                         ->filter('UserLanguage', 0)
                                         ->Count();
-        if($dbLangCount<count($defaultLangs)) {
-            foreach($this->defaultLanguages as $name=>$data) {
-                if(!SnippetLanguage::get()->find('Name', $name)) {
+        if ($dbLangCount<count($defaultLangs)) {
+            foreach ($this->defaultLanguages as $name=>$data) {
+                if (!SnippetLanguage::get()->find('Name', $name)) {
                     $lang=new SnippetLanguage();
                     $lang->Name=$name;
                     $lang->FileExtension=$data['Extension'];
@@ -135,10 +138,10 @@ class SnippetLanguage extends DataObject {
         
         //Look for config languages
         $configLanguages=CodeBank::config()->extra_languages;
-        if(!empty($configLanguages)) {
-            foreach($configLanguages as $language) {
+        if (!empty($configLanguages)) {
+            foreach ($configLanguages as $language) {
                 //Validate languages
-                if(empty($language['Name']) || empty($language['FileName']) || empty($language['HighlightCode']) || empty($language['Brush'])) {
+                if (empty($language['Name']) || empty($language['FileName']) || empty($language['HighlightCode']) || empty($language['Brush'])) {
                     user_error('Invalid snippet user language found in config, user languages defined in config must contain a Name, FileName, HighlightCode and Brush file path', E_USER_WARNING);
                     continue;
                 }
@@ -150,13 +153,13 @@ class SnippetLanguage extends DataObject {
                                             ->filter('UserLanguage', true)
                                             ->first();
                 
-                if(empty($lang) || $lang===false || $lang->ID<=0) {
-                    if(Director::is_absolute($language['Brush']) || Director::is_absolute_url($language['Brush'])) {
+                if (empty($lang) || $lang===false || $lang->ID<=0) {
+                    if (Director::is_absolute($language['Brush']) || Director::is_absolute_url($language['Brush'])) {
                         user_error('Invalid snippet user language found in config, user languages defined in config must contain a path to the brush relative to the SilverStripe base ('.Director::baseFolder().')', E_USER_WARNING);
                         continue;
                     }
                     
-                    if(preg_match('/\.js$/', $language['Brush'])==0) {
+                    if (preg_match('/\.js$/', $language['Brush'])==0) {
                         user_error('Invalid snippet user language found in config, user languages defined in config must be javascript files', E_USER_WARNING);
                         continue;
                     }
@@ -182,14 +185,15 @@ class SnippetLanguage extends DataObject {
      * @param {Member} $member Member instance or member id to check
      * @return {bool} Returns boolean true or false depending if the user can delete this object
      */
-    public function canDelete($member=null) {
+    public function canDelete($member=null)
+    {
         $parentResult=parent::canDelete($member);
         
-        if($parentResult==false || $this->UserLanguage==false) {
+        if ($parentResult==false || $this->UserLanguage==false) {
             return false;
         }
         
-        if($this->Folders()->count()>0 || $this->Snippets()->count()>0) {
+        if ($this->Folders()->count()>0 || $this->Snippets()->count()>0) {
             return false;
         }
         
@@ -200,14 +204,15 @@ class SnippetLanguage extends DataObject {
      * Gets fields used in the cms
      * @return {FieldSet} Fields to be used
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields=new FieldList(
                             new TextField('Name', _t('SnippetLanguage.NAME', '_Name'), null, 100),
                             new TextField('FileExtension', _t('SnippetLanguage.FILE_EXTENSION', '_File Extension'), null, 45),
                             new CheckboxField('Hidden', _t('SnippetLanguage.HIDDEN', '_Hidden'))
                         );
         
-        if($this->UserLanguage==false) {
+        if ($this->UserLanguage==false) {
             $fields->replaceField('Name', $fields->dataFieldByName('Name')->performReadonlyTransformation());
             $fields->replaceField('FileExtension', $fields->dataFieldByName('FileExtension')->performReadonlyTransformation());
         }
@@ -215,7 +220,8 @@ class SnippetLanguage extends DataObject {
         return $fields;
     }
     
-    public function Folders() {
+    public function Folders()
+    {
         return $this->getComponents('Folders')->filter('ParentID', 0);
     }
     
@@ -223,7 +229,8 @@ class SnippetLanguage extends DataObject {
      * Determins if the language has snippets
      * return {bool} Counts how many children snippets there are if there are more than 0 returns true, false otherwise
      */
-    public function hasSnippets() {
+    public function hasSnippets()
+    {
         return ($this->Snippets()->Count()>0);
     }
     
@@ -231,10 +238,11 @@ class SnippetLanguage extends DataObject {
      * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
      * @return {string} a html string ready to be directly used in a template
      */
-    public function getTreeTitle() {
+    public function getTreeTitle()
+    {
         $treeTitle = sprintf(
             "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+            Convert::raw2xml(str_replace(array("\n", "\r"), "", $this->Title))
         );
         
         return $treeTitle;
@@ -244,7 +252,8 @@ class SnippetLanguage extends DataObject {
      * Return the CSS classes to apply to this node in the CMS tree
      * @return {string} Classes used in the cms tree
      */
-    public function CMSTreeClasses() {
+    public function CMSTreeClasses()
+    {
         $classes=sprintf('class-%s', $this->class);
         
         $classes.=$this->markingClasses();
@@ -252,7 +261,8 @@ class SnippetLanguage extends DataObject {
         return $classes;
     }
     
-    public function summaryFields() {
+    public function summaryFields()
+    {
         return array(
                     'Name'=>_t('SnippetLanguage.NAME', '_Name'),
                     'UserLanguage'=>_t('SnippetLanguage.USER_LANGUAGE', '_User Language'),
@@ -264,18 +274,19 @@ class SnippetLanguage extends DataObject {
      * Returns an array of the class names of classes that are allowed to be children of this class.
      * @return {array} Array of children
      */
-    public function allowedChildren() {
+    public function allowedChildren()
+    {
         $allowedChildren = array();
         $candidates = $this->stat('allowed_children');
-        if($candidates && $candidates != "none") {
-            foreach($candidates as $candidate) {
+        if ($candidates && $candidates != "none") {
+            foreach ($candidates as $candidate) {
                 // If a classname is prefixed by "*", such as "*Page", then only that
                 // class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
-                if(substr($candidate,0,1) == '*') {
-                    $allowedChildren[] = substr($candidate,1);
+                if (substr($candidate, 0, 1) == '*') {
+                    $allowedChildren[] = substr($candidate, 1);
                 } else {
                     $subclasses = ClassInfo::subclassesFor($candidate);
-                    foreach($subclasses as $subclass) {
+                    foreach ($subclasses as $subclass) {
                         $allowedChildren[] = $subclass;
                     }
                 }
@@ -289,8 +300,8 @@ class SnippetLanguage extends DataObject {
      * Returns the default child for this class
      * @return {string} Class name of the default child
      */
-    public function default_child() {
+    public function default_child()
+    {
         return $this->stat('default_child');
     }
 }
-?>
