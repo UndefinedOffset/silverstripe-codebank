@@ -3,7 +3,7 @@
     max-width: 100%;
 }
 
-.codebank-tree #record-0 ins, .codebank-tree #record-0 strong {
+.codebank-tree #record-0 > ins, .codebank-tree #record-0 > strong {
     display: none !important;
 }
 
@@ -35,6 +35,18 @@
     background: url(./../images/tree-sheet.png) no-repeat 0 -48px !important;
 }
 
+.CodeBank #Form_SearchForm {
+    float: none;
+}
+
+.CodeBank #Form_SearchForm_q_LanguageID_chzn {
+    width: 100% !important;
+}
+
+.CodeBank #Form_SearchForm_q_LanguageID_chzn .chzn-drop {
+    max-width: 99%;
+}
+
 .CodeBank .cms-content-fields {
     background: url(./../images/edit-form-background.png) no-repeat center center;
 }
@@ -61,53 +73,6 @@
 .CodeBank .cms-content-toolbar {
     border-bottom: 0;
     box-shadow: none;
-}
-
-.cms-container .CodeBank .cms-edit-form {
-    background: #E6EAED;
-}
-
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav {
-    border-bottom: none;
-    float: right;
-    margin: 8px 0 -1px 0;
-    padding: 0 24px 0 0;
-}
-
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav li {
-    float: left;
-}
-
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav li a {
-    font-weight: bold;
-    line-height: 16px;
-    padding: 8px 20px 8px;
-}
-
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-default, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-default {
-    border: 1px solid #C0C0C2;
-}
-
-.cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-content .ui-state-active, .cms-container .CodeBank .cms-edit-form .ui-tabs-nav .ui-widget-header .ui-state-active {
-    padding-bottom: 1px;
-    background: #E6EAED;
-    border: 1px solid #C0C0C2;
-}
-
-.cms-container .CodeBank .ss-tabset .ss-tabset {
-    position: static;
-}
-
-.cms-container .CodeBank .ss-tabset .ui-tabs-panel {
-    background: #E6EAED;
-    border-top: 1px solid #C0C0C2;
-    clear: both;
-    
-    padding: 1em 1.4em;
-}
-
-.cms-container .CodeBank .ss-tabset.ss-tabset-tabshidden .ui-tabs-panel {
-    border-top: none;
 }
 
 .highlightedcontent .innerWrapper {

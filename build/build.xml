@@ -10,15 +10,15 @@
     
     <target name="updateSilverStripe">
         <delete file="cache/stable-download.html"/>
-        <delete file="silverstripe-3.1.tar.gz"/>
+        <delete file="silverstripe-3.4.tar.gz"/>
         
-        <!-- Fetch 3.1 -->
+        <!-- Fetch 3.4 -->
         <get src="http://www.silverstripe.org/software/download/" dest="cache/stable-download.html" verbose="true"/>
         
         <loadfile srcFile="cache/stable-download.html" property="resultStable">
             <filterchain>
                 <linecontains>
-                    <contains value="&lt;h4&gt;&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/assets/releases/SilverStripe-framework-v3.1"/>
+                    <contains value="&lt;h4&gt;&lt;a class=&quot;tracklink&quot; href=&quot;http://www.silverstripe.org/assets/releases/SilverStripe-framework-v3.4"/>
                     <contains value=".tar.gz"/>
                 </linecontains>
                 <tokenfilter>
@@ -28,9 +28,9 @@
         </loadfile>
         
         <echo message="${resultStable}"/>
-        <get src="${resultStable}" dest="cache/silverstripe-3.1.tar.gz" verbose="true"/>
+        <get src="${resultStable}" dest="cache/silverstripe-3.4.tar.gz" verbose="true"/>
         
-        <untar src="cache/silverstripe-3.1.tar.gz" dest="./../../" compression="gzip">
+        <untar src="cache/silverstripe-3.4.tar.gz" dest="./../../" compression="gzip">
             <patternset>
                 <include name="**/framework"/>
                 <include name="**/framework/*"/>
