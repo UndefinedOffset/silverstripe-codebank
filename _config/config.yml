@@ -1,6 +1,8 @@
 ---
 Name: CodeBank
-After: 'framework/*','cms/*'
+After: 
+    - "framework/*"
+    - "cms/*"
 ---
 Member:
     extensions:

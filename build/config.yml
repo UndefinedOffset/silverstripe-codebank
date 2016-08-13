@@ -1,6 +1,8 @@
 ---
 Name: mysite
-After: "framework/*","cms/*"
+After:
+    - "framework/*"
+    - "cms/*"
 ---
 #Director:
     #environment_type: "dev"
