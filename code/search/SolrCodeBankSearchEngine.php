@@ -1,9 +1,12 @@
 <?php
-class SolrCodeBankSearchEngine implements ICodeBankSearchEngine {
+class SolrCodeBankSearchEngine implements ICodeBankSearchEngine
+{
     /**
      * Allows for hooking in to modify the table of the snippet class for the search engine
      */
-    public static function requireTable() {}
+    public static function requireTable()
+    {
+    }
     
     /**
      * Performs the search against the snippets in the system
@@ -13,7 +16,8 @@ class SolrCodeBankSearchEngine implements ICodeBankSearchEngine {
      * @param {int} $folderID Folder to filter to
      * @return {DataList} Data list pointing to the snippets in the results
      */
-    public function doSnippetSearch($keywords, $languageID=false, $folderID=false) {
+    public function doSnippetSearch($keywords, $languageID=false, $folderID=false)
+    {
         $searchIndex=singleton('CodeBankSolrIndex');
         $searchQuery=new SearchQuery();
         $searchQuery->classes=array(
@@ -24,12 +28,12 @@ class SolrCodeBankSearchEngine implements ICodeBankSearchEngine {
                                 );
         
         //Add language filtering
-        if($languageID!==false && $languageID>0) {
+        if ($languageID!==false && $languageID>0) {
             $searchQuery->filter('Snippet_LanguageID', $languageID);
         }
         
         //Add language filtering
-        if($folderID!==false && $folderID>0) {
+        if ($folderID!==false && $folderID>0) {
             $searchQuery->filter('Snippet_FolderID', $folderID);
         }
         
@@ -43,8 +47,10 @@ class SolrCodeBankSearchEngine implements ICodeBankSearchEngine {
     }
 }
 
-class CodeBankSolrIndex extends SolrIndex {
-    public function init() {
+class CodeBankSolrIndex extends SolrIndex
+{
+    public function init()
+    {
         //Add the snippet class
         $this->addClass('Snippet');
         
@@ -58,4 +64,3 @@ class CodeBankSolrIndex extends SolrIndex {
         $this->addFilterField('FolderID');
     }
 }
-?>

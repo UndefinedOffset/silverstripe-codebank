@@ -1,20 +1,22 @@
 <?php
-class CodeBankShortCode {
+class CodeBankShortCode
+{
     /**
      * Parses the snippet short code
      * @example [snippet id=123]
      * @example [snippet id=123 version=456]
      */
-    public static function parse($arguments, $content=null, $parser=null) {
+    public static function parse($arguments, $content=null, $parser=null)
+    {
         //Ensure ID is pressent in the arguments
-        if(!array_key_exists('id', $arguments)) {
+        if (!array_key_exists('id', $arguments)) {
             return '<p><b><i>'._t('CodeBankShortCode.MISSING_ID_ATTRIBUTE', '_Short Code missing the id attribute').'</i></b></p>';
         }
         
         
         //Fetch Snippet
         $snippet=Snippet::get()->byID(intval($arguments['id']));
-        if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+        if (empty($snippet) || $snippet===false || $snippet->ID==0) {
             return '<p><b><i>'._t('CodeBankShortCode.SNIPPET_NOT_FOUND', '_Snippet not found').'</i></b></p>';
         }
         
@@ -24,9 +26,9 @@ class CodeBankShortCode {
         
         
         //If the version exists fetch it, and replace the text with that of the version
-        if(array_key_exists('version', $arguments)) {
+        if (array_key_exists('version', $arguments)) {
             $version=$snippet->Version(intval($arguments['version']));
-            if(empty($version) || $version===false || $version->ID==0) {
+            if (empty($version) || $version===false || $version->ID==0) {
                 $snippetText=$version->Text;
             }
         }
@@ -59,8 +61,9 @@ class CodeBankShortCode {
      * Gets the brush name
      * @return {string} Name of the file used for the syntax highlighter brush
      */
-    protected static function getBrushName($language) {
-        switch(strtolower($language)) {
+    protected static function getBrushName($language)
+    {
+        switch (strtolower($language)) {
             case 'applescript':return 'shBrushAppleScript';
             case 'actionscript3':
             case 'as3':return 'shBrushAS3';
@@ -116,4 +119,3 @@ class CodeBankShortCode {
         }
     }
 }
-?>

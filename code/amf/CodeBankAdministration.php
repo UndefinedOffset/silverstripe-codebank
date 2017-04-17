@@ -1,14 +1,16 @@
 <?php
-class CodeBankAdministration implements CodeBank_APIClass {
+class CodeBankAdministration implements CodeBank_APIClass
+{
     /**
      * Gets a list of users in the database
      * @return {array} Returns a standard response array
      */
-    public function getUsersList() {
+    public function getUsersList()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         $members=Permission::get_members_by_permission(array('ADMIN', 'CODE_BANK_ACCESS'));
-        foreach($members as $member) {
+        foreach ($members as $member) {
             $response['data'][]=array(
                                     'id'=>$member->ID,
                                     'username'=>$member->Email,
@@ -25,18 +27,19 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function deleteUser($data) {
+    public function deleteUser($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
             $member=Member::get()->filter('ID', intval($data->id))->filter('ID:not', Member::currentUserID())->First();
-            if(!empty($member) && $member!==false && $member->ID!=0) {
+            if (!empty($member) && $member!==false && $member->ID!=0) {
                 $member->delete();
             }
             
             $response['status']='HELO';
             $response['message']=_t('CodeBankAPI.USER_DELETED', '_User deleted successfully');
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -49,19 +52,20 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function changeUserPassword($data) {
+    public function changeUserPassword($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
             $member=Member::get()->byID(intval($data->id));
-            if(empty($member) || $member===false || $member->ID==0) {
+            if (empty($member) || $member===false || $member->ID==0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.MEMBER_NOT_FOUND', '_Member not found');
                 
                 return $response;
             }
             
-            if(!$member->changePassword($data->password)) {
+            if (!$member->changePassword($data->password)) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.NEW_PASSWORD_NOT_VALID', '_New password is not valid');
                 
@@ -71,7 +75,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['message']=_t('CodeBankAPI.PASSWORD_CHANGED', '_User\'s password changed successfully');
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -84,11 +88,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function createUser($data) {
+    public function createUser($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>0) {
+            if (Member::get()->filter('Email', Convert::raw2sql($data->username))->count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.EMAIL_EXISTS', '_An account with that email already exists');
                 
@@ -104,7 +109,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             $member->Password=$data->Password;
             $member->UseHeartbeat=0;
             
-            if(!$member->validate()) {
+            if (!$member->validate()) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.PASSWORD_NOT_VALID', '_Password is not valid');
                 
@@ -116,7 +121,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['message']="User added successfully";
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -128,11 +133,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * Gets the list of languages with snippet counts
      * @return {array} Standard response base
      */
-    public function getAdminLanguages() {
+    public function getAdminLanguages()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         $languages=SnippetLanguage::get();
-        foreach($languages as $lang) {
+        foreach ($languages as $lang) {
             $response['data'][]=array(
                                     'id'=>$lang->ID,
                                     'language'=>$lang->Name,
@@ -153,11 +159,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function createLanguage($data) {
+    public function createLanguage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
+            if (SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
                 
@@ -175,7 +182,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['message']="Language added successfully";
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -188,19 +195,20 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function deleteLanguage($data) {
+    public function deleteLanguage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
             $lang=SnippetLanguage::get()->byID(intval($data->id));
-            if(!empty($lang) && $lang!==false && $lang->ID!=0) {
-                if($lang->canDelete()==false) {
+            if (!empty($lang) && $lang!==false && $lang->ID!=0) {
+                if ($lang->canDelete()==false) {
                     $response['status']='EROR';
                     $response['message']=_t('CodeBankAPI.LANGUAGE_DELETE_ERROR', '_Language cannot be deleted, it is either not a user language or has snippets attached to it');
                     
                     return $response;
                 }
-            }else {
+            } else {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
                 
@@ -213,7 +221,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['message']="Language deleted successfully";
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -226,11 +234,12 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Returns a standard response array
      */
-    public function editLanguage($data) {
+    public function editLanguage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
-            if(SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
+            if (SnippetLanguage::get()->filter('Name:nocase', Convert::raw2sql($data->language))->Count()>0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_EXISTS', '_Language already exists');
             
@@ -239,7 +248,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             
             $lang=SnippetLanguage::get()->byID(intval($data->id));
-            if(empty($lang) || $lang===false || $lang->ID==0) {
+            if (empty($lang) || $lang===false || $lang->ID==0) {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
                 
@@ -248,7 +257,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             
             //Update language and write
-            if($lang->UserLanguage==true) {
+            if ($lang->UserLanguage==true) {
                 $lang->Name=$data->language;
                 $lang->FileExtension=$data->fileExtension;
             }
@@ -259,7 +268,7 @@ class CodeBankAdministration implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['message']="Language edited successfully";
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SERVER_ERROR', '_Server error has occured, please try again later');
         }
@@ -271,11 +280,11 @@ class CodeBankAdministration implements CodeBank_APIClass {
      * Gets the permissions required to access the class
      * @return {array} Array of permission names to check
      */
-    public function getRequiredPermissions() {
+    public function getRequiredPermissions()
+    {
         return array(
                     'CODE_BANK_ACCESS',
                     'ADMIN'
                 );
     }
 }
-?>

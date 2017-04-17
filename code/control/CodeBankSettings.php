@@ -1,5 +1,6 @@
 <?php
-class CodeBankSettings extends CodeBank {
+class CodeBankSettings extends CodeBank
+{
     private static $url_segment='codeBank/settings';
     private static $url_rule='/$Action/$ID/$OtherID';
     private static $url_priority=63;
@@ -16,7 +17,8 @@ class CodeBankSettings extends CodeBank {
                                         'doImportData'
                                     );
     
-    public function init() {
+    public function init()
+    {
         parent::init();
         
         Requirements::css(CB_DIR.'/css/CodeBank.css');
@@ -29,10 +31,11 @@ class CodeBankSettings extends CodeBank {
      *
      * @see LeftAndMain::getResponseNegotiator()
      */
-    public function getResponseNegotiator() {
+    public function getResponseNegotiator()
+    {
         $neg=parent::getResponseNegotiator();
         $controller=$this;
-        $neg->setCallback('CurrentForm', function() use(&$controller) {
+        $neg->setCallback('CurrentForm', function () use (&$controller) {
                                                                         return $controller->renderWith($controller->getTemplatesWithSuffix('_Content'));
                                                                     });
         
@@ -42,7 +45,8 @@ class CodeBankSettings extends CodeBank {
     /**
      * @return Form
      */
-    public function getEditForm($id = null, $fields = null) {
+    public function getEditForm($id = null, $fields = null)
+    {
         $config=CodeBankConfig::CurrentConfig();
         $fields=$config->getCMSFields();
         $actions=new FieldList(
@@ -51,7 +55,7 @@ class CodeBankSettings extends CodeBank {
                             );
         
         
-        if(Permission::check('ADMIN')) {
+        if (Permission::check('ADMIN')) {
             $actions->push(FormAction::create('doImportFromClient', _t('CodeBank.IMPORT_FROM_CLIENT', '_Import From Desktop Client'))->setAttribute('data-icon', 'import')->setAttribute('data-importurl', $this->Link('import-from-client')));
         }
         
@@ -59,22 +63,26 @@ class CodeBankSettings extends CodeBank {
         $form->addExtraClass('root-form');
         $form->addExtraClass('cms-edit-form center');
         // don't add data-pjax-fragment=CurrentForm, its added in the content template instead
-        
+
         $form->setHTMLID('Form_EditForm');
         $form->loadDataFrom($config);
         $form->setTemplate($this->getTemplatesWithSuffix('_EditForm'));
         
         // Use <button> to allow full jQuery UI styling
         $actions = $actions->dataFields();
-        if($actions) foreach($actions as $action) $action->setUseButtonTag(true);
+        if ($actions) {
+            foreach ($actions as $action) {
+                $action->setUseButtonTag(true);
+            }
+        }
         
         $this->extend('updateEditForm', $form);
         
         
         //Display message telling user to run dev/build because the version numbers are out of sync
-        if(CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
+        if (CB_VERSION!='@@VERSION@@' && CodeBankConfig::CurrentConfig()->Version!=CB_VERSION.' '.CB_BUILD_DATE) {
             $form->setMessage(_t('CodeBank.UPDATE_NEEDED', '_A database upgrade is required please run {startlink}dev/build{endlink}.', array('startlink'=>'<a href="dev/build?flush=all">', 'endlink'=>'</a>')), 'error');
-        }else if($this->hasOldTables()) {
+        } elseif ($this->hasOldTables()) {
             $form->setMessage(_t('CodeBank.MIGRATION_AVAILABLE', '_It appears you are upgrading from Code Bank 2.2.x, your old data can be migrated {startlink}click here to begin{endlink}, though it is recommended you backup your database first.', array('startlink'=>'<a href="dev/tasks/CodeBankLegacyMigrate">', 'endlink'=>'</a>')), 'warning');
         }
         
@@ -91,7 +99,8 @@ class CodeBankSettings extends CodeBank {
      * @param {Form} $form Submitting form
      * @return {SS_HTTPResponse} Response
      */
-    public function doSave($data, $form) {
+    public function doSave($data, $form)
+    {
         $config=CodeBankConfig::CurrentConfig();
         $form->saveInto($config);
         $config->write();
@@ -104,14 +113,15 @@ class CodeBankSettings extends CodeBank {
      * Handles requests for the import from client popup
      * @return {string} Rendered template
      */
-    public function import_from_client() {
-        if(!Permission::check('ADMIN')) {
+    public function import_from_client()
+    {
+        if (!Permission::check('ADMIN')) {
             Security::permissionFailure($this);
             return;
         }
         
         $form=$this->ImportFromClientForm();
-        if(Session::get('reloadOnImportDialogClose')) {
+        if (Session::get('reloadOnImportDialogClose')) {
             Requirements::javascript(CB_DIR.'/javascript/CodeBank.ImportDialog.js');
             Session::clear('reloadOnImportDialogClose');
         }
@@ -126,8 +136,9 @@ class CodeBankSettings extends CodeBank {
      * Form used for importing data from the client
      * @return {Form} Form to be used in the popup
      */
-    public function ImportFromClientForm() {
-        if(!Permission::check('ADMIN')) {
+    public function ImportFromClientForm()
+    {
+        if (!Permission::check('ADMIN')) {
             Security::permissionFailure($this);
             return;
         }
@@ -169,15 +180,16 @@ class CodeBankSettings extends CodeBank {
      * @param {Form} $form Submitting form
      * @return {SS_HTTPResponse} Response
      */
-    public function doImportData($data, Form $form) {
-        if(!Permission::check('ADMIN')) {
+    public function doImportData($data, Form $form)
+    {
+        if (!Permission::check('ADMIN')) {
             Security::permissionFailure($this);
             return;
         }
         
         $fileData=$form->Fields()->dataFieldByName('ImportFile')->Value();
         //Check that the file uploaded
-        if(!array_key_exists('tmp_name', $fileData) || !file_exists($fileData['tmp_name'])) {
+        if (!array_key_exists('tmp_name', $fileData) || !file_exists($fileData['tmp_name'])) {
             $form->sessionMessage(_t('CodeBank.IMPORT_READ_ERROR', '_Could not read the file to be imported'), 'bad');
             return $this->redirectBack();
         }
@@ -185,7 +197,7 @@ class CodeBankSettings extends CodeBank {
         
         //Load the file into memory
         $fileData=file_get_contents($fileData['tmp_name']);
-        if($fileData===false || empty($fileData)) {
+        if ($fileData===false || empty($fileData)) {
             $form->sessionMessage(_t('CodeBank.IMPORT_READ_ERROR', '_Could not read the file to be imported'), 'bad');
             return $this->redirectBack();
         }
@@ -193,14 +205,14 @@ class CodeBankSettings extends CodeBank {
         
         //Decode the json
         $fileData=json_decode($fileData);
-        if($fileData===false || !is_object($fileData)) {
+        if ($fileData===false || !is_object($fileData)) {
             $form->sessionMessage(_t('CodeBank.IMPORT_READ_ERROR', '_Could not read the file to be imported'), 'bad');
             return $this->redirectBack();
         }
         
         
         //Verify the format is ToServer
-        if($fileData->format!='ToServer') {
+        if ($fileData->format!='ToServer') {
             $form->sessionMessage(_t('CodeBank.IMPORT_FILE_FORMAT_INCORRECT', '_Import file format is incorrect'), 'bad');
             return $this->redirectBack();
         }
@@ -211,19 +223,19 @@ class CodeBankSettings extends CodeBank {
         
         
         //Start transaction if supported
-        if(DB::getConn()->supportsTransactions()) {
+        if (DB::getConn()->supportsTransactions()) {
             DB::getConn()->transactionStart();
         }
         
         
         //If not appending empty the tables
-        if(!isset($data['AppendData'])) {
+        if (!isset($data['AppendData'])) {
             DB::query('DELETE FROM Snippet');
             DB::query('DELETE FROM SnippetVersion');
             DB::query('DELETE FROM SnippetLanguage');
             DB::query('DELETE FROM SnippetPackage');
             DB::query('DELETE FROM SnippetFolder');
-        }else {
+        } else {
             $langMap=array();
             $pkgMap=array();
             $folderMap=array();
@@ -232,12 +244,12 @@ class CodeBankSettings extends CodeBank {
         
         
         //Import Languages
-        foreach($fileData->data->languages as $lang) {
-            if(isset($data['AppendData'])) {
+        foreach ($fileData->data->languages as $lang) {
+            if (isset($data['AppendData'])) {
                 $dbLang=SnippetLanguage::get()->filter('Name:ExactMatch:nocase', Convert::raw2sql($lang->language))->first();
-                if(!empty($dbLang) && $dbLang!==false && $dbLang->ID>0) {
+                if (!empty($dbLang) && $dbLang!==false && $dbLang->ID>0) {
                     $langMap['lang-'.$lang->id]=$dbLang->ID;
-                }else {
+                } else {
                     $newLang=new SnippetLanguage();
                     $newLang->Name=$lang->language;
                     $newLang->FileExtension=$lang->file_extension;
@@ -248,7 +260,7 @@ class CodeBankSettings extends CodeBank {
                     $langMap['lang-'.$lang->id]=$newLang->ID;
                     unset($newLang);
                 }
-            }else {
+            } else {
                 DB::query('INSERT INTO "SnippetLanguage" ("ID", "ClassName", "Created", "LastEdited", "Name", "FileExtension", "HighlightCode", "UserLanguage") '.
                         "VALUES(".intval($lang->id).",'SnippetLanguage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($lang->language)."','".Convert::raw2sql($lang->file_extension)."','".Convert::raw2sql($lang->shjs_code)."',".intval($lang->user_language).")");
             }
@@ -256,15 +268,15 @@ class CodeBankSettings extends CodeBank {
         
         
         //Import Packages
-        foreach($fileData->data->packages as $pkg) {
-            if(isset($data['AppendData'])) {
+        foreach ($fileData->data->packages as $pkg) {
+            if (isset($data['AppendData'])) {
                 $newPkg=new SnippetPackage();
                 $newPkg->Title=$pkg->title;
                 $newPkg->write();
                 
                 $pkgMap['pkg-'.$pkg->id]=$newPkg->ID;
                 unset($newPkg);
-            }else {
+            } else {
                 DB::query('INSERT INTO "SnippetPackage" ("ID", "ClassName", "Created", "LastEdited", "Title") '.
                         "VALUES(".intval($pkg->id).",'SnippetPackage', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($pkg->title)."')");
             }
@@ -272,10 +284,10 @@ class CodeBankSettings extends CodeBank {
         
         
         //Import Folders
-        foreach($fileData->data->folders as $folder) {
-            if(isset($data['AppendData'])) {
-                if(!isset($langMap['lang-'.$folder->fkLanguageId])) {
-                    if(DB::getConn()->supportsTransactions()) {
+        foreach ($fileData->data->folders as $folder) {
+            if (isset($data['AppendData'])) {
+                if (!isset($langMap['lang-'.$folder->fkLanguageId])) {
+                    if (DB::getConn()->supportsTransactions()) {
                         DB::getConn()->transactionRollback();
                     }
                     
@@ -291,7 +303,7 @@ class CodeBankSettings extends CodeBank {
                 
                 $folderMap['fld-'.$folder->id]=$newFld->ID;
                 unset($newFld);
-            }else {
+            } else {
                 DB::query('INSERT INTO "SnippetFolder" ("ID", "ClassName", "Created", "LastEdited", "Name", "ParentID", "LanguageID") '.
                         "VALUES(".intval($folder->id).",'SnippetFolder', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($folder->name)."', ".intval($folder->fkParentId).", ".intval($folder->fkLanguageId).")");
             }
@@ -299,10 +311,10 @@ class CodeBankSettings extends CodeBank {
         
         
         //Import Snippets
-        foreach($fileData->data->snippets as $snip) {
-            if(isset($data['AppendData'])) {
-                if(!isset($langMap['lang-'.$snip->fkLanguage])) {
-                    if(DB::getConn()->supportsTransactions()) {
+        foreach ($fileData->data->snippets as $snip) {
+            if (isset($data['AppendData'])) {
+                if (!isset($langMap['lang-'.$snip->fkLanguage])) {
+                    if (DB::getConn()->supportsTransactions()) {
                         DB::getConn()->transactionRollback();
                     }
                     
@@ -323,7 +335,7 @@ class CodeBankSettings extends CodeBank {
                 
                 $snipMap['snip-'.$snip->id]=$newSnip->ID;
                 unset($newSnip);
-            }else {
+            } else {
                 DB::query('INSERT INTO "Snippet" ("ID", "ClassName", "Created", "LastEdited", "Title", "Description", "Tags", "LanguageID", "CreatorID", "LastEditorID", "PackageID", "FolderID") '.
                         "VALUES(".intval($snip->id).",'Snippet', '".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."','".Convert::raw2sql($snip->title)."', '".Convert::raw2sql($snip->description)."', '".Convert::raw2sql($snip->tags)."', ".intval($snip->fkLanguage).", ".Member::currentUserID().", ".Member::currentUserID().", ".intval($snip->fkPackageID).", ".intval($snip->fkFolderID).")");
             }
@@ -331,10 +343,10 @@ class CodeBankSettings extends CodeBank {
         
         
         //Import Snippet Versions
-        foreach($fileData->data->versions as $ver) {
-            if(isset($data['AppendData'])) {
-                if(!isset($snipMap['snip-'.$ver->fkSnippit])) {
-                    if(DB::getConn()->supportsTransactions()) {
+        foreach ($fileData->data->versions as $ver) {
+            if (isset($data['AppendData'])) {
+                if (!isset($snipMap['snip-'.$ver->fkSnippit])) {
+                    if (DB::getConn()->supportsTransactions()) {
                         DB::getConn()->transactionRollback();
                     }
                 
@@ -344,7 +356,7 @@ class CodeBankSettings extends CodeBank {
                 
                 DB::query('INSERT INTO "SnippetVersion" ("ClassName", "Created", "LastEdited", "Text", "ParentID") '.
                         "VALUES('SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($snipMap['snip-'.$ver->fkSnippit]).")");
-            }else {
+            } else {
                 DB::query('INSERT INTO "SnippetVersion" ("ID", "ClassName", "Created", "LastEdited", "Text", "ParentID") '.
                         "VALUES(".intval($ver->id).",'SnippetVersion', '".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->date)."','".Convert::raw2sql($ver->text)."', ".intval($ver->fkSnippit).")");
             }
@@ -352,7 +364,7 @@ class CodeBankSettings extends CodeBank {
         
         
         //End transaction if supported
-        if(DB::getConn()->supportsTransactions()) {
+        if (DB::getConn()->supportsTransactions()) {
             DB::getConn()->transactionEnd();
         }
         
@@ -366,7 +378,8 @@ class CodeBankSettings extends CodeBank {
     /**
      * @return ArrayList
      */
-    public function Breadcrumbs($unlinked=false) {
+    public function Breadcrumbs($unlinked=false)
+    {
         $defaultTitle=self::menu_title_for_class(get_class($this));
         return new ArrayList(array(
                                     new ArrayData(array(
@@ -376,4 +389,3 @@ class CodeBankSettings extends CodeBank {
                                 ));
     }
 }
-?>

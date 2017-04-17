@@ -1,11 +1,13 @@
 <?php
-class SnippetHierarchyTest extends SapphireTest {
+class SnippetHierarchyTest extends SapphireTest
+{
     public static $fixture_file='SnippetTest.yml';
     
     /**
      * Forces the snippet languages to be populated on setup
      */
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
         
         //Populate default languages
@@ -15,7 +17,8 @@ class SnippetHierarchyTest extends SapphireTest {
     /**
      * Tests to verify that the children of the language are what is expected
      */
-    public function testLanguageChildren() {
+    public function testLanguageChildren()
+    {
         $language=SnippetLanguage::get()->filter('Name', 'PHP')->first();
         
         
@@ -42,7 +45,8 @@ class SnippetHierarchyTest extends SapphireTest {
     /**
      * Tests to verify that the children of the folder are what is expected
      */
-    public function testFolderChildren() {
+    public function testFolderChildren()
+    {
         $folder=$this->objFromFixture('SnippetFolder', 'folder1');
         
         
@@ -61,7 +65,8 @@ class SnippetHierarchyTest extends SapphireTest {
     /**
      * Tests to see that the language only contains three children, the 4th child should be considered a child of the folder
      */
-    public function testLanguageChildrenCount() {
+    public function testLanguageChildrenCount()
+    {
         $language=SnippetLanguage::get()->filter('Name', 'PHP')->first();
         
         $this->assertEquals(3, $language->Children()->count(), 'There should be 3 children of the language');
@@ -70,10 +75,10 @@ class SnippetHierarchyTest extends SapphireTest {
     /**
      * Tests to see that the folder only contains one child
      */
-    public function testFolderChildrenCount() {
+    public function testFolderChildrenCount()
+    {
         $folder=$this->objFromFixture('SnippetFolder', 'folder1');
         
         $this->assertEquals(1, $folder->Children()->count(), 'There should be 1 child of the folder');
     }
 }
-?>

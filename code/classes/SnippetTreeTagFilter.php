@@ -1,7 +1,9 @@
 <?php
-class SnippetTreeTagFilter extends SnippetTreeFilter {
-    public function __construct($tag=null) {
-        if($tag) {
+class SnippetTreeTagFilter extends SnippetTreeFilter
+{
+    public function __construct($tag=null)
+    {
+        if ($tag) {
             $this->tag=$tag;
         }
     
@@ -11,19 +13,20 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
     /**
      * @return Array Map of Snippet Language IDs
      */
-    public function snippetLanguagesIncluded() {
+    public function snippetLanguagesIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->tag)) {
+        if (!empty($this->tag)) {
             $SQL_val=Convert::raw2sql($this->tag);
             $q->setWhereAny(array(
                                 "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
                             ));
         }
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['LanguageID']);
         }
         
@@ -33,12 +36,13 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
     /**
      * @return Array Map of Snippet IDs
      */
-    public function snippetsIncluded() {
+    public function snippetsIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."LanguageID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->tag)) {
+        if (!empty($this->tag)) {
             $SQL_val=Convert::raw2sql($this->tag);
             $q->setWhereAny(array(
                             "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
@@ -46,7 +50,7 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
         }
         
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['ID']);
         }
         
@@ -56,23 +60,23 @@ class SnippetTreeTagFilter extends SnippetTreeFilter {
     /**
      * @return Array Map of Snippet Folder IDs
      */
-    public function snippetFoldersIncluded() {
+    public function snippetFoldersIncluded()
+    {
         $ids=array();
         $q=new SQLQuery();
         $q->setSelect(array('"Snippet"."ID"', '"Snippet"."FolderID"'))->setFrom('"Snippet"');
         
-        if(!empty($this->tag)) {
+        if (!empty($this->tag)) {
             $SQL_val=Convert::raw2sql($this->tag);
             $q->setWhereAny(array(
                                 "\"Tags\" LIKE '$SQL_val,%' OR \"Tags\" LIKE '%,$SQL_val' OR \"Tags\" LIKE '%,$SQL_val,%' OR \"Tags\" LIKE '$SQL_val'"
                             ));
         }
         
-        foreach($q->execute() as $row) {
+        foreach ($q->execute() as $row) {
             $ids[]=array('ID'=>$row['FolderID']);
         }
         
         return $ids;
     }
 }
-?>

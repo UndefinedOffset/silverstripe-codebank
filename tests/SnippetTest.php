@@ -1,11 +1,13 @@
 <?php
-class SnippetTest extends SapphireTest {
+class SnippetTest extends SapphireTest
+{
     public static $fixture_file='SnippetTest.yml';
     
     /**
      * Forces the snippet languages to be populated on setup
      */
-    public function setUp() {
+    public function setUp()
+    {
         parent::setUp();
         
         //Populate default languages
@@ -15,7 +17,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to see if the current version functionality is actually returning the correct version
      */
-    public function testCurrentVersion() {
+    public function testCurrentVersion()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         $version=SnippetVersion::get()->filter('Created', '2014-04-27 15:46:00')->first();
         
@@ -36,7 +39,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to ensure that the snippet text is what it should be at the current version
      */
-    public function testSnippetText() {
+    public function testSnippetText()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         $this->assertEquals("<?php print 'Hello World'; ?>", $snippet->SnippetText, 'Snippet text is not matching the head version');
@@ -45,7 +49,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to see if a version is created when we update the snippet's text
      */
-    public function testVersionCreation() {
+    public function testVersionCreation()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         //Fetch the current version id
@@ -67,7 +72,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to see if the proper brush name is loaded for the snippet
      */
-    public function testBrushName() {
+    public function testBrushName()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         $this->assertEquals('shBrushPhp', $snippet->BrushName, 'Snippet brush name should be shBrushPhp');
@@ -76,7 +82,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to see if the folder is reset after changing to another language id
      */
-    public function testFolderResetOnNewLanguage() {
+    public function testFolderResetOnNewLanguage()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         
         
@@ -99,7 +106,8 @@ class SnippetTest extends SapphireTest {
     /**
      * Tests to see if the versions for a snippet are actually removed when the snippet is deleted using a call to DataObject::delete()
      */
-    public function testVersionCleanupOnDelete() {
+    public function testVersionCleanupOnDelete()
+    {
         $snippet=$this->objFromFixture('Snippet', 'snippet1');
         $snippetID=$snippet->ID;
         
@@ -116,4 +124,3 @@ class SnippetTest extends SapphireTest {
         $this->assertEquals(0, SnippetVersion::get()->filter('ParentID', $snippetID)->count(), 'Snippet versions were found');
     }
 }
-?>

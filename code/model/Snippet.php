@@ -1,5 +1,6 @@
 <?php
-class Snippet extends DataObject {
+class Snippet extends DataObject
+{
     private static $db=array(
                             'Title'=>'Varchar(300)',
                             'Description'=>'Varchar(600)',
@@ -33,8 +34,9 @@ class Snippet extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can view false otherwise
      */
-    public function canView($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canView($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -46,8 +48,9 @@ class Snippet extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can edit false otherwise
      */
-    public function canEdit($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canEdit($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -59,8 +62,9 @@ class Snippet extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can delete false otherwise
      */
-    public function canDelete($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canDelete($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -72,8 +76,9 @@ class Snippet extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can create false otherwise
      */
-    public function canCreate($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canCreate($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -83,12 +88,13 @@ class Snippet extends DataObject {
     /**
      * Check the database schema and update it as necessary.
      */
-    public function requireTable() {
+    public function requireTable()
+    {
         //Init the search engine
         $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
-        if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+        if ($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
             $searchEngine::requireTable();
-        }else {
+        } else {
             //Class is missing or invalid so fallback to the default
             DefaultCodeBankSearchEngine::requireTable();
         }
@@ -102,7 +108,8 @@ class Snippet extends DataObject {
      * Gets fields used in the cms
      * @return {FieldList} Fields to be used
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $fields=new FieldList(
                             new TabSet('Root',
                                 new Tab('Main', _t('Snippet.MAIN', '_Main'),
@@ -124,7 +131,8 @@ class Snippet extends DataObject {
      * Gets validator used in the cms
      * @return {RequiredFields} Required fields validator
      */
-    public function getCMSValidator() {
+    public function getCMSValidator()
+    {
         return new RequiredFields(
                                 'LanguageID',
                                 'Title',
@@ -136,16 +144,17 @@ class Snippet extends DataObject {
     /**
      * Sets the creator id for new snippets and sets the last editor id for existing snippets
      */
-    protected function onBeforeWrite() {
+    protected function onBeforeWrite()
+    {
         parent::onBeforeWrite();
         
-        if($this->ID==0) {
+        if ($this->ID==0) {
             $this->CreatorID=Member::currentUserID();
-        }else {
+        } else {
             $this->LastEditorID=Member::currentUserID();
             
             //If the language is changing reset the folder id
-            if($this->isChanged('LanguageID')) {
+            if ($this->isChanged('LanguageID')) {
                 $this->FolderID=0;
             }
         }
@@ -154,11 +163,12 @@ class Snippet extends DataObject {
     /**
      * Creates the snippet version record after writing
      */
-    protected function onAfterWrite() {
+    protected function onAfterWrite()
+    {
         parent::onAfterWrite();
         
         //Write the snippet version record
-        if(!empty($this->Text)) {
+        if (!empty($this->Text)) {
             $version=new SnippetVersion();
             $version->Text=$this->Text;
             $version->ParentID=$this->ID;
@@ -169,7 +179,8 @@ class Snippet extends DataObject {
     /**
      * Removes all version history for this snippet before deleting the snippet record
      */
-    protected function onBeforeDelete() {
+    protected function onBeforeDelete()
+    {
         parent::onBeforeDelete();
         
         SnippetVersion::get()->filter('ParentID', $this->ID)->removeAll();
@@ -179,7 +190,8 @@ class Snippet extends DataObject {
      * Gets the current version
      * @return {SnippetVersion} Current version of the snippet
      */
-    public function getCurrentVersion() {
+    public function getCurrentVersion()
+    {
         return $this->Versions()->First();
     }
     
@@ -187,9 +199,10 @@ class Snippet extends DataObject {
      * Gets the id from the latest snippet version
      * @return {string} Snippet text
      */
-    public function getCurrentVersionID() {
+    public function getCurrentVersionID()
+    {
         $version=$this->CurrentVersion;
-        if($version) {
+        if ($version) {
             return $version->ID;
         }
     }
@@ -198,9 +211,10 @@ class Snippet extends DataObject {
      * Gets the text from the latest snippet version
      * @return {string} Snippet text
      */
-    public function getSnippetText() {
+    public function getSnippetText()
+    {
         $version=$this->CurrentVersion;
-        if($version) {
+        if ($version) {
             return $version->Text;
         }
     }
@@ -210,7 +224,8 @@ class Snippet extends DataObject {
      * @param {int} $id Version to fetch
      * @return {SnippetVersion} Snippet Version record
      */
-    public function Version($id) {
+    public function Version($id)
+    {
         return $this->Versions()->byID($id);
     }
     
@@ -218,8 +233,9 @@ class Snippet extends DataObject {
      * Gets the brush name
      * @return {string} Name of the file used for the syntax highlighter brush
      */
-    public function getBrushName() {
-        switch(strtolower($this->Language()->Name)) {
+    public function getBrushName()
+    {
+        switch (strtolower($this->Language()->Name)) {
             case 'applescript':return 'shBrushAppleScript';
             case 'actionscript3':
             case 'as3':return 'shBrushAS3';
@@ -281,7 +297,8 @@ class Snippet extends DataObject {
      * Gets the highlight code used for syntax highlighter
      * @return {string} Language code
      */
-    public function getHighlightCode() {
+    public function getHighlightCode()
+    {
         return strtolower($this->Language()->HighlightCode);
     }
     
@@ -289,7 +306,8 @@ class Snippet extends DataObject {
      * Gets the summary fields used in gridfield
      * @return {array} Array of field's mapped to labels
      */
-    public function summaryFields() {
+    public function summaryFields()
+    {
         return array(
                     'Language.Name'=>_t('Snippet.LANGUAGE', '_Language'),
                     'Title'=>_t('Snippet.TITLE', '_Title')
@@ -300,10 +318,11 @@ class Snippet extends DataObject {
      * Returns two <span> html DOM elements, an empty <span> with the class 'jstree-pageicon' in front, following by a <span> wrapping around its Title.
      * @return string a html string ready to be directly used in a template
      */
-    public function getTreeTitle() {
+    public function getTreeTitle()
+    {
         $treeTitle = sprintf(
             "<span class=\"jstree-pageicon\"></span><span class=\"item\">%s</span>",
-            Convert::raw2xml(str_replace(array("\n","\r"),"",$this->Title))
+            Convert::raw2xml(str_replace(array("\n", "\r"), "", $this->Title))
         );
         
         return $treeTitle;
@@ -313,7 +332,8 @@ class Snippet extends DataObject {
      * Workaround to get snippets to display
      * @return {bool} Returns boolean true
      */
-    public function hasSnippets() {
+    public function hasSnippets()
+    {
         return true;
     }
     
@@ -321,7 +341,8 @@ class Snippet extends DataObject {
      * Return the CSS classes to apply to this node in the CMS tree
      * @return {string} Classes used in the cms tree
      */
-    public function CMSTreeClasses() {
+    public function CMSTreeClasses()
+    {
         $classes=sprintf('class-%s', $this->class);
         
         $classes.=$this->markingClasses();
@@ -333,18 +354,19 @@ class Snippet extends DataObject {
      * Returns an array of the class names of classes that are allowed to be children of this class.
      * @return {array} Array of children
      */
-    public function allowedChildren() {
+    public function allowedChildren()
+    {
         $allowedChildren = array();
         $candidates = $this->stat('allowed_children');
-        if($candidates && $candidates != "none") {
-            foreach($candidates as $candidate) {
+        if ($candidates && $candidates != "none") {
+            foreach ($candidates as $candidate) {
                 // If a classname is prefixed by "*", such as "*Page", then only that
                 // class is allowed - no subclasses. Otherwise, the class and all its subclasses are allowed.
-                if(substr($candidate,0,1) == '*') {
-                    $allowedChildren[] = substr($candidate,1);
+                if (substr($candidate, 0, 1) == '*') {
+                    $allowedChildren[] = substr($candidate, 1);
                 } else {
                     $subclasses = ClassInfo::subclassesFor($candidate);
-                    foreach($subclasses as $subclass) {
+                    foreach ($subclasses as $subclass) {
                         $allowedChildren[] = $subclass;
                     }
                 }
@@ -358,8 +380,8 @@ class Snippet extends DataObject {
      * Returns the default child for this class
      * @return {string} Class name of the default child
      */
-    public function default_child() {
+    public function default_child()
+    {
         return $this->stat('default_child');
     }
 }
-?>

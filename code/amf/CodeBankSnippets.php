@@ -1,14 +1,16 @@
 <?php
-class CodeBankSnippets implements CodeBank_APIClass {
+class CodeBankSnippets implements CodeBank_APIClass
+{
     /**
      * Gets the list of languages
      * @return {array} Standard response base
      */
-    public function getLanguages() {
+    public function getLanguages()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -19,8 +21,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $languages=SnippetLanguage::get();
         $response['data']=array();
         
-        foreach($languages as $lang) {
-            if($lang->Hidden && $lang->Snippets()->Count()==0) {
+        foreach ($languages as $lang) {
+            if ($lang->Hidden && $lang->Snippets()->Count()==0) {
                 continue;
             }
             
@@ -40,11 +42,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * Gets a list of snippets in an array of languages
      * @return {array} Standard response base
      */
-    public function getSnippets() {
+    public function getSnippets()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -53,8 +56,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $languages=SnippetLanguage::get();
-        foreach($languages as $lang) {
-            if($lang->Snippets()->Count()>0) {
+        foreach ($languages as $lang) {
+            if ($lang->Snippets()->Count()>0) {
                 $snippets=$this->overviewList($lang->Snippets()->filter('FolderID', 0), 'Title', 'ID', 'LanguageID');
                 
                 $response['data'][]=array(
@@ -76,27 +79,28 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {string} $searchQuery Search Query
      * @return {array} Nested array of folder data
      */
-    private function mapFolders(SS_List $folders, $searchQuery=null) {
+    private function mapFolders(SS_List $folders, $searchQuery=null)
+    {
         $result=array();
         
-        foreach($folders as $folder) {
-            if(!empty($searchQuery) && $searchQuery!==false) {
+        foreach ($folders as $folder) {
+            if (!empty($searchQuery) && $searchQuery!==false) {
                 $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
-                if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+                if ($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
                     $searchEngine=new $searchEngine();
-                }else {
+                } else {
                     //Class is missing or invalid so fallback to the default
                     $searchEngine=new DefaultCodeBankSearchEngine();
                 }
                 
                 $snippets=$searchEngine->doSnippetSearch($searchQuery, false, $folder->ID);
-            }else {
+            } else {
                 $snippets=$folder->Snippets();
             }
             
             $snippets=$this->overviewList($snippets, 'Title', 'ID', 'LanguageID');
             
-            if(!empty($searchQuery) && $searchQuery!==false && count($snippets)==0) {
+            if (!empty($searchQuery) && $searchQuery!==false && count($snippets)==0) {
                 continue;
             }
             
@@ -117,11 +121,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippetsByLanguage($data) {
+    public function getSnippetsByLanguage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -130,7 +135,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $lang=SnippetLanguage::get()->byID(intval($data->id));
-        if(!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
+        if (!empty($lang) && $lang!==false && $lang->ID!=0 && $lang->Snippets()->Count()>0) {
             $snippets=$this->arrayUnmap($lang->Snippets()->filter('FolderID', 0)->map('ID', 'Title')->toArray());
             $response['data'][]=array(
                                     'id'=>$lang->ID,
@@ -149,11 +154,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function searchSnippets($data) {
+    public function searchSnippets($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -162,11 +168,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $languages=SnippetLanguage::get();
-        foreach($languages as $lang) {
+        foreach ($languages as $lang) {
             $searchEngine=Config::inst()->get('CodeBank', 'snippet_search_engine');
-            if($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
+            if ($searchEngine && class_exists($searchEngine) && in_array('ICodeBankSearchEngine', class_implements($searchEngine))) {
                 $searchEngine=new $searchEngine();
-            }else {
+            } else {
                 //Class is missing or invalid so fallback to the default
                 $searchEngine=new DefaultCodeBankSearchEngine();
             }
@@ -174,7 +180,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippets=$searchEngine->doSnippetSearch($data->query, $lang->ID);
             
             
-            if($snippets->Count()>0) {
+            if ($snippets->Count()>0) {
                 $snippets=$this->arrayUnmap($snippets->filter('FolderID', 0)->map('ID', 'Title')->toArray());
                 $response['data'][]=array(
                                         'id'=>$lang->ID,
@@ -194,11 +200,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippetInfo($data) {
+    public function getSnippetInfo($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -207,9 +214,9 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $snippet=Snippet::get()->byID($data->id);
-        if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+        if (!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
             $packageDetails=null;
-            if($snippet->Package()) {
+            if ($snippet->Package()) {
                 $packageDetails=array(
                                         'id'=>$snippet->Package()->ID,
                                         'title'=>$snippet->Package()->Title,
@@ -236,7 +243,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                 );
             
             $snippetScript='<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$response['data'][0]['shjs_code'].'.js"></script>';
-            if($snippet->Language()->UserLanguage==true && !empty($snippet->Language()->BrushFile)) {
+            if ($snippet->Language()->UserLanguage==true && !empty($snippet->Language()->BrushFile)) {
                 $snippetScript="<script type=\"text/javascript\">\n".@file_get_contents(Director::baseFolder().'/'.$snippet->Language()->BrushFile)."\n</script>";
             }
             
@@ -260,10 +267,10 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                                     '</body>'.
                                                  '</html>';
             
-            if($response['data'][0]['language']=='ActionScript 3') {
+            if ($response['data'][0]['language']=='ActionScript 3') {
                 $response['data'][0]['fileType']='zip';
             }
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
         }
@@ -277,11 +284,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippetRevisions($data) {
+    public function getSnippetRevisions($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -290,18 +298,18 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $snippet=Snippet::get()->byID($data->id);
-        if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+        if (!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
             $revisions=$snippet->Versions()->map('ID', 'Created');
             
             $i=0;
-            foreach($revisions as $id=>$date) {
+            foreach ($revisions as $id=>$date) {
                 $response['data'][]=array(
                                         'id'=>$id,
                                         'date'=>($i==0 ? '{Current Revision}':$date)
                                     );
                 $i++;
             }
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
         }
@@ -314,11 +322,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippetTextFromRevision($data) {
+    public function getSnippetTextFromRevision($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -327,11 +336,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $revision=SnippetVersion::get()->byID(intval($data->id));
-        if(!empty($revision) && $revision!==false && $revision->ID!=0) {
+        if (!empty($revision) && $revision!==false && $revision->ID!=0) {
             $lang=$revision->Parent()->Language();
             
             $snippetScript='<script type="text/javascript" src="app:/tools/external/syntaxhighlighter/brushes/shBrush'.$lang->HighlightCode.'.js"></script>';
-            if($lang->UserLanguage==true && !empty($lang->BrushFile)) {
+            if ($lang->UserLanguage==true && !empty($lang->BrushFile)) {
                 $snippetScript="<script type=\"text/javascript\">\n".@file_get_contents(Director::baseFolder().'/'.$lang->BrushFile)."\n</script>";
             }
             
@@ -352,7 +361,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                         '<pre class="brush: '.strtolower($lang->HighlightCode).'" style="font-size:10pt;">'.htmlentities(preg_replace('/\r\n|\n|\r/', "\n", $revision->Text), null, 'UTF-8').'</pre>'.
                                     '</body>'.
                                  '</html>';
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.REVISION_NOT_FOUND', '_Revision not found');
         }
@@ -367,11 +376,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function newSnippet($data) {
+    public function newSnippet($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -389,15 +399,15 @@ class CodeBankSnippets implements CodeBank_APIClass {
             $snippet->CreatorID=Member::currentUserID();
             $snippet->PackageID=$data->packageID;
             
-            if($data->folderID>0) {
+            if ($data->folderID>0) {
                 $folder=SnippetFolder::get()->byID(intval($data->folderID));
-                if(empty($folder) || $folder===false || $folder->ID==0) {
+                if (empty($folder) || $folder===false || $folder->ID==0) {
                     $response['status']="EROR";
                     $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
                     return $response;
                 }
                 
-                if($folder->LanguageID!=$snippet->LanguageID) {
+                if ($folder->LanguageID!=$snippet->LanguageID) {
                     $response['status']="EROR";
                     $response['message']=_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet');
                     return $response;
@@ -408,7 +418,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']="HELO";
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -422,11 +432,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function saveSnippet($data) {
+    public function saveSnippet($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -436,23 +447,23 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         try {
             $snippet=Snippet::get()->byID(intval($data->id));
-            if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+            if (!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
                 $snippet->Title=$data->title;
                 $snippet->Description=$data->description;
                 $snippet->Text=$data->code;
                 $snippet->Tags=$data->tags;
                 
                 //Ensure we're not assigning to another hidden language
-                if($snippet->LanguageID!=$data->language) {
+                if ($snippet->LanguageID!=$data->language) {
                     $lang=SnippetLanguage::get()->byID(intval($data->language));
-                    if(!empty($lang) && $lang!==false && $lang->ID>0) {
-                        if($lang->Hidden) {
+                    if (!empty($lang) && $lang!==false && $lang->ID>0) {
+                        if ($lang->Hidden) {
                             $response['status']='EROR';
                             $response['message']=_t('CodeBankAPI.LANGUAGE_HIDDEN', '_You cannot assign this snippet to a hidden language');
                             
                             return $response;
                         }
-                    }else {
+                    } else {
                         throw new Exception('Language not found');
                     }
                 }
@@ -464,11 +475,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 
                 
                 $response['status']='HELO';
-            }else {
+            } else {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -482,13 +493,14 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function deleteSnippet($data) {
+    public function deleteSnippet($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         try {
             $snippet=Snippet::get()->byID(intval($data->id));
-            if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
-                if($snippet->canDelete()==false) {
+            if (!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+                if ($snippet->canDelete()==false) {
                     $response['status']="EROR";
                     $response['message']="Not authorized";
                     
@@ -501,11 +513,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
                 
                 
                 $response['status']='HELO';
-            }else {
+            } else {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -518,13 +530,14 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getSnippetDiff($data) {
+    public function getSnippetDiff($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         
         //Get the Main Revision
         $snippet1=SnippetVersion::get()->byID(intval($data->mainRev));
-        if(empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
+        if (empty($snippet1) || $snippet1===false || $snippet1->ID==0) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.MAIN_REVISION_NOT_FOUND', '_Main revision not found');
         
@@ -536,7 +549,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         //Get the Comparision Revision
         $snippet2=SnippetVersion::get()->byID(intval($data->compRev));
-        if(empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
+        if (empty($snippet2) || $snippet1===false || $snippet2->ID==0) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.COMPARE_REVISION_NOT_FOUND', '_Compare revision not found');
         
@@ -560,11 +573,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * Gets the list of packages
      * @return {array} Standard response base
      */
-    public function getPackages() {
+    public function getPackages()
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -583,11 +597,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function getPackageInfo($data) {
+    public function getPackageInfo($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -596,7 +611,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $package=SnippetPackage::get()->byID(intval($data->id));
-        if(!empty($package) && $package!==false && $package->ID!=0) {
+        if (!empty($package) && $package!==false && $package->ID!=0) {
             $response['data']=array(
                                     'id'=>$package->ID,
                                     'title'=>$package->Title,
@@ -605,7 +620,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']='HELO';
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
@@ -618,11 +633,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function packageRemoveSnippet($data) {
+    public function packageRemoveSnippet($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -631,12 +647,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $package=SnippetPackage::get()->byID(intval($data->packageID));
-        if(!empty($package) && $package!==false && $package->ID!=0) {
+        if (!empty($package) && $package!==false && $package->ID!=0) {
             $package->Snippets()->removeByID(intval($data->snippetID));
             
             
             $response['status']='HELO';
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
@@ -649,11 +665,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function findSnippetAutoComplete($data) {
+    public function findSnippetAutoComplete($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -676,11 +693,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function addSnippetToPackage($data) {
+    public function addSnippetToPackage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -689,20 +707,20 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $package=SnippetPackage::get()->byID(intval($data->packageID));
-        if(!empty($package) && $package!==false && $package->ID!=0) {
+        if (!empty($package) && $package!==false && $package->ID!=0) {
             $snippet=Snippet::get()->byID(intval($data->snippetID));
-            if(!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
+            if (!empty($snippet) && $snippet!==false && $snippet->ID!=0) {
                 $package->Snippets()->add($snippet);
                 
                 
                 $response['status']='HELO';
-            }else {
+            } else {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             }
             
             $response['status']='HELO';
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
@@ -716,11 +734,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function savePackage($data) {
+    public function savePackage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -729,18 +748,18 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $package=SnippetPackage::get()->byID(intval($data->packageID));
-        if(!empty($package) && $package!==false && $package->ID!=0) {
-            if(!empty($data->title)) {
+        if (!empty($package) && $package!==false && $package->ID!=0) {
+            if (!empty($data->title)) {
                 $package->Title=$data->title;
                 $package->write();
                 
                 
                 $response['status']='HELO';
-            }else {
+            } else {
                 $response['status']='EROR';
                 $response['message']=_t('CodeBankAPI.PACKAGES_TITLE_REQUIRED', '_Packages must have a title');
             }
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
@@ -753,11 +772,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function createPackage($data) {
+    public function createPackage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -765,7 +785,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         }
         
         
-        if(!empty($data->title)) {
+        if (!empty($data->title)) {
             $package=new SnippetPackage();
             $package->Title=$data->title;
             $package->write();
@@ -773,7 +793,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             $response['status']='HELO';
             $response['data']=$package->ID;
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGES_TITLE_REQUIRED', '_Packages must have a title');
         }
@@ -786,11 +806,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function deletePackage($data) {
+    public function deletePackage($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
         
@@ -799,12 +820,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $package=SnippetPackage::get()->byID(intval($data->id));
-        if(!empty($package) && $package!==false && $package->ID!=0) {
+        if (!empty($package) && $package!==false && $package->ID!=0) {
             $package->delete();
             
             
             $response['status']='HELO';
-        }else {
+        } else {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PACKAGE_NOT_FOUND', '_Package not found');
         }
@@ -817,11 +838,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function newFolder($data) {
+    public function newFolder($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -829,22 +851,22 @@ class CodeBankSnippets implements CodeBank_APIClass {
         }
         
         $language=SnippetLanguage::get()->byID(intval($data->languageID));
-        if(empty($language) || $language===false || $language->ID==0) {
+        if (empty($language) || $language===false || $language->ID==0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_FOUND', '_Language not found');
             return $response;
         }
         
         
-        if($data->parentID>0) {
+        if ($data->parentID>0) {
             $folder=SnippetFolder::get()->byID(intval($data->parentID));
-            if(empty($folder) || $folder===false || $folder->ID==0) {
+            if (empty($folder) || $folder===false || $folder->ID==0) {
                 $response['status']="EROR";
                 $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
                 return $response;
             }
             
-            if($folder->LanguageID!=$language->ID) {
+            if ($folder->LanguageID!=$language->ID) {
                 $response['status']="EROR";
                 $response['message']=_t('CodeBankAPI.FOLDER_NOT_LANGUAGE', '_Folder is not in the same language as the snippet');
                 return $response;
@@ -857,7 +879,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         $existingCheck=SnippetFolder::get()->filter('Name:nocase', Convert::raw2sql($data->name))->filter('LanguageID', $language->ID)->filter('ParentID', $data->parentID);
         
         
-        if($existingCheck->Count()>0) {
+        if ($existingCheck->Count()>0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name');
             return $response;
@@ -873,7 +895,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']="HELO";
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -887,11 +909,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function renameFolder($data) {
+    public function renameFolder($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -900,7 +923,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
     
         $snippetFolder=SnippetFolder::get()->byID(intval($data->id));
-        if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+        if (empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
             return $response;
@@ -914,7 +937,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
                                             ->filter('LanguageID', $snippetFolder->LanguageID)
                                             ->filter('ParentID', $snippetFolder->ParentID);
         
-        if($existingCheck->Count()>0) {
+        if ($existingCheck->Count()>0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBank.FOLDER_EXISTS', '_A folder already exists with that name');
             return $response;
@@ -927,7 +950,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']="HELO";
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -941,11 +964,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function deleteFolder($data) {
+    public function deleteFolder($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -954,7 +978,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
     
         $snippetFolder=SnippetFolder::get()->byID(intval($data->id));
-        if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+        if (empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
             return $response;
@@ -966,7 +990,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']="HELO";
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -980,11 +1004,12 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {stdClass} $data Data passed from ActionScript
      * @return {array} Standard response base
      */
-    public function moveSnippet($data) {
+    public function moveSnippet($data)
+    {
         $response=CodeBank_ClientAPI::responseBase();
         
         //Ensure logged in
-        if(!Permission::check('CODE_BANK_ACCESS')) {
+        if (!Permission::check('CODE_BANK_ACCESS')) {
             $response['status']='EROR';
             $response['message']=_t('CodeBankAPI.PERMISSION_DENINED', '_Permission Denied');
             
@@ -993,22 +1018,22 @@ class CodeBankSnippets implements CodeBank_APIClass {
         
         
         $snippet=Snippet::get()->byID(intval($data->id));
-        if(empty($snippet) || $snippet===false || $snippet->ID==0) {
+        if (empty($snippet) || $snippet===false || $snippet->ID==0) {
             $response['status']="EROR";
             $response['message']=_t('CodeBankAPI.SNIPPET_NOT_FOUND', '_Snippet not found');
             return $response;
         }
         
         
-        if($data->folderID!=0) {
+        if ($data->folderID!=0) {
             $snippetFolder=SnippetFolder::get()->byID(intval($data->folderID));
-            if(empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
+            if (empty($snippetFolder) || $snippetFolder===false || $snippetFolder->ID==0) {
                 $response['status']="EROR";
                 $response['message']=_t('CodeBankAPI.FOLDER_DOES_NOT_EXIST', '_Folder does not exist');
                 return $response;
             }
             
-            if($snippetFolder->LanguageID!=$snippet->LanguageID) {
+            if ($snippetFolder->LanguageID!=$snippet->LanguageID) {
                 $response['status']="EROR";
                 $response['message']=_t('CodeBankAPI.LANGUAGE_NOT_SAME', '_Folder is not in the same language as the snippet');
                 return $response;
@@ -1022,7 +1047,7 @@ class CodeBankSnippets implements CodeBank_APIClass {
             
             
             $response['status']="HELO";
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             $response['status']="EROR";
             $response['message']="Internal Server error occured";
         }
@@ -1038,10 +1063,11 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {string} $valueLbl Key's value mapping name
      * @return {array} Unmapped array
      */
-    final protected function arrayUnmap($array, $keyLbl='id', $valueLbl='title') {
+    final protected function arrayUnmap($array, $keyLbl='id', $valueLbl='title')
+    {
         $result=array();
         
-        foreach($array as $key=>$value) {
+        foreach ($array as $key=>$value) {
             $result[]=array(
                             $keyLbl=>$key,
                             $valueLbl=>$value
@@ -1061,7 +1087,8 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {string} ... Overloaded for additional fields, allows for silverstripe relation formatting ex: Relationship.Field the dot is replaced with a dash in the resulting object
      * @return {array} Nested array of items, each item has an id and a title key
      */
-    final protected function overviewList(SS_List $list, $labelField='Title', $idField='ID') {
+    final protected function overviewList(SS_List $list, $labelField='Title', $idField='ID')
+    {
         $result=array();
         $idFieldLower=strtolower($idField);
         $labelFieldLower=strtolower($labelField);
@@ -1073,34 +1100,34 @@ class CodeBankSnippets implements CodeBank_APIClass {
         unset($args[2]);
         
         
-        foreach($list as $item) {
+        foreach ($list as $item) {
             $obj=new stdClass();
             $obj->$idFieldLower=$item->$idField;
             $obj->$labelFieldLower=$item->$labelField;
             
-            if(count($args)>0) {
-                foreach($args as $field) {
+            if (count($args)>0) {
+                foreach ($args as $field) {
                     $fieldLower=strtolower($field);
                     
                     //If the field contains a dot assume relationship and loop through till field is found
-                    if(strpos($field, '.')!==false) {
+                    if (strpos($field, '.')!==false) {
                         $fieldLower=str_replace('.', '-', $fieldLower);
                         $fieldBits=explode('.', $field);
                         
                         $value=$item;
-                        for($i=0;$i<count($fieldBits);$i++) {
+                        for ($i=0;$i<count($fieldBits);$i++) {
                             $fieldBit=$fieldBits[$i];
-                            if($i==count($fieldBits)-1) {
+                            if ($i==count($fieldBits)-1) {
                                 $value=$value->$fieldBit;
-                            }else {
+                            } else {
                                 $value=$value->$fieldBit();
                             }
                         }
                         
-                        if(!is_object($value)) {
+                        if (!is_object($value)) {
                             $obj->$fieldLower=$value;
                         }
-                    }else {
+                    } else {
                         $obj->$fieldLower=$item->$field;
                     }
                 }
@@ -1120,9 +1147,10 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * @param {array} $array Array to sort
      * @return {array} Finalized array
      */
-    final protected function sortToTop($value, $field, $array) {
-        foreach($array as $key=>$item) {
-            if($item->$field==$value) {
+    final protected function sortToTop($value, $field, $array)
+    {
+        foreach ($array as $key=>$item) {
+            if ($item->$field==$value) {
                 unset($array[$key]);
                 array_unshift($array, $item);
                 break;
@@ -1136,10 +1164,10 @@ class CodeBankSnippets implements CodeBank_APIClass {
      * Gets the permissions required to access the class
      * @return {array} Array of permission names to check
      */
-    public function getRequiredPermissions() {
+    public function getRequiredPermissions()
+    {
         return array(
                     'CODE_BANK_ACCESS'
                 );
     }
 }
-?>

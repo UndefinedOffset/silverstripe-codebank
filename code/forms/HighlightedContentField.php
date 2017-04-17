@@ -1,8 +1,10 @@
 <?php
-class HighlightedContentField extends FormField {
+class HighlightedContentField extends FormField
+{
     protected $language;
     
-    public function __construct($name, $title=null, $language=null, $value=null) {
+    public function __construct($name, $title=null, $language=null, $value=null)
+    {
         parent::__construct($name, $title, $value);
         
         $this->language=$language;
@@ -12,7 +14,8 @@ class HighlightedContentField extends FormField {
     /**
      * @return array
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         $attrs=array(
                     'type'=>'hidden',
                     'name'=>$this->getName(),
@@ -31,7 +34,8 @@ class HighlightedContentField extends FormField {
      * @param {array} $properties key value pairs of template variables
      * @return {string} Returns the html to be sent to the browser
      */
-    public function Field($properties=array()) {
+    public function Field($properties=array())
+    {
         $obj=($properties ? $this->customise($properties):$this);
         
         
@@ -43,11 +47,11 @@ class HighlightedContentField extends FormField {
         Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/shCore.js');
         
         $brushName=$this->getBrushName();
-        if(!empty($brushName)) {
+        if (!empty($brushName)) {
             Requirements::javascript(CB_DIR.'/javascript/external/syntaxhighlighter/brushes/'.$this->getBrushName().'.js');
-        }else {
+        } else {
             $lang=SnippetLanguage::get()->filter('HighlightCode', Convert::raw2sql($this->language))->filter('UserLanguage', true)->first();
-            if(!empty($lang) && $lang!==false && $lang->ID>0 && !empty($lang->BrushFile)) {
+            if (!empty($lang) && $lang!==false && $lang->ID>0 && !empty($lang->BrushFile)) {
                 Requirements::javascript($lang->BrushFile);
             }
         }
@@ -62,8 +66,9 @@ class HighlightedContentField extends FormField {
      * Gets the brush name
      * @return {string} Name of the file used for the syntax highlighter brush
      */
-    public function getBrushName() {
-        switch(strtolower($this->language)) {
+    public function getBrushName()
+    {
+        switch (strtolower($this->language)) {
             case 'applescript':return 'shBrushAppleScript';
             case 'actionscript3':
             case 'as3':return 'shBrushAS3';
@@ -125,7 +130,8 @@ class HighlightedContentField extends FormField {
      * sets the language used for syntax highlighter
      * @param {string} $lang Language code
      */
-    public function setLanguage($lang) {
+    public function setLanguage($lang)
+    {
         $this->language=$lang;
     }
     
@@ -133,7 +139,8 @@ class HighlightedContentField extends FormField {
      * Gets the language used for syntax highlighter
      * @return {string} Language code
      */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         return $this->language;
     }
     
@@ -141,7 +148,8 @@ class HighlightedContentField extends FormField {
      * Gets the highlight code used for syntax highlighter
      * @return {string} Language code
      */
-    public function getHighlightCode() {
+    public function getHighlightCode()
+    {
         return strtolower($this->language);
     }
     
@@ -149,8 +157,9 @@ class HighlightedContentField extends FormField {
      * Detects the theme based on the current config
      * @return {string} Theme based on looking at the value in config, if its not valid or not present use 'Default'
      */
-    protected function theme_file() {
-        switch(HighlightedContentField::config()->theme) {
+    protected function theme_file()
+    {
+        switch (HighlightedContentField::config()->theme) {
             case 'Django':
             case 'Eclipse':
             case 'Emacs':
@@ -166,11 +175,11 @@ class HighlightedContentField extends FormField {
     /**
      * Returns a readonly version of this field
      */
-    public function performReadonlyTransformation() {
+    public function performReadonlyTransformation()
+    {
         $field=clone $this;
         $field->setReadonly(true);
         
         return $field;
     }
 }
-?>

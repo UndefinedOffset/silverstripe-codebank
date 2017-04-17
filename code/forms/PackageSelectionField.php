@@ -1,5 +1,6 @@
 <?php
-class PackageSelectionField extends DropdownField {
+class PackageSelectionField extends DropdownField
+{
     protected $extraClasses=array(
                                 'dropdown'
                             );
@@ -16,7 +17,8 @@ class PackageSelectionField extends DropdownField {
      * @param {array} $properties Key value pairs of template variables
      * @return {string}
      */
-    public function FieldHolder($properties=array()) {
+    public function FieldHolder($properties=array())
+    {
         Requirements::css(CB_DIR.'/css/PackageSelectionField.css');
         Requirements::javascript(CB_DIR.'/javascript/PackageSelectionField.js');
         
@@ -27,7 +29,8 @@ class PackageSelectionField extends DropdownField {
      * Handles requests for the add package dialog
      * @return {string} HTML to be rendered
      */
-    public function addPackage() {
+    public function addPackage()
+    {
         return $this->renderWith('CMSDialog', array(
                                                     'Form'=>$this->AddPackageForm()
                                                 ));
@@ -37,7 +40,8 @@ class PackageSelectionField extends DropdownField {
      * Generates the form for adding packages
      * @return {Form} Form to be used
      */
-    public function AddPackageForm() {
+    public function AddPackageForm()
+    {
         $sng=singleton('SnippetPackage');
         
         $fields=new FieldList(
@@ -70,9 +74,10 @@ class PackageSelectionField extends DropdownField {
      * @param {Form} $form Submitting form
      * @return {mixed}
      */
-    public function doAddPackage($data, Form $form) {
+    public function doAddPackage($data, Form $form)
+    {
         $record=new SnippetPackage();
-        if($record->canEdit()) {
+        if ($record->canEdit()) {
             $form->saveInto($record);
             $record->write();
             
@@ -89,9 +94,9 @@ class PackageSelectionField extends DropdownField {
      * @param {SS_HTTPRequest} $request HTTP Request Data
      * @return {string} HTML to be returned
      */
-    public function ReloadField(SS_HTTPRequest $request) {
+    public function ReloadField(SS_HTTPRequest $request)
+    {
         $this->value=$request->getVar('id');
         return $this->FieldHolder();
     }
 }
-?>

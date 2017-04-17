@@ -1,9 +1,11 @@
 <?php
-class DefaultCodeBankSearchEngine implements ICodeBankSearchEngine {
+class DefaultCodeBankSearchEngine implements ICodeBankSearchEngine
+{
     /**
-	 * Allows for hooking in to modify the table of the snippet class for the search engine
-	 */
-    public static function requireTable() {
+     * Allows for hooking in to modify the table of the snippet class for the search engine
+     */
+    public static function requireTable()
+    {
         //Add fulltext searchable extension
         Snippet::add_extension("FulltextSearchable('Title,Description,Tags')");
         
@@ -19,24 +21,25 @@ class DefaultCodeBankSearchEngine implements ICodeBankSearchEngine {
      * @param {int} $folderID Folder to filter to
      * @return {DataList} Data list pointing to the snippets in the results
      */
-    public function doSnippetSearch($keywords, $languageID=false, $folderID=false) {
+    public function doSnippetSearch($keywords, $languageID=false, $folderID=false)
+    {
         $list=Snippet::get();
         
-        if(isset($languageID) && !empty($languageID)) {
+        if (isset($languageID) && !empty($languageID)) {
             $list=$list->filter('LanguageID', intval($languageID));
         }
         
         
-        if(isset($folderID) && !empty($folderID)) {
+        if (isset($folderID) && !empty($folderID)) {
             $list=$list->filter('FolderID', intval($folderID));
         }
         
         
-        if(isset($keywords) && !empty($keywords)) {
+        if (isset($keywords) && !empty($keywords)) {
             $SQL_val=Convert::raw2sql($keywords);
-            if(DB::getConn() instanceof MySQLDatabase) {
+            if (DB::getConn() instanceof MySQLDatabase) {
                 $list=$list->where("MATCH(\"Title\", \"Description\", \"Tags\") AGAINST('".$SQL_val."' IN BOOLEAN MODE)");
-            }else {
+            } else {
                 $list=$list->filterAny(array(
                                         'Title:PartialMatch'=>$SQL_val,
                                         'Description:PartialMatch'=>$SQL_val,
@@ -48,4 +51,3 @@ class DefaultCodeBankSearchEngine implements ICodeBankSearchEngine {
         return $list;
     }
 }
-?>

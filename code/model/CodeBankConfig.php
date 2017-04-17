@@ -1,5 +1,6 @@
 <?php
-class CodeBankConfig extends DataObject {
+class CodeBankConfig extends DataObject
+{
     private static $db=array(
                             'IPMessage'=>'HTMLText',
                             'Version'=>'Varchar(30)'
@@ -13,8 +14,9 @@ class CodeBankConfig extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can view false otherwise
      */
-    public function canView($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canView($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -26,8 +28,9 @@ class CodeBankConfig extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can edit false otherwise
      */
-    public function canEdit($member=null) {
-        if(Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
+    public function canEdit($member=null)
+    {
+        if (Permission::check('CODE_BANK_ACCESS', 'any', $member)) {
             return true;
         }
         
@@ -39,7 +42,8 @@ class CodeBankConfig extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can delete false otherwise
      */
-    public function canDelete($member=null) {
+    public function canDelete($member=null)
+    {
         return false;
     }
     
@@ -48,20 +52,22 @@ class CodeBankConfig extends DataObject {
      * @param {int|Member} $member Member ID or instance to check
      * @return {bool} Returns boolean true if the member can create false otherwise
      */
-    public function canCreate($member=null) {
+    public function canCreate($member=null)
+    {
         return false;
     }
     
     /**
      * Creates the default code bank config
      */
-    public function requireDefaultRecords() {
+    public function requireDefaultRecords()
+    {
         parent::requireDefaultRecords();
         
         
         $codeVersion=singleton('CodeBank')->getVersion();
         
-        if(!CodeBankConfig::get()->first()) {
+        if (!CodeBankConfig::get()->first()) {
             $conf=new CodeBankConfig();
             $conf->Version=$codeVersion;
             $conf->write();
@@ -70,7 +76,7 @@ class CodeBankConfig extends DataObject {
         }
         
         
-        if(!Group::get()->filter('Code', 'code-bank-api')->first()) {
+        if (!Group::get()->filter('Code', 'code-bank-api')->first()) {
             $group=new Group();
             $group->Title='Code Bank Users';
             $group->Description='Code Bank Access Group';
@@ -90,25 +96,25 @@ class CodeBankConfig extends DataObject {
         //Check for and perform any needed updates
         $codeVersionTmp=explode(' ', $codeVersion);
         $dbVerTmp=explode(' ', CodeBankConfig::CurrentConfig()->Version);
-        if($codeVersionTmp[0]!='@@VERSION@@' && $codeVersionTmp[0]!=$dbVerTmp[0]) {
+        if ($codeVersionTmp[0]!='@@VERSION@@' && $codeVersionTmp[0]!=$dbVerTmp[0]) {
             $updateXML=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/airUpdate.xml'));
             $latestVersion=strip_tags($updateXML->version->asXML());
             $versionTmp=explode(' ', $latestVersion);
             
             //Sanity Check code version against latest
-            if(version_compare($codeVersionTmp[0], $versionTmp[0], '>')) {
+            if (version_compare($codeVersionTmp[0], $versionTmp[0], '>')) {
                 DB::alteration_message('Unknown Code Bank server version '.$codeVersion.', current version available for download is '.$latestVersion, 'error');
                 return;
             }
             
             //Sanity Check make sure latest version is installed
-            if($codeVersionTmp[0]!=$versionTmp[0]) {
+            if ($codeVersionTmp[0]!=$versionTmp[0]) {
                 DB::alteration_message('A Code Bank Server update is available, please <a href="http://programs.edchipman.ca/applications/code-bank/">download</a> and install the update then run dev/build again.', 'error');
                 return;
             }
             
             //Sanity Check database version against latest
-            if(version_compare($dbVerTmp[0], $versionTmp[0], '<')) {
+            if (version_compare($dbVerTmp[0], $versionTmp[0], '<')) {
                 $data=array(
                             'version'=>CodeBankConfig::CurrentConfig()->Version,
                             'db_type'=>'SERVER'
@@ -130,12 +136,12 @@ class CodeBankConfig extends DataObject {
                 //Download and run queries needed
                 $sql=simplexml_load_string(file_get_contents('http://update.edchipman.ca/codeBank/DatabaseUpgrade.php', false, $context));
                 $sets=count($sql->query);
-                foreach($sql->query as $query) {
-                    $queries=explode('$',$query);
+                foreach ($sql->query as $query) {
+                    $queries=explode('$', $query);
                     $t=count($queries);
                 
-                    foreach($queries as $query) {
-                        if(empty($query)) {
+                    foreach ($queries as $query) {
+                        if (empty($query)) {
                             continue;
                         }
                 
@@ -159,8 +165,9 @@ class CodeBankConfig extends DataObject {
      * Gets the current config
      * @return {CodeBankConfig} Code Bank Config Data
      */
-    public static function CurrentConfig() {
-        if(empty(self::$_currentConfig)) {
+    public static function CurrentConfig()
+    {
+        if (empty(self::$_currentConfig)) {
             self::$_currentConfig=CodeBankConfig::get()->first();
         }
         
@@ -172,7 +179,8 @@ class CodeBankConfig extends DataObject {
      * Gets fields used in the cms
      * @return {FieldList} Fields to be used
      */
-    public function getCMSFields() {
+    public function getCMSFields()
+    {
         $langGridConfig=GridFieldConfig_RecordEditor::create(30);
         $langGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest');
         $langGridConfig->getComponentByType('GridFieldDataColumns')->setFieldCasting(array(
@@ -182,17 +190,17 @@ class CodeBankConfig extends DataObject {
         
         $packageGridConfig=GridFieldConfig_RecordEditor::create(30);
         $packageGridConfig->addComponent(new ExportPackageButton());
-        $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest')->setItemEditFormCallback(function(Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
+        $packageGridConfig->getComponentByType('GridFieldDetailForm')->setItemRequestClass('CodeBankGridField_ItemRequest')->setItemEditFormCallback(function (Form $form, GridFieldDetailForm_ItemRequest $itemRequest) {
                                                                                                     Requirements::javascript(CB_DIR.'/javascript/SnippetPackages.ItemEditForm.js');
                                                                                                     
-                                                                                                    if($form->getRecord() && $form->getRecord()->ID>0) {
+                                                                                                    if ($form->getRecord() && $form->getRecord()->ID>0) {
                                                                                                         $form->Actions()->push(FormAction::create('doExportPackage', _t('CodeBank.EXPORT', '_Export'))->setForm($form));
                                                                                                     }
                                                                                                     
                                                                                                     $form->addExtraClass('CodeBankPackages');
                                                                                                 });
         
-        if(Permission::check('ADMIN')) {
+        if (Permission::check('ADMIN')) {
             $fields=new FieldList(
                                 new TabSet('Root',
                                         new Tab('Main', _t('CodeBankConfig.MAIN', '_IP Message'),
@@ -206,7 +214,7 @@ class CodeBankConfig extends DataObject {
                                             )
                                     )
                             );
-        }else {
+        } else {
             $fields=new FieldList(
                                 new TabSet('Root',
                                                 new Tab('Packages', _t('CodeBank.PACKAGES', '_Packages'),
@@ -219,4 +227,3 @@ class CodeBankConfig extends DataObject {
         return $fields;
     }
 }
-?>
